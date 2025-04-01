@@ -1,0 +1,24 @@
+{
+    "FormatVersion": 1.0,
+    "DataVersion": 1.0,
+    "ManagementTopology": {
+        "Anchor": {
+            "Buses": []
+        }
+    },
+    "Objects": {
+        "Connector_Event": {
+            "Bom": "14100513",
+            "Slot": 20,
+            "Position": 0,
+            "Presence": 1,
+            "Id": "Event",
+            "AuxId": "0",
+            "Buses": [],
+            "SystemId": 1,
+            "SilkText": "EXU",
+            "IdentifyMode": 2            
+        },
+        "IpmiCore_1":{}
+    }
+}

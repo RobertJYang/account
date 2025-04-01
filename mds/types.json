@@ -1,0 +1,301 @@
+{
+    "defs": {
+        "FirstLoginPolicy": {
+            "Null": 0,
+            "PromptPasswordReset": 1,
+            "ForcePasswordReset": 2
+        },
+        "SNMPAuthenticationProtocols": {
+            "None": 0,
+            "MD5": 1,
+            "SHA96": 2,
+            "SHA224": 3,
+            "SHA256": 4,
+            "SHA384": 5,
+            "SHA512": 6
+        },
+        "SNMPEncryptionProtocols": {
+            "None": 0,
+            "DES": 1,
+            "AES128": 2,
+            "AES256": 3
+        },
+        "SNMPKuType": {
+            "Authentication": 0,
+            "Encryption": 1
+        },
+        "TimeSource": {
+            "TS_NTP": 0,
+            "TS_NOT_NTP": 1
+        },
+        "AuthType": {
+            "Local": 0,
+            "ldap_auto_match": 1,
+            "ldap_server1": 2,
+            "ldap_server2": 3,
+            "ldap_server3": 4,
+            "ldap_server4": 5,
+            "ldap_server5": 6,
+            "ldap_server6": 7,
+            "ldap_kerberos_sso": 12,
+            "kerberos_server": 13,
+            "sso_local": 14,
+            "sso_ldap": 15,
+            "skip_auth": 16,
+            "auto_match": 255
+        },
+        "AuthAlgorithm": {
+            "AT_MD5": 0,
+            "AT_SHA": 1,
+            "AT_SHA1": 2,
+            "AT_SHA256": 3,
+            "AT_SHA384": 4,
+            "AT_SHA512": 5,
+            "AT_INVLID": 255
+        },
+        "SessionType": {
+            "GUI": 0,
+            "Redfish": 1,
+            "CLI": 2,
+            "SSO": 3,
+            "KVM": 4,
+            "VNC": 5,
+            "KVM_VMM": 6,
+            "VIDEO": 7,
+            "All": 255
+        },
+        "RedfishInnerSessionType": {
+            "HMM": 0,
+            "BMA": 1,
+            "MAX": 2,
+            "Not_Inner": 16,
+            "Unknown": 255
+        },
+        "WebSessionType": {
+            "Sso": 0,
+            "Web": 1
+        },
+        "OccupationMode": {
+            "Shared": 0,
+            "Exclusive": 1
+        },
+        "RmcpAuthAlgo": {
+            "None": 0,
+            "HmacSha1": 1,
+            "HmacMd5": 2,
+            "HmacSha2": 3
+        },
+        "WeakPwdDictEnum": {
+            "WEAK_PWDDICT_COMPELETE": 0,
+            "WEAK_PWDDICT_IN_PROCESS": 1
+        },
+        "RoleType": {
+            "NoAccess": 0,
+            "CommonUser": 2,
+            "Operator": 3,
+            "Administrator": 4,
+            "CustomRole1": 5,
+            "CustomRole2": 6,
+            "CustomRole3": 7,
+            "CustomRole4": 8
+        },
+        "IpmiPrivilege": {
+            "RESERVED": 0,
+            "CALLBACK": 1,
+            "USER": 2,
+            "OPERATOR": 3,
+            "ADMIN": 4,
+            "OEM": 5,
+            "NO_ACCESS": 15
+        },
+        "AccountType": {
+            "Local": 0,
+            "LDAP": 1,
+            "Kerberos": 2,
+            "VNC": 3,
+            "KVM": 4,
+            "KerberosSSO": 5,
+            "IPMI_INNER": 6,
+            "SnmpCommunity": 7,
+            "OEM": 8
+        },
+        "LoginInterface": {
+            "Invalid": 0,
+            "Web": 1,
+            "SNMP": 2,
+            "IPMI": 4,
+            "SSH": 8,
+            "SFTP": 16,
+            "Local": 64,
+            "Redfish": 128
+        },
+        "LoginRuleIds": {
+            "Rule_Invalid": 0,
+            "Rule1": 1,
+            "Rule2": 2,
+            "Rule3": 4
+        },
+        "SessionLogoutType": {
+            "SessionLogout": 0,
+            "SessionTimeout": 1,
+            "SessionKickout": 2,
+            "SessionRelogin": 3,
+            "AccountConfigChange": 4,
+            "BMCConfigChange": 5
+        },
+        "IpmiChannel": {
+            "IPMB_CHAN_NUM": 0,
+            "LAN1_CHAN_NUM": 1,
+            "LAN2_CHAN_NUM": 2,
+            "IPMB_CARD_CHAN_NUM": 5,
+            "IPMB_SM_CHAN_NUM": 6,
+            "IPMB_L_CHAN_NUM": 7,
+            "IPMB_ETH_CHAN_NUM": 8,
+            "EDMA_CHAN_NUM": 9,
+            "IPMB_MM_CHAN_NUM": 10,
+            "LOCAL_MM_CHAN_NUM": 11,
+            "CPLDRAM_CHAN_NUM": 13,
+            "PRSENT_CHAN_NUM": 14,
+            "SYS_CHAN_NUM": 15,
+            "MAINT_CHAN_NUM": 16,
+            "RACK_MAIN_CHAN_NUM": 17,
+            "RACK_BAK_CHAN_NUM": 18,
+            "REMOTE_BUS_NUM": 19,
+            "MAX_IPMI_CHAN_NUM": 20,
+            "INVALID_CHAN_NUM": 255
+        },
+        "IpmiPwdComplexityEnum": {
+            "PWD_COMPLEXITY_DISABLE": 0,
+            "PWD_COMPLEXITY_ENABLE": 1,
+            "PWD_COMPLEXITY_STRONG_ENABLE": 2
+        },
+        "IpmiOperPassword": {
+            "IPMI_OPERATION_NOT_SET_PASSWORD": 0,
+            "IPMI_OPERATION_SET_PASSWORD": 1
+        },
+        "IpmiInterfaceEnable": {
+            "USER_LOGIN_INTERFACE_DISABLE": 0,
+            "USER_LOGIN_INTERFACE_ENABLE": 1
+        },
+        "IpmiUserOperater": {
+            "OPERATION_DISABLE_USER": 0,
+            "OPERATION_ENABLE_USER": 1,
+            "OPERATION_SET_PASSWD": 2,
+            "OPERATION_TEST_PASSWD": 3,
+            "OPERATION_DEFAULT": 4,
+            "OPERATION_SET_SNMP_PVACY_PASSWD": 5,
+            "OPERATION_TEST_SNMP_PRIVACY_PASSWD": 6
+        },
+        "PrivilegeType": {
+            "UserMgmt": 0,
+            "BasicSetting": 1,
+            "KVMMgmt": 2,
+            "VMMMgmt": 3,
+            "SecurityMgmt": 4,
+            "PowerMgmt": 5,
+            "DiagnoseMgmt": 6,
+            "ReadOnly": 7,
+            "ConfigureSelf": 8
+        },
+        "UserLocked": {
+            "USER_UNLOCK": 0,
+            "USER_LOCK": 1
+        },
+        "IpmiChannelType": {
+            "IPMI_SMM": 0,
+            "IPMI_ME": 1,
+            "IPMI_MMC": 2,
+            "IPMI_HOST": 3,
+            "IPMI_LAN": 4,
+            "IPMI_BASE": 5,
+            "IPMI_FABRIC": 6,
+            "IPMI_FCOE": 7,
+            "IPMI_BMC": 8,
+            "IPMI_BMA": 9
+        },
+        "IpmiUserEnableByPassword": {
+            "Disable": 0,
+            "UserEnable": 1,
+            "PasswordEnable": 2
+        },
+        "LdapCertVerifyLevel": {
+            "LDAP_OPT_X_TLS_NEVER": 0,
+            "LDAP_OPT_X_TLS_HARD": 1,
+            "LDAP_OPT_X_TLS_DEMAND": 2,
+            "LDAP_OPT_X_TLS_ALLOW": 3,
+            "LDAP_OPT_X_TLS_TRY": 4
+        },
+        "IpmiSetUserSNMPV3PrivacyPwd": {
+            "SET_PASSWORD": 0,
+            "TEST_PASSWORD": 1
+        },
+        "RemoteGroupType": {
+            "GROUP_TYPE_LDAP": 0,
+            "GROUP_TYPE_KERBEROS": 1
+        },
+        "IpmiSetTwoFactorState": {
+            "Disable": 0,
+            "Enable": 1
+        },
+        "IpMode": {
+            "IPV4": 0,
+            "IPV6": 1
+        },
+        "IpmiSNMPConfiguration": {
+            "Community": 1,
+            "LongCommunityEnabled": 2
+        },
+        "IpmiSNMPCommunity": {
+            "Ro": 1,
+            "Rw": 2
+        },
+        "IpmiLongCommunityEnabled": {
+            "Disable": 0,
+            "Enable": 1
+        },
+        "IpmiAccountServiceConfiguration": {
+            "WeakPasswdCheck": 1,
+            "UserFirstLoginPasswdModifyPolicy": 2,
+            "HistoryPasswdCheckCount": 3,
+            "WebTimeOut": 4,
+            "EmergencyLoginAccount": 5,
+            "InitialPasswordPromptEnable": 6
+        },
+        "IpType": {
+            "V4": 0,
+            "V6": 1,
+            "All": 2
+        },
+        "Progress": {
+            "RUNNING": 1,
+            "COMPLETED": 2
+        },
+        "VncPasswordItem": {
+            "SetPassword": 1,
+            "CheckPassword": 2
+        },
+        "SNMPv3TrapAccountLimitPolicy": {
+            "Modifiable": 0,
+            "NameModifiable": 1,
+            "NotModifiable": 2
+        },
+        "LogLevel": {
+            "DEBUG": 0,
+            "NOTICE": 1,
+            "ERROR": 2
+        },
+        "IpRuleType": {
+            "INVALID": 0,
+            "NO_MASK": 1,
+            "IPV6_NO_MASK": 2,
+            "MASK": 3,
+            "IPV6_MASK": 4,
+            "NULL": 5
+        },
+        "PasswordRulePolicy": {
+            "Default": 1,
+            "Customized": 2,
+            "Hybrid": 3
+        }
+    }
+}

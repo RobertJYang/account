@@ -1,0 +1,25 @@
+{
+    "FormatVersion": 1.0,
+    "DataVersion": 1.0,
+    "ManagementTopology": {
+        "Anchor": {
+            "Buses": []
+        }
+    },
+    "Objects": {
+        "Events_Global": {
+            "DumpRecord": 0
+        },
+        "Component_BMC": {
+            "FruId": 255,
+            "Instance": 3,
+            "Type": 26,
+            "Name": "BMC",
+            "Presence": 1,
+            "Health": 0,
+            "PowerState": 1,
+            "GroupId": 1,
+            "SegmentId": 0
+        }
+    }
+}

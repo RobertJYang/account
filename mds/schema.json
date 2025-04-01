@@ -1,0 +1,325 @@
+{
+    "defs": {
+        "ManagerAccount": {
+            "properties": {
+                "Id": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/U8"
+                        },
+                        {
+                            "description": "\u8d26\u6237Id",
+                            "privilege": {
+                                "read": [
+                                    "ConfigureSelf"
+                                ],
+                                "write": [
+                                    "UserMgmt"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            "type": "object",
+            "interfaces": {
+                "bmc.kepler.AccountService.ManagerAccount": [
+                    "AccountExpiration",
+                    "Certificates",
+                    "Enabled",
+                    "Id",
+                    "Locked",
+                    "UserName",
+                    "Deletable",
+                    "PasswordChangeRequired",
+                    "PasswordExpiration",
+                    "RoleId",
+                    "SshPublicKeyHash",
+                    "AccountType",
+                    "LoginRuleIds",
+                    "LastLoginTime",
+                    "LastLoginIP",
+                    "LastLoginInterface",
+                    "FirstLoginPolicy",
+                    "LoginInterface",
+                    "Privileges"
+                ],
+                "bmc.kepler.AccountService.ManagerAccount.SnmpUser": [
+                    "AuthenticationProtocol",
+                    "EncryptionProtocol",
+                    "SnmpEncryptionPasswordInitialStatus"
+                ],
+                "bmc.kepler.Object.Properties": []
+            },
+            "path": "/bmc/kepler/AccountService/Accounts/${Id}",
+            "additionalProperties": false
+        }
+    },
+    "id": "bmc",
+    "type": "object",
+    "patternProperties": {
+        "^ManagerAccount_": {
+            "$ref": "#/defs/ManagerAccount"
+        }
+    },
+    "$schema": "https://json-schema.org/draft/2019-09/schema#",
+    "structs": {
+        "StructIdentifier": {
+            "type": "object",
+            "properties": {
+                "SystemId": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/U8"
+                        },
+                        {
+                            "readOnly": true
+                        }
+                    ]
+                },
+                "ManagerId": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        },
+                        {
+                            "readOnly": true
+                        }
+                    ]
+                },
+                "ChassisId": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        },
+                        {
+                            "readOnly": true
+                        }
+                    ]
+                },
+                "Position": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        },
+                        {
+                            "readOnly": true
+                        }
+                    ]
+                }
+            }
+        },
+        "Options": {
+            "type": "object",
+            "properties": {
+                "volatile": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
+                },
+                "deprecated": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
+                },
+                "explicit": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
+                },
+                "emitsChangedSignal": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                }
+            }
+        },
+        "RoleType": {
+            "type": "object",
+            "properties": {
+                "NoAccess": {},
+                "CommonUser": {},
+                "Operator": {},
+                "Administrator": {},
+                "CustomRole1": {},
+                "CustomRole2": {},
+                "CustomRole3": {},
+                "CustomRole4": {}
+            }
+        },
+        "LoginInterfaceType": {
+            "type": "object",
+            "properties": {
+                "Invalid": {},
+                "Web": {},
+                "SNMP": {},
+                "IPMI": {},
+                "SSH": {},
+                "SFTP": {},
+                "Local": {},
+                "Redfish": {}
+            }
+        },
+        "FirstLoginPolicy": {
+            "type": "object",
+            "properties": {
+                "PromptPasswordReset": {},
+                "ForcePasswordReset": {}
+            }
+        },
+        "PropertyWritable": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                },
+                "value": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
+                }
+            }
+        },
+        "ExtraData": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                },
+                "value": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                }
+            }
+        },
+        "EnumLoginPolicy": {
+            "type": "object",
+            "properties": {
+                "LP_Null": {},
+                "LP_PromptPasswordReset": {},
+                "LP_ForcePasswordReset": {}
+            }
+        },
+        "EnumAccountType": {
+            "type": "object",
+            "properties": {
+                "Local": {},
+                "LDAP": {},
+                "Kerberos": {},
+                "VNC": {},
+                "KVM": {},
+                "KerberosSSO": {},
+                "IPMI_INNER": {}
+            }
+        },
+        "EnumLoginInterface": {
+            "type": "object",
+            "properties": {
+                "Invalid": {},
+                "Web": {},
+                "SNMP": {},
+                "IPMI": {},
+                "SSH": {},
+                "SFTP": {},
+                "Local": {},
+                "Redfish": {}
+            }
+        },
+        "EnumLoginRuleIds": {
+            "type": "object",
+            "properties": {
+                "Rule_Invalid": {},
+                "Rule1": {},
+                "Rule2": {},
+                "Rule3": {}
+            }
+        },
+        "SNMPAuthenticationProtocols": {
+            "type": "object",
+            "properties": {
+                "None": {},
+                "MD5": {},
+                "SHA96": {},
+                "SHA224": {},
+                "SHA256": {},
+                "SHA384": {},
+                "SHA512": {}
+            }
+        },
+        "SNMPEncryptionProtocols": {
+            "type": "object",
+            "properties": {
+                "None": {},
+                "DES": {},
+                "AES128": {},
+                "AES256": {}
+            }
+        },
+        "SNMPKuType": {
+            "type": "object",
+            "properties": {
+                "Authentication": {},
+                "Encryption": {}
+            }
+        },
+        "Config": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                },
+                "value": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
+                }
+            }
+        },
+        "AccountData": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                },
+                "value": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/String"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

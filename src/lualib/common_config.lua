@@ -1,0 +1,359 @@
+-- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- openUBMC is licensed under Mulan PSL v2.
+-- You can use this software according to the terms and conditions of the Mulan PSL v2.
+-- You may obtain a copy of Mulan PSL v2 at:
+--         http://license.coscl.org.cn/MulanPSL2
+-- THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+-- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+-- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+-- See the Mulan PSL v2 for more details.
+
+local RESERVED_ROOT_USER_NAME = '<root>'
+local ACTUAL_ROOT_USER_NAME   = 'root'
+local TELNET_USER             = '<su>'
+local HOST_CHAN_IP            = 'HOST'   -- 带内通道ipmi命令转发ip
+
+-- 文件路径与路径长度
+local PASSWD_FILE             = '/data/trust/passwd'
+local SHADOW_FILE             = '/data/trust/shadow'
+local GROUP_FILE              = '/data/trust/group'
+local IPMI_FILE               = '/data/trust/ipmi'
+local TMP_PASSWD_FILE         = '/dev/shm/passwd'
+local TMP_SHADOW_FILE         = '/dev/shm/shadow'
+local TMP_GROUP_FILE          = '/dev/shm/group'
+local TMP_IPMI_FILE           = '/dev/shm/ipmi'
+local URL_HEAD_TABLE          = { "https:", "sftp:", "nfs:", "cifs:", "scp:" } -- url文件路径
+local TMP_PATH                = '/tmp'
+local DATA_HOME_PATH          = '/data/trust/home'
+local DATA_PATH               = '/data'
+local SHM_PATH                = '/dev/shm'
+local SHM_TMP_PATH            = '/dev/shm/tmp'
+local LOGINRULE_FILE          = '/dev/shm/loginrules'
+local TMP_LOGINRULE_FILE      = '/dev/shm/tmp_loginrules'
+local WEAK_PWDDICT_FILE_PATH  = "/data/trust/weakdictionary"
+local WEAK_PWDDICT_FILE_PATH_INIT = "/etc/weakdictionary"
+local WEAK_PWDDICT_FILE_SHM_PATH = '/dev/shm/tmp/weakdictionary'
+local PRESERVE_CONFIG_FILE = '/data/trust/opt/bmc/home.tar.gz'
+local PRESERVE_CONFIG_PATH = '/data/trust'
+local FILE_MAX_SIZE = (20 * 1024 * 1024)
+local FILE_MAX_NUM = 100
+local FILE_LIMITED_SIZE       = (1024 * 1024)
+local MAX_FILEPATH_LENGTH     = 256
+local MAX_FILE_LINE_BUFF_SIZE = 512
+
+local PAM_FAILLOCK = '/data/trust/pam_faillock' --pam配置
+local TEMP_PAM_FAILLOCK = '/dev/shm/tmp_pam_faillock'  --pam配置临时文件
+local TALLY_FAIL_INTERVAL_ADD_SECONDS = 300 -- from faillock, the record fail_interval = unlock_time + 5min(300)
+
+local WEAK_PWDDICT_FILE_EXPORT_PATH = '/tmp/weakdictionary'
+
+-- 证书目录
+local CERT_INTER_DIR = '/dev/shm/ca-bundle.crt'
+
+-- KSF文件
+local ACCOUNT_KSF_FILE_NAME = 'datatocheck_account.dat'
+local ACCOUNT_KSF_BACK_NAME = "datatocheck_account_bak.dat"
+
+-- 系统用户/组
+local SSHD_USER_NAME      = 'sshd'
+local SNMPD_USER_NAME     = 'snmpd_user'
+local IPMI_USER_NAME      = 'ipmi_user'
+local KVM_USER_NAME       = 'kvm_user'
+local APACHE_USER_NAME    = 'apache'
+local DISCOVERY_USER_NAME = 'discovery_user'
+local FTP_USER_NAME       = 'ftp'
+local COMM_USER_NAME      = 'comm_user'
+local REDFISH_USER_NAME   = 'redfish_user'
+local SECBOX_USER_NAME    = 'secbox'
+
+-- 内部会话用户名
+local USER_NAME_FOR_BMA_ID = 22 -- <host sms>用户ID
+local USER_NAME_FOR_BMA    = "<host sms>" -- 通过BMA通道来创建会话的，用户名使用<host sms>
+local USER_NAME_FOR_HMM_ID = 23 -- <hmm>用户ID
+local USER_NAME_FOR_HMM    = "<hmm>" -- 通过IPMBeth通道来创建会话的，用户名使用<hmm>
+
+local APPS_GROUP_NAME = 'apps'
+local NOBODY_GROUP_NAME = 'nobody'
+
+-- linux保留用户组名
+local OPERATOR_GROUP_NAME      = "operator"
+local USER_GROUP_NAME          = "user"
+local NO_ACCESS_GROUP_NAME     = "no_access"
+local ADMINISTRATOR_GROUP_NAME = "admin"
+
+
+-- linux保留用户的组ID
+local ROOT_USER_GID = 0
+local SSHD_USER_GID = 74
+local SNMPD_USER_GID = 95
+local IPMI_USER_GID = 96
+local KVM_USER_GID = 97
+local APACHE_GID = 98
+local DISCOVERY_USER_GID = 100 -- DISCOVERY用户
+local COMM_USER_GID = 101 -- 降权限app使用的用户
+local REDFISH_USER_GID = 102
+local APPS_USER_GID = 103
+local SECBOX_USER_GID = 104
+local OPERATOR_GID = 200
+local USER_GID = 201
+local NO_ACCESS_USER_GID = 202
+local OEM_GID = 203
+local ADMINISTRATOR_GID = 204
+local LDAP_USER_GID = 1000
+
+-- linux保留用户的ID
+local ROOT_USER_UID = ROOT_USER_GID
+local SNMPD_USER_UID = SNMPD_USER_GID
+local IPMI_USER_UID = IPMI_USER_GID
+local KVM_USER_UID = KVM_USER_GID
+local APACHE_UID = APACHE_GID
+local DISCOVERY_USER_UID = DISCOVERY_USER_GID
+local COMM_USER_UID = COMM_USER_GID
+local REDFISH_USER_UID = REDFISH_USER_GID
+local SECBOX_USER_UID = SECBOX_USER_GID
+local SSHD_USER_UID = SSHD_USER_GID
+local ADMINISTRATOR_USER_UID = 502
+
+local LINUX_USER_ID_BASE = 500 -- Linux用户ID基数
+local LINUX_USER_ID_MAX = 520 -- Linux用户ID最大值
+
+local RMCP_SESSION_MAX_NUM = 5
+local IPMI_ACCOUNT_ID = 19
+local VNC_ACCOUNT_ID = 18 -- id18对应用户用于vnc管理
+local LDAP_USER_UID = LDAP_USER_GID
+local MAX_USER_NAME_LEN = 16
+local MIN_PASSWORD_DEFAULT_LEN = 1 -- 密码默认最小长度
+
+local MAX_IPMI_DATA_LEN = 256
+
+-- SSH公钥配置
+local SSH_PUBLIC_KEY_PARSE_PATH     = "/dev/shm/tmp/ssh_rsa.pub"
+local SSH_PUBLIC_KEY_TEMP_FILE      = '/tmp/ssh_rsa.pub'
+local SSH_PUBLIC_KEY_CONF_TEMP_FILE = '/dev/shm/tmp/publickeyconf'
+local SSH_PUBLIC_KEY_HASH_TEMP_FILE = '/dev/shm/tmp/publickeyhash'
+local SSH_PUBLIC_KEY_MAX_LEN        = 2048
+local SSH_PUBLIC_KEY_RFC4716_HEADER = 'BEGIN SSH2 PUBLIC KEY'
+local SSH_PUBLIC_KEY_DSA_HEADER     = "ssh-dss"
+local SSH_PUBLIC_KEY_RSA_HEADER     = "ssh-rsa"
+local SSH_PUBLIC_KEY_SUB_DIR_NAME   = '.ssh'
+
+-- 天数秒数转换 24时*60分*60秒
+local DAY_SECOND_COUNT = 24 * 60 * 60
+-- 分钟秒数转换
+local MIN_SECOND_COUNT = 60
+
+-- 日志打印限制频率
+local LIMIT_LOG_TIME = 60
+
+-- 用户名称密码前N字节比对
+local USERNAME_PWD_COMPARE_DEFAULT_LEN = 4
+local USERNAME_PWD_COMPARE_LEN_MAX = 20
+
+-- 登录规则数量限制
+local LOGIN_RULE_COUNT = 3
+
+local SHA512_CRYPT_SALT_PREFIX = "$6$"
+local SHA512_SALT_PATTERN = "(%$.-%$.-%$)(.*)"
+
+return {
+  PASSWD_FILE = PASSWD_FILE,
+  SHADOW_FILE = SHADOW_FILE,
+  GROUP_FILE = GROUP_FILE,
+  IPMI_FILE = IPMI_FILE,
+
+  LINUX_FILES = {
+    passwd_path = PASSWD_FILE,
+    shadow_path = SHADOW_FILE,
+    group_path = GROUP_FILE,
+    ipmi_path = IPMI_FILE
+  },
+
+  TMP_PASSWD_FILE = TMP_PASSWD_FILE,
+  TMP_SHADOW_FILE = TMP_SHADOW_FILE,
+  TMP_GROUP_FILE = TMP_GROUP_FILE,
+  TMP_IPMI_FILE = TMP_IPMI_FILE,
+
+  LOGINRULE_FILE = LOGINRULE_FILE,
+  TMP_LOGINRULE_FILE = TMP_LOGINRULE_FILE,
+  WEAK_PWDDICT_FILE_PATH = WEAK_PWDDICT_FILE_PATH,
+  WEAK_PWDDICT_FILE_PATH_INIT = WEAK_PWDDICT_FILE_PATH_INIT,
+  WEAK_PWDDICT_FILE_SHM_PATH = WEAK_PWDDICT_FILE_SHM_PATH,
+  PAM_TALLY_LOG_DIR = "/dev/shm/tallylog",
+
+  PAM_FAILLOCK = PAM_FAILLOCK,
+  TEMP_PAM_FAILLOCK = TEMP_PAM_FAILLOCK,
+  TALLY_FAIL_INTERVAL_ADD_SECONDS = TALLY_FAIL_INTERVAL_ADD_SECONDS,
+
+  RMCP_SESSION_MAX_NUM = RMCP_SESSION_MAX_NUM,
+  RESERVED_ROOT_USER_NAME = RESERVED_ROOT_USER_NAME,
+  ACTUAL_ROOT_USER_NAME = ACTUAL_ROOT_USER_NAME,
+  TELNET_USER = TELNET_USER,
+  HOST_CHAN_IP = HOST_CHAN_IP,
+
+  CERT_INTER_DIR = CERT_INTER_DIR,
+
+  -- 天数秒数转换
+  DAY_SECOND_COUNT = DAY_SECOND_COUNT,
+  -- 秒数转换
+  MIN_SECOND_COUNT = MIN_SECOND_COUNT,
+
+  -- IPMI账号id
+  IPMI_ACCOUNT_ID = IPMI_ACCOUNT_ID,
+
+  -- VNC账号id
+  VNC_ACCOUNT_ID = VNC_ACCOUNT_ID,
+
+  -- IPMI相关长度
+  MAX_IPMI_DATA_LEN = MAX_IPMI_DATA_LEN,
+
+  -- 登录规则数量限制
+  LOGIN_RULE_COUNT = LOGIN_RULE_COUNT,
+
+  -- 用户名和组名相同
+  SSHD_USER_NAME = SSHD_USER_NAME,
+  SNMPD_USER_NAME = SNMPD_USER_NAME,
+  IPMI_USER_NAME = IPMI_USER_NAME,
+  KVM_USER_NAME = KVM_USER_NAME,
+  APACHE_USER_NAME = APACHE_USER_NAME,
+  DISCOVERY_USER_NAME = DISCOVERY_USER_NAME,
+  FTP_USER_NAME = FTP_USER_NAME,
+  COMM_USER_NAME = COMM_USER_NAME,
+  REDFISH_USER_NAME = REDFISH_USER_NAME,
+  SECBOX_USER_NAME = SECBOX_USER_NAME,
+
+  USER_NAME_FOR_BMA_ID = USER_NAME_FOR_BMA_ID,
+  USER_NAME_FOR_BMA = USER_NAME_FOR_BMA,
+  USER_NAME_FOR_HMM_ID = USER_NAME_FOR_HMM_ID,
+  USER_NAME_FOR_HMM = USER_NAME_FOR_HMM,
+
+    -- linux保留用户组名
+  OPERATOR_GROUP_NAME  = OPERATOR_GROUP_NAME,
+  USER_GROUP_NAME = USER_GROUP_NAME,
+  NO_ACCESS_GROUP_NAME = NO_ACCESS_GROUP_NAME,
+  ADMINISTRATOR_GROUP_NAME = ADMINISTRATOR_GROUP_NAME,
+
+  -- linux保留用户的组ID
+  ROOT_USER_GID = ROOT_USER_GID,
+  SSHD_USER_GID = SSHD_USER_GID,
+  SNMPD_USER_GID = SNMPD_USER_GID,
+  IPMI_USER_GID = IPMI_USER_GID,
+  KVM_USER_GID = KVM_USER_GID,
+  APACHE_GID = APACHE_GID,
+  DISCOVERY_USER_GID = DISCOVERY_USER_GID, -- DISCOVERY用户
+  COMM_USER_GID = COMM_USER_GID, -- 降权限app使用的用户
+  REDFISH_USER_GID = REDFISH_USER_GID,
+  APPS_USER_GID = APPS_USER_GID,
+  SECBOX_USER_GID = SECBOX_USER_GID,
+  OPERATOR_GID = OPERATOR_GID,
+  USER_GID = USER_GID,
+  NO_ACCESS_USER_GID = NO_ACCESS_USER_GID,
+  OEM_GID = OEM_GID,
+  ADMINISTRATOR_GID = ADMINISTRATOR_GID,
+  LDAP_USER_GID = LDAP_USER_GID,
+  APPS_GROUP_NAME = APPS_GROUP_NAME,
+  NOBODY_GROUP_NAME = NOBODY_GROUP_NAME,
+
+  -- linux保留用户的ID
+  ROOT_USER_UID = ROOT_USER_UID,
+  SNMPD_USER_UID = SNMPD_USER_UID,
+  IPMI_USER_UID = IPMI_USER_UID,
+  KVM_USER_UID = KVM_USER_UID,
+  APACHE_UID = APACHE_UID,
+  DISCOVERY_USER_UID = DISCOVERY_USER_UID,
+  COMM_USER_UID = COMM_USER_UID,
+  REDFISH_USER_UID = REDFISH_USER_UID,
+  SECBOX_USER_UID = SECBOX_USER_UID,
+  SSHD_USER_UID = SSHD_USER_UID,
+  ADMINISTRATOR_USER_UID = ADMINISTRATOR_USER_UID,
+  LDAP_USER_UID = LDAP_USER_UID,
+
+  LINUX_USER_ID_BASE = LINUX_USER_ID_BASE,
+  LINUX_USER_ID_MAX = LINUX_USER_ID_MAX,
+  MAX_USER_NAME_LEN = MAX_USER_NAME_LEN,
+  MIN_PASSWORD_DEFAULT_LEN = MIN_PASSWORD_DEFAULT_LEN,
+
+  -- 文件路径与路径长度
+  FILE_LIMITED_SIZE = FILE_LIMITED_SIZE,
+  MAX_FILEPATH_LENGTH = MAX_FILEPATH_LENGTH,
+  MAX_FILE_LINE_BUFF_SIZE = MAX_FILE_LINE_BUFF_SIZE,
+  TMP_PATH = TMP_PATH,
+  URL_HEAD_TABLE = URL_HEAD_TABLE,
+  DATA_HOME_PATH = DATA_HOME_PATH,
+  DATA_PATH = DATA_PATH,
+  SHM_PATH = SHM_PATH,
+  SHM_TMP_PATH = SHM_TMP_PATH,
+  WEAK_PWDDICT_FILE_EXPORT_PATH = WEAK_PWDDICT_FILE_EXPORT_PATH,
+
+  -- KSF文件
+  ACCOUNT_KSF_FILE_NAME = ACCOUNT_KSF_FILE_NAME,
+  ACCOUNT_KSF_BACK_NAME = ACCOUNT_KSF_BACK_NAME,
+
+  -- SSH公钥配置
+  SSH_PUBLIC_KEY_PARSE_PATH = SSH_PUBLIC_KEY_PARSE_PATH,
+  SSH_PUBLIC_KEY_TEMP_FILE = SSH_PUBLIC_KEY_TEMP_FILE,
+  SSH_PUBLIC_KEY_CONF_TEMP_FILE = SSH_PUBLIC_KEY_CONF_TEMP_FILE,
+  SSH_PUBLIC_KEY_HASH_TEMP_FILE = SSH_PUBLIC_KEY_HASH_TEMP_FILE,
+  SSH_PUBLIC_KEY_MAX_LEN = SSH_PUBLIC_KEY_MAX_LEN,
+  SSH_PUBLIC_KEY_RFC4716_HEADER = SSH_PUBLIC_KEY_RFC4716_HEADER,
+  SSH_PUBLIC_KEY_DSA_HEADER = SSH_PUBLIC_KEY_DSA_HEADER,
+  SSH_PUBLIC_KEY_RSA_HEADER = SSH_PUBLIC_KEY_RSA_HEADER,
+  SSH_PUBLIC_KEY_SUB_DIR_NAME = SSH_PUBLIC_KEY_SUB_DIR_NAME,
+
+  -- 进程用户配置，USER ID 与 GROUP ID相同
+  APP_USERS = {
+    { name = ACTUAL_ROOT_USER_NAME, uid = ROOT_USER_UID, gids = { ROOT_USER_GID } }, -- root
+    { name = SSHD_USER_NAME, uid = SSHD_USER_UID, gids = { SSHD_USER_GID } }, -- ssh
+    { name = APACHE_USER_NAME, uid = APACHE_UID, gids = { APACHE_GID, APPS_USER_GID } }, -- apache
+    { name = SNMPD_USER_NAME, uid = SNMPD_USER_UID, gids = { SNMPD_USER_GID, APPS_USER_GID } }, -- snmpd
+    { name = IPMI_USER_NAME, uid = IPMI_USER_UID, gids = { IPMI_USER_GID, APPS_USER_GID } }, -- ipmi
+    { name = KVM_USER_NAME, uid = KVM_USER_UID, gids = { KVM_USER_GID, APPS_USER_GID, OPERATOR_GID, USER_GID,
+        NO_ACCESS_USER_GID }, privilege = OPERATOR_GID }, -- kvm
+    { name = DISCOVERY_USER_NAME, uid = DISCOVERY_USER_UID, gids = { DISCOVERY_USER_GID, APPS_USER_GID } }, -- discover
+    { name = COMM_USER_NAME, uid = COMM_USER_UID, gids = { COMM_USER_GID, APPS_USER_GID } }, -- common_user
+    { name = REDFISH_USER_NAME, uid = REDFISH_USER_UID, gids = { REDFISH_USER_GID, APPS_USER_GID, OPERATOR_GID,
+        USER_GID, NO_ACCESS_USER_GID },
+      privilege = OPERATOR_GID }, -- redfish
+    { name = SECBOX_USER_NAME, uid = SECBOX_USER_UID, gids = { SECBOX_USER_GID, APPS_USER_GID } } -- secbox
+  },
+
+  APP_GID_NAME_MAP = {
+    [ROOT_USER_GID] = ACTUAL_ROOT_USER_NAME,
+    [SSHD_USER_GID] = SSHD_USER_NAME,
+    [SNMPD_USER_GID] = SNMPD_USER_NAME,
+    [IPMI_USER_GID] = IPMI_USER_NAME,
+    [KVM_USER_GID] = KVM_USER_NAME,
+    [APACHE_GID] = APACHE_USER_NAME,
+    [DISCOVERY_USER_GID] = DISCOVERY_USER_NAME,
+    [COMM_USER_GID] = COMM_USER_NAME,
+    [REDFISH_USER_GID] = REDFISH_USER_NAME,
+    [APPS_USER_GID] = APPS_GROUP_NAME,
+    [SECBOX_USER_GID] = SECBOX_USER_NAME,
+    [OPERATOR_GID] = OPERATOR_GROUP_NAME,
+    [USER_GID] = USER_GROUP_NAME,
+    [NO_ACCESS_USER_GID] = NO_ACCESS_GROUP_NAME,
+    [ADMINISTRATOR_GID] = ADMINISTRATOR_GROUP_NAME,
+  },
+
+  -- 启用cli扫描用户的ssh进程，该功能需要在集成测试禁用，防止linux中集成测试失败
+  ENABLE_CLI_SSHD_SCAN = true,
+
+  -- 启用通过/etc/passwd获取用户的gid和uid，该功能集成测试禁用
+  ENABLE_GET_UID_GID_BY_PASSWD = true,
+
+  -- 为了避开某些调用外部rpc的方法，该标识位为单元测试禁用
+  ENABLE_UT = true,
+
+  LIMIT_LOG_TIME = LIMIT_LOG_TIME,
+
+  USERNAME_PWD_COMPARE_DEFAULT_LEN = USERNAME_PWD_COMPARE_DEFAULT_LEN,
+  USERNAME_PWD_COMPARE_LEN_MAX     = USERNAME_PWD_COMPARE_LEN_MAX,
+
+  SHA512_CRYPT_SALT_PREFIX = SHA512_CRYPT_SALT_PREFIX,
+  SHA512_SALT_PATTERN = SHA512_SALT_PATTERN,
+
+  PRESERVE_CONFIG_FILE = PRESERVE_CONFIG_FILE,
+  PRESERVE_CONFIG_PATH = PRESERVE_CONFIG_PATH,
+
+  FILE_MAX_SIZE = FILE_MAX_SIZE,
+  FILE_MAX_NUM = FILE_MAX_NUM
+}

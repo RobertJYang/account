@@ -1,0 +1,1366 @@
+{
+    "AccountService": {
+        "path": "/bmc/kepler/AccountService",
+        "tableName": "t_account_service",
+        "tableType": "PoweroffPer",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService": {
+                "properties": {
+                    "AccountLockoutCounterResetAfter": {
+                        "default": 0
+                    },
+                    "AccountLockoutCounterResetEnabled": {
+                        "default": false
+                    },
+                    "AuthFailureLoggingThreshold": {
+                        "default": 0
+                    },
+                    "MaxPasswordLength": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": 20,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "MinPasswordLength": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": 8,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "ServiceEnabled": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true
+                    },
+                    "PasswordComplexityEnable": {
+                        "default": true,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "InitialPasswordPromptEnable": {
+                        "default": true,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "InitialPasswordNeedModify": {
+                        "default": true,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "InitialAccountPrivilegeRestrictEnabled": {
+                        "default": false,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "MinPasswordValidDays": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ],
+                        "description": "密码最短有效期"
+                    },
+                    "MaxPasswordValidDays": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ],
+                        "description": "密码最长有效期"
+                    },
+                    "EmergencyLoginAccountId": {
+                        "baseType": "U8",
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": 0,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "SNMPv3TrapAccountId": {
+                        "baseType": "U8",
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["BasicSetting"]
+                        },
+                        "default": 2,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "InactiveDaysThreshold": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": 0,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "WeakPasswordDictionaryEnabled": {
+                        "default": true,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "HistoryPasswordCount": {
+                        "default": 5,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "HostUserManagementEnabled": {
+                        "baseType": "Boolean",
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "OSAdministratorPrivilegeEnabled": {
+                        "baseType": "Boolean",
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "SNMPv3TrapAccountLimitPolicy": {
+                        "baseType": "U8",
+                        "readOnly": false,
+                        "default": 2,
+                        "description": "对trap用户的修改策略.trap版本不为v3,该属性为0,对用户修改不作限制;trap版本为v3,使能关闭,该属性为1,用户不可被删除;trap版本为v3,使能开启,该属性为2,用户不可被删除和更改名字"
+                    },
+                    "UserNamePasswordPrefixCompareEnabled": {
+                        "baseType": "Boolean",
+                        "default": false,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "readOnly": false,
+                        "usage": [
+                            "PoweroffPer"
+                        ],
+                        "description": "密码与用户名前n个字节比较策略使能开关"
+                    },
+                    "UserNamePasswordPrefixCompareLength": {
+                        "baseType": "U8",
+                        "default": 4,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "readOnly": false,
+                        "usage": [
+                            "PoweroffPer"
+                        ],
+                        "description": "密码与用户名前n个字节比较长度"
+                    }
+                }
+            }
+        },
+        "properties": {
+            "PasswordExpirationDays": {
+                "baseType": "U32",
+                "default": 4294967295,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },"AccountLockoutDuration": {
+                "baseType": "S32",
+                "default": 300,
+                "description": "账号登录失败后锁定时长,单位为秒"
+                
+            },
+            "AccountLockoutThreshold": {
+                "baseType": "S32",
+                "default": 5,
+                "description": "账号登录失败该次数后被锁定"
+            },
+            "UserMgmtEnable": {
+                "baseType": "Boolean",
+                "default": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "TimeSource": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/TimeSource",
+                "default": "TS_NOT_NTP",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "PasswordComplexityIsLock": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "密码复杂度是否允许解锁，IPMI设置为strong_enable时，不允许解锁"
+            },
+            "PreviousPasswordsDisallowed": {
+                "baseType": "U8",
+                "default": 5,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Id": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "因持久化需要而添加，无实际作用，AccountService仅有一条数据"
+            }
+        }
+    },
+    "ManagerAccounts": {
+        "path": "/bmc/kepler/AccountService/Accounts",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.ManagerAccounts": {}
+        }
+    },
+    "ManagerAccount": {
+        "path": "/bmc/kepler/AccountService/Accounts/:Id",
+        "privilege": ["ConfigureSelf"],
+        "interfaces": {
+            "bmc.kepler.AccountService.ManagerAccount": {
+                "properties": {
+                    "AccountExpiration": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "Certificates": {},
+                    "Enabled": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "Id": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        },
+                        "usage": [
+                            "CSR"
+                        ]
+                    },
+                    "Locked": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "UserName": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "Deletable": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "PasswordChangeRequired": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["ConfigureSelf"]
+                        }
+                    },
+                    "PasswordExpiration": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "RoleId": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "SshPublicKeyHash": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "AccountType": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "LoginRuleIds": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "LastLoginTime": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "LastLoginIP": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "LastLoginInterface": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "FirstLoginPolicy": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "LoginInterface": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "Privileges": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    }
+                }
+            },
+            "bmc.kepler.AccountService.ManagerAccount.SnmpUser": {
+                "properties": {
+                    "AuthenticationProtocol": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "EncryptionProtocol": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    },
+                    "SnmpEncryptionPasswordInitialStatus": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "ManagerAccountDB": {
+        "tableName": "t_manager_account",
+        "properties": {
+            "AccountExpiration": {
+                "baseType": "String",
+                "description": "",
+                "notAllowNull": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Certificates": {
+                "baseType": "U16",
+                "description": "",
+                "notAllowNull": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Enabled": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Id": {
+                "baseType": "U8",
+                "description": "",
+                "primaryKey": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Locked": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "UserName": {
+                "baseType": "String",
+                "description": "",
+                "uniqueKey": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Deletable": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Password": {
+                "baseType": "String",
+                "description": "",
+                "notAllowNull": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "KDFPassword": {
+                "baseType": "String",
+                "description": "",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "PasswordChangeRequired": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "PasswordExpiration": {
+                "baseType": "U32",
+                "description": "",
+                "default": 4294967295,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "RoleId": {
+                "baseType": "U8",
+                "description": "",
+                "default": 0,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "SshPublicKeyHash": {
+                "baseType": "String",
+                "description": "",
+                "default": "",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "IpmiPassword": {
+                "baseType": "String",
+                "description": "",
+                "notAllowNull": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "IpmiPasswordBak": {
+                "baseType": "String",
+                "description": "",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "WithinMinPasswordDays": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": false,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LoginRuleIds": {
+                "baseType": "U8",
+                "description": "",
+                "default": 0,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "InactUserRemainDays": {
+                "baseType": "U32",
+                "description": "",
+                "default": 4294967295,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LastLoginTime": {
+                "baseType": "U32",
+                "description": "",
+                "default": 4294967295,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LastLoginIP": {
+                "baseType": "String",
+                "description": "",
+                "default": "",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LastLoginInterface": {
+                "baseType": "Enum",
+                "description": "",
+                "default": "Web",
+                "$ref": "types.json#/defs/LoginInterface",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "FirstLoginPolicy": {
+                "baseType": "Enum",
+                "description": "",
+                "default": "ForcePasswordReset",
+                "$ref": "types.json#/defs/FirstLoginPolicy",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "AccountType": {
+                "baseType": "Enum",
+                "description": "",
+                "default": "Local",
+                "$ref": "types.json#/defs/AccountType",
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LoginInterface": {
+                "baseType": "U32",
+                "description": "",
+                "default": 0,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "PasswordValidStartTime": {
+                "baseType": "U32",
+                "description": "",
+                "default": 0,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "InactiveStartTime": {
+                "baseType": "U32",
+                "description": "",
+                "default": 0,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "PasswordWritable": {
+                "baseType": "Boolean",
+                "description": "密码是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "UserNameWritable": {
+                "baseType": "Boolean",
+                "description": "用户名是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LoginInterfaceWritable": {
+                "baseType": "Boolean",
+                "description": "登录接口是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "RoleIdWritable": {
+                "baseType": "Boolean",
+                "description": "管理角色是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "EnabledWritable": {
+                "baseType": "Boolean",
+                "description": "启用状态是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "LoginRuleIdsWritable": {
+                "baseType": "Boolean",
+                "description": "登录规则是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "AuthenticationProtocolWritable": {
+                "baseType": "Boolean",
+                "description": "鉴权算法是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "EncryptionProtocolWritable": {
+                "baseType": "Boolean",
+                "description": "加密算法是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "SNMPPasswordWritable": {
+                "baseType": "Boolean",
+                "description": "snmp密码是否可修改",
+                "default": true,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            }
+        }
+    },
+    "ManagerAccountBackup": {
+        "tableName": "t_manager_account_backup",
+        "privilege":["UserMgmt"],
+        "properties": {
+            "Id": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "description": "用户id",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "ManagerAccountData": {
+                "baseType": "String",
+                "description": "manager account数据表备份",
+                "notAllowNull": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "IpmiAccountData": {
+                "baseType": "String",
+                "description": "ipmi account数据表备份",
+                "notAllowNull": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            },
+            "SnmpAccountData": {
+                "baseType": "String",
+                "description": "snmp account数据表备份",
+                "notAllowNull": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true
+            }
+        }
+    },
+    "SNMPUserInfo": {
+        "tableName": "t_snmp_user_info",
+        "properties": {
+            "AccountId": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "AuthenticationKey": {
+                "baseType": "String",
+                "notAllowNull": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": "AuthKu"
+            },
+            "AuthenticationKeySet": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "AuthenticationProtocol": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/SNMPAuthenticationProtocols",
+                "default": "SHA256",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "AuthProtocol"
+            },
+            "EncryptionKey": {
+                "baseType": "String",
+                "notAllowNull": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": "PrivKu"
+            },
+            "EncryptionKeySet": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "EncryptionProtocol": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/SNMPEncryptionProtocols",
+                "default": "AES128",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "PrivProtocol"
+            },
+            "SNMPPassword": {
+                "baseType": "String",
+                "notAllowNull": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": ""
+            },
+            "SNMPKDFPassword": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": ""
+            },
+            "SnmpEncryptionPasswordInitialStatus": {
+                "baseType": "Boolean",
+                "default": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "IsSnmpPrivacyInitialPwd"
+            }
+        }
+    },
+    "IpmiUserInfo": {
+        "tableName": "t_ipmi_user_info",
+        "properties": {
+            "AccountId": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Use20BytesPasswd": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsCallin": {
+                "baseType": "U8",
+                "default": 0,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsEnableAuth": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsEnableIpmiMsg": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsEnableByPasswd": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiUserEnableByPassword",
+                "default": "Disable",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Privilege0": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiPrivilege",
+                "default": "RESERVED",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Privilege1": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiPrivilege",
+                "default": "RESERVED",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            }
+        }
+    },
+    "HistoryPassword": {
+        "tableName": "t_history_password",
+        "properties": {
+            "AccountId": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "notAllowNull": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "SequenceNumber": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "notAllowNull": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Password": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": ""
+            },
+            "KDFPassword": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": true,
+                "description": ""
+            }
+        }
+    },
+    "Rule": {
+        "path": "/bmc/kepler/AccountService/Rules/:RuleId",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.Rule": {
+                "properties": {
+                    "Enabled": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
+                    },
+                    "IpRule": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
+                    },
+                    "MacRule": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
+                    },
+                    "TimeRule": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "LoginRule": {
+        "tableName": "t_login_rule",
+        "properties": {
+            "RuleId": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "IpRule": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Ipv6Rule": {
+                "baseType": "String",
+                "default": "",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "TimeRule": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "MacRule": {
+                "baseType": "String",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Enabled": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            }
+        }
+    },
+    "Role": {
+        "tableName": "t_role",
+        "path": "/bmc/kepler/AccountService/Roles/:Id",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.Role": {
+                "properties": {
+                    "RolePrivilege": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": []
+                    },
+                    "Name": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        }
+                    }
+                }
+            }
+        },
+        "properties": {
+            "Id": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/RoleType",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "RoleName": {
+                "baseType": "String",
+                "uniqueKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "角色 Name"
+            },
+            "UserMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "用户管理权限"
+            },
+            "BasicSetting": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "基本设置功能权限"
+            },
+            "KVMMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "KVM使用权限"
+            },
+            "ReadOnly": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "只读功能权限"
+            },
+            "VMMMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "VMM使用权限"
+            },
+            "SecurityMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "安全配置权限"
+            },
+            "PowerMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "电源控制权限"
+            },
+            "DiagnoseMgmt": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "诊断调试权限"
+            },
+            "ConfigureSelf": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "配置自身权限"
+            }
+        }
+    },
+    "SnmpCommunity": {
+        "path": "/bmc/kepler/Managers/:ManagerId/SnmpService/SnmpCommunity",
+        "tableName": "t_snmp_community",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.Managers.SnmpService.SnmpCommunity": {
+                "properties": {
+                    "LongCommunityEnabled": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true,
+                        "usage": [
+                            "PoweroffPer"
+                        ],
+                        "description": ""
+                    },
+                    "RwCommunityEnabled": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    }
+                }
+            }
+        },
+        "properties": {
+            "Id": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "因持久化需要而添加，无实际作用，AccountService仅有一条数据"
+            }
+        }
+    },
+    "LocalAccountAuthN": {
+        "path": "/bmc/kepler/AccountService/LocalAccountAuthN",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.LocalAccountAuthN": {}
+        }
+    },
+    "AccountBackup": {
+        "tableName": "t_account_backup",
+        "properties": {
+            "Id": {
+                "baseType": "U8",
+                "description": "",
+                "primaryKey": true,
+                "usage": [
+                    "PermanentPer"
+                ]
+            },
+            "UserName": {
+                "baseType": "String",
+                "description": "",
+                "uniqueKey": true,
+                "usage": [
+                    "PermanentPer"
+                ]
+            },
+            "Password": {
+                "baseType": "String",
+                "description": "",
+                "notAllowNull": true,
+                "usage": [
+                    "PermanentPer"
+                ],
+                "sensitive": true
+            },
+            "RoleId": {
+                "baseType": "U8",
+                "description": "",
+                "default": 0,
+                "usage": [
+                    "PermanentPer"
+                ]
+            },
+            "LoginInterface": {
+                "baseType": "U32",
+                "description": "",
+                "default": 0,
+                "usage": [
+                    "PermanentPer"
+                ]
+            },
+            "Enabled": {
+                "baseType": "Boolean",
+                "description": "",
+                "default": false,
+                "usage": [
+                    "PermanentPer"
+                ]
+            }
+        }
+    },
+    "PasswordPolicy": {
+        "tableName": "t_password_policy",
+        "tableType": "PoweroffPer",
+        "privilege": ["ReadOnly"],
+        "path": "/bmc/kepler/AccountService/PasswordPolicys/:AccountType",
+        "interfaces": {
+            "bmc.kepler.AccountService.PasswordPolicy": {
+                "properties": {
+                    "Policy": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": 1,
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    },
+                    "Pattern": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": "",
+                        "usage": [
+                            "PoweroffPer"
+                        ]
+                    }
+                }
+            }
+        },
+        "properties": {
+            "AccountType": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            }
+        }
+    },
+    "LocalAccountPolicy": {
+        "privilege": ["ReadOnly"],
+        "path": "/bmc/kepler/AccountService/AccountPolicies/Local",
+        "interfaces": {
+            "bmc.kepler.AccountService.AccountPolicy": {
+                "properties": {
+                    "NamePattern": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "default": ""
+                    }
+                }
+            }
+        }
+    },
+    "AccountPolicy": {
+        "tableName": "t_account_policy",
+        "properties": {
+            "AccountType": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "NamePattern": {
+                "baseType": "String",
+                "default": "",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            }
+        }
+    }
+}

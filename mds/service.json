@@ -1,0 +1,132 @@
+{
+    "name": "account",
+    "version": "1.70.19",
+    "type": "application",
+    "deployConfig": "security.service",
+    "author": "Huawei",
+    "license": "Mulan PSL v2",
+    "description": "Identity and Access Management Module",
+    "codegen_policy": {
+        "version": "8"
+    },
+    "dependencies": {
+        "test": [
+            {
+                "conan": "persistence/[>=1.60.0]"
+            },
+            {
+                "conan": "ipmi_core/[>=1.60.0]"
+            },
+            {
+                "conan": "maca/[>=1.50.15]"
+            },
+            {
+                "conan": "rmcpd/[>=1.60.1]"
+            },
+            {
+                "conan": "key_mgmt/[>=1.26.0]"
+            },
+            {
+                "conan": "mdb_interface/[>=1.70.0]"
+            },
+            {
+                "conan": "libsoc_adapter/[>=1.60.0]"
+            },
+            {
+                "conan": "lsnmp/[>=1.20.0]"
+            },
+            {
+                "conan": "hwproxy/[>=1.60.0]"
+            },
+            {
+                "conan": "hwdiscovery/[>=1.60.0]"
+            },
+            {
+                "conan": "bmc_network/[>=1.60.0]"
+            },
+            {
+                "conan": "dtframeforlua/[>=0.0.1]"
+            },
+            {
+                "conan": "file_transfer/[>=1.50.0]"
+            },
+            {
+                "conan": "event/[>=1.60.0]"
+            },
+            {
+                "conan": "frudata/[>=1.60.0]"
+            },
+            {
+                "conan": "capability_agent/[>=1.0.0]"
+            },
+            {
+                "conan": "certificate_mgmt/[>=1.0.0]"
+            }     
+        ],
+        "build": [
+            {
+                "conan": "libmc4lua/[>=1.60.0]"
+            },
+            {
+                "conan": "mdb_interface/[>=1.70.0]"
+            },
+            {
+                "conan": "libiam/[>=1.0.1]"
+            }
+        ]
+    },
+    "required": [
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.Security.TlsConfig.CipherSuit"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.FileTransfer"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.TaskService.Task"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.EthernetInterfaces.Ipv4"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.EthernetInterfaces.Ipv6"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Systems.Events"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.IpmiCore"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.EthernetInterfaces"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.CertificateService.Certificate.Account"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.CertificateService.CA"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.CertificateService.Certificate"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.CertificateService"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.Managers.Security.File"
+        }
+    ]
+}

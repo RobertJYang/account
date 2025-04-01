@@ -1,0 +1,1785 @@
+{
+    "package": "AccountIpmiCmds",
+    "cmds": {
+        "SetUserAccess": {
+            "netfn": "0x6",
+            "cmd": "0x43",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ChannelNumber",
+                    "baseType": "U8",
+                    "len": "4b"
+                },
+                {
+                    "data": "MessagingEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "AuthenticationEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "UserRestricted",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "ChangeEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "UserPrivilege",
+                    "baseType": "U8",
+                    "len": "4b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "4b"
+                },
+                {
+                    "data": "SessionLimit",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                }
+            ]
+        },
+        "GetUserAccess": {
+            "netfn": "0x6",
+            "cmd": "0x44",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ChannelNumber",
+                    "baseType": "U8",
+                    "len": "4b"
+                },
+                {
+                    "data": "MessagingEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "AuthenticationEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "UserRestricted",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "ChangeEnable",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "MaxUserNumber",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "EnabledUser",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "EnableStatus",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "UserNumber",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "PrivilegeLimit",
+                    "baseType": "U8",
+                    "len": "4b"
+                },
+                {
+                    "data": "IpmiMessaging",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "LinkAuthentication",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "ChaAccessMode",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "Reserved3",
+                    "baseType": "U8",
+                    "len": "1b"
+                }
+            ]
+        },
+        "SetUserName": {
+            "netfn": "0x6",
+            "cmd": "0x45",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "UserName",
+                    "baseType": "String",
+                    "len": "16B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                }
+            ]
+        },
+        "GetUserName": {
+            "netfn": "0x6",
+            "cmd": "0x46",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "UserName",
+                    "baseType": "String",
+                    "len": "16B"
+                }
+            ]
+        },
+        "SetUserPassComplexity": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Operator",
+            "privilege": ["SecurityMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x22"
+                },
+                {
+                    "data": "Control",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "GetUserPassComplexity": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ReadOnly"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x21"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Control",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ]
+        },
+        "SetUserInterface": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "sensitive": true,
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x68"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Operation",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "LoginInterface",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "PasswordLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "PasswordData",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "UserIpmiSetUserSNMPV3PrivacyPwd": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ConfigureSelf"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x44"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Operation",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "PwdLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "PasswordData",
+                    "baseType": "String",
+                    "len": "PwdLength"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetSNMPConfiguration": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x74"
+                },
+                {
+                    "data": "SNMPParameter",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "BlockSelector",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "SubBlockSelector",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "GetSNMPConfiguration": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "sensitive": true,
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x75"
+                },
+                {
+                    "data": "SNMPParameter",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "BlockSelector",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "SubBlockSelector",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetAccountInterface": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x79"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Interface",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ]
+        },
+        "SetVncPassword": {
+            "netfn": "0x30",
+            "cmd": "0x94",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["KVMMgmt"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x67"
+                },
+                {
+                    "data": "Index",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x00"
+                },
+                {
+                    "data": "Item",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x01"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U16",
+                    "len": "2B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Password",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetUserPasswordCompareInfo": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["SecurityMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x5A"
+                },
+                {
+                    "data": "ParameterSelector",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x30"
+                },
+                {
+                    "data": "CompareEnabled",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "CompareLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "GetUserPasswordCompareInfo": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ReadOnly"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x5B"
+                },
+                {
+                    "data": "Index",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x30"
+                },
+                {
+                    "data": "CommandLength",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x00"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "CompareEnabled",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "CompareLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ]
+        },
+        "GetWeakPwdDictionaryEnabled": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x01"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetFirstLoginModifyPolicy": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x02"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetHistoryPwdCheckCount": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x03"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetEmergencyLoginAccount": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x05"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetInitialPasswordPromptEnable": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x06"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "SetWeakPwdDictionaryEnabled": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x01"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetFirstLoginModifyPolicy": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x02"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetHistoryPwdCheckCount": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x03"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetEmergencyLoginAccount": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x05"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "SetInitialPasswordPromptEnable": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x06"
+                },
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "2b"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "DisableAccount": {
+            "netfn": "0x6",
+            "cmd": "0x47",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ConfigureSelf"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "PasswordSize",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "Operation",
+                    "baseType": "U8",
+                    "len": "2b",
+                    "value": "0x00"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "PasswordData",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                }
+            ]
+        },
+        "EnableAccount": {
+            "netfn": "0x6",
+            "cmd": "0x47",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ConfigureSelf"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "PasswordSize",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "Operation",
+                    "baseType": "U8",
+                    "len": "2b",
+                    "value": "0x01"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "PasswordData",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                }
+            ]
+        },
+        "SetAccountPassword": {
+            "netfn": "0x6",
+            "cmd": "0x47",
+            "priority": "Default",
+            "role": "User",
+            "privilege": ["ConfigureSelf"],
+            "sensitive": true,
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "UserId",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "Reserved1",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "PasswordSize",
+                    "baseType": "U8",
+                    "len": "1b"
+                },
+                {
+                    "data": "Operation",
+                    "baseType": "U8",
+                    "len": "2b",
+                    "value": "0x02"
+                },
+                {
+                    "data": "Reserved2",
+                    "baseType": "U8",
+                    "len": "6b"
+                },
+                {
+                    "data": "PasswordData",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U32",
+                    "len": "1B"
+                }
+            ]
+        },
+        "GetPasswordRulePolicy": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Operator",
+            "privilege": ["SecurityMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x07"
+                },
+                {
+                    "data": "AccountType",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "SetPasswordRulePolicy": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Operator",
+            "privilege": ["SecurityMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x07"
+                },
+                {
+                    "data": "AccountType",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        },
+        "GetPasswordPattern": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Operator",
+            "privilege": ["SecurityMgmt"],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x76"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x08"
+                },
+                {
+                    "data": "AccountType",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "SetPasswordPattern": {
+            "netfn": "0x30",
+            "cmd": "0x93",
+            "priority": "Default",
+            "role": "Operator",
+            "privilege": ["SecurityMgmt"],
+            "sysLockedPolicy": "Forbidden",
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x77"
+                },
+                {
+                    "data": "Function",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x08"
+                },
+                {
+                    "data": "AccountType",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Length",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                }
+            ]
+        }
+    }
+}

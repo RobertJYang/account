@@ -1,0 +1,261 @@
+{
+    "messages": {
+        "kepler.account.AuthorizationFailed": {
+            "message": "Authorization failed because the user name or password is incorrect, or your account is locked.",
+            "http_response": 401,
+            "ipmi_response": "0XCC",
+            "severity": "error"
+        },
+        "kepler.account.InternalError": {
+            "message": "Internal Error Met.",
+            "http_response": 500,
+            "ipmi_response": "0xFF",
+            "severity": "error"
+        },
+        "kepler.account.InvalidAccountId": {
+            "message": "The Account ID is invalid.",
+            "ipmi_response": "0XC9",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.AuthTypeNotSupport": {
+            "message": "The authentication mode is not supported.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.AuthAlgoNotSupport": {
+            "message": "The authentication algorithm is not supported.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionTypeNotSupport": {
+            "message": "The session type is not supported.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionTimeout": {
+            "message": "The session has timed out, please log in again.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.NoValidSession": {
+            "message": "There is no valid session established with the implementation.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionKickout": {
+            "message": "You have been forced to log out by the system administrator.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionRelogin": {
+            "message": "Your account has been logged in elsewhere.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionChanged": {
+            "message": "Account information has been modified, please log in again.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionLimitExceeded": {
+            "message": "Exceeded the maximum number of sessions.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.SessionStillAlive": {
+            "message": "The session is still alive.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.ResourceAlreadyExists": {
+            "message": "The user already exists.",
+            "ipmi_response": "0X80",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.UnSupported": {
+            "message": "The operate not supported.",
+            "ipmi_response": "0XD5",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidParameter": {
+            "message": "The parameter is invalid.",
+            "ipmi_response": "0XC1",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidUserName": {
+            "message": "The user name is invalid",
+            "ipmi_response": "0XC1",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.ExclusiveMode": {
+            "message": "The session is already exclusive or already exists session cannot be created exclusive.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.PasswordComplexityCheckFail": {
+            "message": "The property does not meet the password complexity requirements.",
+            "ipmi_response": "0x84",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.UnlockUserFail": {
+            "message": "Fail to unlock the user.",
+            "ipmi_response": "0x85",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidPasswordSameWithHistory": {
+            "message": "The property can not same with history password.",
+            "ipmi_response": "0x93",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.IpmiPasswordEmpty": {
+            "message": "The password for IPMI is empty, please set password.",
+            "ipmi_response": "0x94",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.NoAccess": {
+            "message": "Login failed because the user has no permission or is disabled, or the redfish interface is disabled.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.PasswordNeedReset": {
+            "message": "This password is an initial password or has been changed by another administrator. Please reset the password for security purposes.",
+            "ipmi_response": "0x96",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidPasswordLength": {
+            "message": "Invalid password length.",
+            "ipmi_response": "0XC7",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.ValueOutOfRange": {
+            "message": "The value for the property is out of range.",
+            "ipmi_response": "0XC9",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.PasswordForbidSetComplexityCheck": {
+            "message": "It is not allowed to enable or disable password complexity check when password complexity check enhancement enabled.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidDataField": {
+            "message": "The user data field is invalid.",
+            "ipmi_response": "0xCC",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.ParameterInvalid": {
+            "message": "The parameter {1} is invalid.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.RuleFormatInvalid": {
+            "message": "The rule does not meet the format requirements",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.WeakPWDDictInProcess": {
+            "message": "When weakpwd dictionary is in process, can't export or import again, or check password.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.PasswordInWeakPWDDict": {
+            "message": "The property cannot be in the weak password dictionary.",
+            "ipmi_response": "0x95",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidPathOrFile": {
+            "message": "The path or password dictionary is invalid.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.DuringMinimumPasswordAge": {
+            "message": "The password cannot be changed because it has not passed the minimum password age.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.PropertyMemberQtyExceedLimit": {
+            "message": "The number of items in the property {1} exceeds the limit.",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.UserNameNotExist": {
+            "message": "The user name {1} is not exist",
+            "ipmi_response": "0x81",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.IncorrectPublicKeyFormat": {
+            "message": "Incorrect public key format.",
+            "ipmi_response": "0x92",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.HostUserManagementDiabled": {
+            "message": "Host user management is disabled",
+            "ipmi_response": "0x87",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.UserFull": {
+            "message": "User full, cannot add more user",
+            "ipmi_response": "0xFF",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.CommunityStringContainSpace": {
+            "message": "The property cannot contain spaces",
+            "ipmi_response": "0x86",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.InvalidCommunityStringLength": {
+            "message": "The length of the property is invalid",
+            "ipmi_response": "0x85",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.UnsupportTwoFactorParam": {
+            "message": "Two Factor Auth parameter not supported",
+            "ipmi_response": "0x80",
+            "http_response": 401,
+            "severity": "error"
+        },
+        "kepler.account.ImportInvalidKeytab": {
+            "message": "The Keytab path is invalid or format is invalid",
+            "http_response": 401,
+            "severity": "error"
+        }
+    }
+}

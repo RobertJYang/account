@@ -1,0 +1,23 @@
+{
+    // 使用 IntelliSense 了解相关属性。
+    // 悬停以查看现有属性的描述。
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "lua",
+        "request": "launch",
+        "name": "unit test", 
+        "stopOnEntry": false,
+        "cwd": "${workspaceFolder}",
+        "program": "${workspaceFolder}/test/unit/test.lua",
+        "env": {
+          "PROJECT_DIR": "${workspaceFolder}",
+          "ROOT_DIR": "${workspaceFolder}/temp",
+          "LD_LIBRARY_PATH": "${workspaceFolder}/temp/lib:${workspaceFolder}/temp/lib64:${workspaceFolder}/temp/usr/lib:${workspaceFolder}/temp/usr/lib64",
+          "PROJECT_NAME" : "account",
+          "CONFIG_FILE": "${workspaceFolder}/temp/opt/bmc/libmc/lualib/test_common/test_config.cfg"        
+        }
+      }
+    ]
+  }
+  

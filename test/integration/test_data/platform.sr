@@ -1,0 +1,118 @@
+{
+    "FormatVersion": 1.0,
+    "DataVersion": 1.0,
+    "Objects": {
+        "ManagerAccount_02": {
+            "Id": 2,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_03": {
+            "Id": 3,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_04": {
+            "Id": 4,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_05": {
+            "Id": 5,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_06": {
+            "Id": 6,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_07": {
+            "Id": 7,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_08": {
+            "Id": 8,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_09": {
+            "Id": 9,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_10": {
+            "Id": 10,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_11": {
+            "Id": 11,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_12": {
+            "Id": 12,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_13": {
+            "Id": 13,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_14": {
+            "Id": 14,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_15": {
+            "Id": 15,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_16": {
+            "Id": 16,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        },
+        "ManagerAccount_17": {
+            "Id": 17,
+            "AuthenticationProtocolAlarmEnabled" : false,
+            "AuthenticationProtocolAlarmContent" : "",
+            "EncryptionProtocolAlarmEnabled" : false,
+            "EncryptionProtocolAlarmContent" : ""
+        }
+    }
+}

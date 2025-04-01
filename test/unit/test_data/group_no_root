@@ -1,0 +1,17 @@
+sshd:x:74:
+operator:x:200:redfish_user,Administrator,kvm_user
+user:x:201:redfish_user,Administrator,kvm_user
+no_access:x:202:redfish_user,Administrator,kvm_user
+apache:x:98:apache
+snmpd_user:x:95:snmpd_user
+ipmi_user:x:96:ipmi_user
+kvm_user:x:97:kvm_user
+discovery_user:x:100:discovery_user
+comm_user:x:101:comm_user
+redfish_user:x:102:redfish_user
+secbox:x:104:secbox
+admin:x:204:Administrator
+apps:x:103:ipmi_user,snmpd_user,kvm_user,apache,discovery_user,comm_user,redfish_user,secbox
+test_root:x:1:test_root
+test1:x:1001:test1
+test_linux:x:200:test_linux
