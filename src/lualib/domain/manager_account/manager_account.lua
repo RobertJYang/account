@@ -836,4 +836,13 @@ function ManagerAccount:get_backup_info()
     return account_data_str, ipmi_data_str, snmp_data_str
 end
 
+function ManagerAccount:is_delete_ipmi_interface(interface_num)
+    local old_interface = self.m_account_data.LoginInterface
+    -- 表示删除用户的ipmi接口权限
+    if (old_interface >> 2) & 1 == 1 and (interface_num >> 2) & 1 == 0 then
+        return true
+    end
+    return false
+end
+
 return ManagerAccount

@@ -1,3 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.70.20] - 2025-3-31
+取消ipmi接口后清除ipmi密码
+
 ## [1.70.19] - 2025-3-30
 openUBMC开源

@@ -504,6 +504,12 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
     end
     local interface_num = utils.cover_interface_str_to_num(interface)
+    -- 判断要取消ipmi接口
+    if account:is_delete_ipmi_interface(interface_num) then
+        -- 清掉ipmi密码， ipmi密码设为空
+        account.m_account_data.IpmiPassword = ""
+        account.m_account_data:save()
+    end
     account:set_login_interface(interface_num)
     self.m_account_ipmi_changed:emit(account_id)
     self.m_account_security_changed:emit(account_id, user_name)
