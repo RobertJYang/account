@@ -17,6 +17,7 @@ local vos_utils = require 'utils.vos'
 local utils_core = require 'utils.core'
 local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
+local sqlite3 = require 'lsqlite3'
 local enum = require 'class.types.types'
 local err = require 'account.errors'
 local ipmi_cmds = require 'account.ipmi.ipmi'
@@ -51,8 +52,9 @@ local DEFAULT_MIN_USER_NUM = 2
 local DEFAULT_MAX_USER_NUM = 17
 
 local AccountCollection = class()
-function AccountCollection:ctor(db, global_account_config, role_collection, host_privilege_limit,
+function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
     password_validator_collection, linux_file_path)
+    self.persist = persist
     self.db = db
     self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
     self.shadow_path = linux_file_path['shadow'] or config.SHADOW_FILE
@@ -112,6 +114,10 @@ function AccountCollection:init_account_collection(db)
             db, account, self.password_validator_collection:get_validator(account.AccountType:value()))
         if suc == true then
             acc[account.Id] = ret
+            if self.persist then
+                self.persist:per_save(sqlite3.UPDATE, 't_manager_account', {{"Id", account.Id}},
+                    {['Password'] = {value = account.Password, persist_type = 'protect_power_off'}})
+            end
         else
             log:error(ret)
         end

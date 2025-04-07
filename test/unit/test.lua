@@ -28,6 +28,7 @@ local account_backup_db = require 'infrastructure.account_backup_db'
 local ipmi_running_record = require 'infrastructure.ipmi_running_record'
 local role_collection = require 'domain.role'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
+local account_policy = require 'domain.account_policies.local_account_policy'
 local global_account_config = require 'domain.global_account_config'
 local password_validator_collection = require 'domain.password_validator_collection'
 local manager_account = require 'domain.manager_account.manager_account'
@@ -120,17 +121,18 @@ function TestAccount:setupClass()
     redirect_path(test_data_dir)
     gen_linux_user_file(test_data_dir)
     gen_weakpwddic_file(test_data_dir)
-    self:PrepareFile(self.test_data_dir)
+    self:PrepareFile(test_data_dir)
     self.tally_dir = test_data_dir .. '/tally'
     os.execute('mkdir -p ' .. self.tally_dir)
     self.db = open_db(test_data_dir .. '/account.test.db', datas)
     self.test_kmc_client = kmc_client.new(nil, nil, true)
-    self.test_global_account_config = global_account_config.new(self.db, nil)
+    self.account_policy = account_policy.new(self.db)
+    self.test_global_account_config = global_account_config.new(self.db, nil, self.account_policy)
     self.test_password_validator_collection = password_validator_collection.new(self.db,
         self.test_global_account_config)
     self.test_login_rule_collection = login_rule_collection.new(nil, self.db)
     self.test_role_collection = role_collection.new(self.db)
-    self.test_account_collection = account_collection.new(self.db, self.test_global_account_config,
+    self.test_account_collection = account_collection.new(nil, self.db, self.test_global_account_config,
         self.test_role_collection, nil, self.test_password_validator_collection, {})
     self.test_account_permanent_backup = account_permanent_backup.new(self.db, self.test_account_collection)
     self.test_file_synchronization = file_synchronization.new(self.db, self.test_account_collection, {})

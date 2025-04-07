@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.70.21] - 2025-04-07
+初始化阶段保障密码强制持久化
+
 ## [1.70.20] - 2025-3-31
 取消ipmi接口后清除ipmi密码
 

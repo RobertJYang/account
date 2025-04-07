@@ -151,11 +151,6 @@ t_ipmi_user_info:
   - AccountId: 18
   - AccountId: 19
 
-t_snmp_community:
-  - Id: 1
-    LongCommunityEnabled: true
-    RwCommunityEnabled: true
-
 t_password_policy:
   - AccountType: 0
     Policy: 1

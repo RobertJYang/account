@@ -13,6 +13,8 @@ local test_case_utils = require 'testcase_utils'
 local class = require 'mc.class'
 local BaseSuit = require 'test_base_suit'
 local vos = require 'utils.vos'
+local mc_utils = require 'mc.utils'
+local utils_core = require 'utils.core'
 local gvariant = require 'mc.gvariant'
 
 local PROJECT_DIR = os.getenv('PROJECT_DIR')
@@ -61,9 +63,11 @@ function FileTransferSuit:setup_before_server_stop()
     if RUN_FT then
         -- 清理filetransfer进程
         local bash_path = PROJECT_DIR .. '/test/integration/test_suit/file_transfer/stop.sh'
+        utils_core.chmod(bash_path, mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP)
         vos.system_s(bash_path, PROJECT_DIR)
 
         bash_path = PROJECT_DIR .. '/test/integration/test_suit/file_transfer/start.sh'
+        utils_core.chmod(bash_path, mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP)
         vos.system_s(bash_path, PROJECT_DIR)
         -- 服务启动后，给时间让系统就绪，门禁场景下需要多等一会儿，保证数据库写入
         if string.match(self.test_data_dir, 'V3CODE') then

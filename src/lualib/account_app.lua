@@ -187,8 +187,8 @@ function app:service_init()
         ['group'] = skynet.getenv('GROUP_FILE'),
         ['ipmi'] = skynet.getenv('IPMI_FILE')
     }
-    self.account_collection = account_collection.new(self.db, self.global_account_config, self.role_collection,
-        self.host_privilege_limit, self.password_validator_collection, linux_file_path)
+    self.account_collection = account_collection.new(self.persist, self.db, self.global_account_config,
+        self.role_collection, self.host_privilege_limit, self.password_validator_collection, linux_file_path)
     self.account_permanent_backup = account_permanent_backup.new(self.db, self.account_collection)
     log:notice("account manager init end, linux file manager init start")
     -- 文件管理
