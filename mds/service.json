@@ -1,6 +1,6 @@
 {
     "name": "account",
-    "version": "1.70.20",
+    "version": "1.70.21",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",
@@ -57,10 +57,10 @@
                 "conan": "frudata/[>=1.60.0]"
             },
             {
-                "conan": "capability_agent/[>=1.0.0]"
+                "conan": "capability_proxy/[>=1.0.0]"
             },
             {
-                "conan": "certificate_mgmt/[>=1.0.0]"
+                "conan": "certificate/[>=1.0.0]"
             }     
         ],
         "build": [
