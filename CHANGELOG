@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.70.22] - 2025-04-09
+支持默认密码
+
 ## [1.70.21] - 2025-04-07
 初始化阶段保障密码强制持久化
 
