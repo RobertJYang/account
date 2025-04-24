@@ -52,7 +52,7 @@ function OEMAccount:init_account(account_info)
     self.m_account_data.Locked = false
     self.m_account_data.Deletable = true
     self.m_account_data.PasswordChangeRequired = true
-    self.m_account_data.LastLoginInterface = enum.LoginInterface.Local
+    self.m_account_data.LastLoginInterface = enum.LoginInterface.Invalid
     self.m_account_data.FirstLoginPolicy = account_info.first_login_policy or
         enum.FirstLoginPolicy.ForcePasswordReset
     self.m_account_data.AccountType = enum.AccountType.OEM

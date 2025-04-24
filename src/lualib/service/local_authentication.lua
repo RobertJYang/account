@@ -51,10 +51,10 @@ local function _auth_password(account, password)
 end
 
 function local_authentication:ext_record_operation(ctx, user_name, ext_config)
-    local account = self.m_account_collection:get_account_by_name(user_name)
+    local account, account_id = self.m_account_collection:get_account_by_name(user_name)
     if ext_config['RecordLoginInfo'] then
-        account:record_login_time_ip(os.time(), ctx.ClientAddr, false)
-        account:record_last_login_interface(ctx.Interface, false)
+        self.m_account_collection:record_login_time_ip(account_id, ctx.ClientAddr, false)
+        self.m_account_collection:record_last_login_interface(account_id, enum.LoginInterface[ctx.Interface], false)
     end
 
     if ext_config['UpdateActiveTime'] then
@@ -272,7 +272,8 @@ function local_authentication:gen_rmcp20_auth_code(ctx, authalgo, user_name, con
     end
 
 
-    target_account:record_login_time_ip(os.time(), ctx.ClientAddr, true)
+    self.m_account_collection:record_login_time_ip(target_account_id, ctx.ClientAddr, false)
+    self.m_account_collection:record_last_login_interface(target_account_id, enum.LoginInterface.IPMI, false)
     local rakp2code = target_account:gen_rakp2_auth_code(auth_algo, console_sid, managed_sid, console_random,
         managed_random, managed_guid, role)
     local sik = target_account:gen_sik(auth_algo, console_random, managed_random, role)
@@ -312,7 +313,8 @@ function local_authentication:gen_rmcp15_auth_code(ctx, authalgo, pay_load, acco
         error(custom_msg.AuthorizationFailed())
     end
 
-    target_account:record_login_time_ip(os.time(), ctx.ClientAddr, true)
+    self.m_account_collection:record_login_time_ip(account_id, ctx.ClientAddr, false)
+    self.m_account_collection:record_last_login_interface(account_id, enum.LoginInterface.IPMI, false)
     return target_account:gen_rmcp_md5_code(auth_algo, pay_load, session_id, session_sequence)
 end
 
