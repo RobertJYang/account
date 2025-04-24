@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+## [1.70.23] - 2025-04-24
+修改新用户默认LastLoginInterface;
+修复LocalAuthenticate接口记录用户上次登录审计信息未更新资源树问题
+
 ## [1.70.22] - 2025-04-09
 支持默认密码
 
