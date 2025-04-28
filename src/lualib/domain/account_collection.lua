@@ -274,6 +274,10 @@ function AccountCollection:get_account_by_account_id(account_id)
 end
 
 function AccountCollection:record_login_time_ip(account_id, ip, flush_flag)
+    if not ip then
+        log:notice('record last login ip failed, ip is invalid')
+        return
+    end
     local cur_timestamp = os.time()
     if self.collection[account_id] == nil then
         error(err.invalid_account_id())
@@ -284,6 +288,13 @@ function AccountCollection:record_login_time_ip(account_id, ip, flush_flag)
 end
 
 function AccountCollection:record_last_login_interface(account_id, interface, flush_flag)
+    local ok = pcall(function()
+        enum.LoginInterface.new(interface:value())
+    end)
+    if not ok then
+        log:notice('record last login interface failed, interface : %s', tostring(interface))
+        return
+    end
     if self.collection[account_id] == nil then
         error(err.invalid_account_id())
     end
