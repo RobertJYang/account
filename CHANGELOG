@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.70.24] - 2025-04-28
+增加上次登录信息记录的参数校验
+
 ## [1.70.23] - 2025-04-24
 修改新用户默认LastLoginInterface;
 修复LocalAuthenticate接口记录用户上次登录审计信息未更新资源树问题
