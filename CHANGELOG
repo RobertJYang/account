@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.70.25] - 2025-04-29
+新增issue模板
+
 ## [1.70.24] - 2025-04-28
 增加上次登录信息记录的参数校验
 
