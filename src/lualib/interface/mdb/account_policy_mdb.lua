@@ -15,6 +15,7 @@ local cls_mng = require 'mc.class_mgnt'
 local context = require 'mc.context'
 local base_msg = require 'messages.base'
 local operation_logger = require 'interface.operation_logger'
+local utils = require 'infrastructure.utils'
 
 local INTERFACE_ACCOUNT_POLICY = 'bmc.kepler.AccountService.AccountPolicy'
 
@@ -37,6 +38,8 @@ function account_policy_mdb:init()
     local config_mdb = {}
     local global_config = self.m_account_config
     config_mdb.NamePattern = global_config:get_name_pattern()
+    config_mdb.AllowedLoginInterfaces =
+        utils.convert_num_to_interface_str(global_config:get_allowed_login_interfaces(), true)
     self:new_config_to_mdb_tree(config_mdb)
 
     self.m_account_config.m_account_policy.m_config_changed:on(function(...)
@@ -48,7 +51,12 @@ end
 account_policy_mdb.watch_property_hook = {
     NamePattern = operation_logger.proxy(function(self, ctx, value)
         self.m_account_config:set_name_pattern(value)
-    end, 'NamePatternChange')
+    end, 'NamePatternChange'),
+    AllowedLoginInterfaces = operation_logger.proxy(function(self, ctx, value)
+        ctx.operation_log.params = { interfaces = table.concat(value, ', ') }
+        local interface_num = utils.cover_interface_str_to_num(value)
+        self.m_account_config:set_allowed_login_interfaces(interface_num)
+    end, 'SetAllowedLoginInterfaces')
 }
 
 function account_policy_mdb:watch_service_property(service)
@@ -74,6 +82,7 @@ end
 function account_policy_mdb:new_config_to_mdb_tree(user_config)
     local cls_config = cls_mng('LocalAccountPolicy'):get("/bmc/kepler/AccountService/AccountPolicies/Local")
     cls_config[INTERFACE_ACCOUNT_POLICY].NamePattern = user_config.NamePattern
+    cls_config[INTERFACE_ACCOUNT_POLICY].AllowedLoginInterfaces = user_config.AllowedLoginInterfaces
     self:watch_service_property(cls_config)
 end
 

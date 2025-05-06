@@ -8,6 +8,11 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 -- Description: 定制化操作时用户公共服务相关项
+local utils = require 'infrastructure.utils'
+local base_msg = require 'messages.base'
+local log = require 'mc.logging'
+local config = require 'common_config'
+
 local AccountServiceCustomization = {}
 
 local ENABLED_IMPORT_MAP = {
@@ -146,6 +151,21 @@ end
 function AccountServiceCustomization.get_weak_pwd_dictionary_enable(self)
     local enabled = self.m_account_config:get_weak_pwd_dictionary_enable()
     return ENABLED_EXPORT_MAP[enabled]
+end
+
+function AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, value)
+    -- 定制接口值含有不支持的接口则需要报错
+    if value & config.DEFAULT_INTERFACES ~= value then
+        log:error('set allowed login interfaces failed, interfaces num value : %d', value)
+        error(base_msg.PropertyValueNotInList(value, "LoginInterface"))
+    end
+    local login_interfaces_str = utils.convert_num_to_interface_str(value, true)
+    ctx.operation_log.params = { interfaces = table.concat(login_interfaces_str, ', ') }
+    self.m_account_config:set_allowed_login_interfaces(value)
+end
+
+function AccountServiceCustomization.get_allowed_login_interfaces(self)
+    return self.m_account_config:get_allowed_login_interfaces()
 end
 
 function AccountServiceCustomization.set_long_community_enable(self, ctx, value)

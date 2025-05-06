@@ -18,13 +18,68 @@ local mdb = require 'mc.mdb'
 
 local AccountPolicy = {}
 
+---@class AccountPolicy.AllowedLoginInterfaces
+---@field AllowedLoginInterfaces string[]
+local TAllowedLoginInterfaces = {}
+TAllowedLoginInterfaces.__index = TAllowedLoginInterfaces
+TAllowedLoginInterfaces.group = {}
+
+local function TAllowedLoginInterfaces_from_obj(obj)
+    return setmetatable(obj, TAllowedLoginInterfaces)
+end
+
+function TAllowedLoginInterfaces.new(AllowedLoginInterfaces)
+    return TAllowedLoginInterfaces_from_obj({
+        AllowedLoginInterfaces = AllowedLoginInterfaces or
+            {[=[Web]=], [=[SNMP]=], [=[IPMI]=], [=[SSH]=], [=[SFTP]=], [=[Local]=], [=[Redfish]=]}
+    })
+end
+---@param obj AccountPolicy.AllowedLoginInterfaces
+function TAllowedLoginInterfaces:init_from_obj(obj)
+    self.AllowedLoginInterfaces = obj.AllowedLoginInterfaces or
+                                      {
+            [=[Web]=], [=[SNMP]=], [=[IPMI]=], [=[SSH]=], [=[SFTP]=], [=[Local]=], [=[Redfish]=]
+        }
+end
+
+function TAllowedLoginInterfaces:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TAllowedLoginInterfaces.group)
+end
+
+TAllowedLoginInterfaces.from_obj = TAllowedLoginInterfaces_from_obj
+
+TAllowedLoginInterfaces.proto_property = {'AllowedLoginInterfaces'}
+
+TAllowedLoginInterfaces.default = {{}}
+
+TAllowedLoginInterfaces.struct = {{name = 'AllowedLoginInterfaces', is_array = true, struct = nil}}
+
+function TAllowedLoginInterfaces:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.OptionalArray(prefix .. 'AllowedLoginInterfaces', self.AllowedLoginInterfaces, 'string', false, errs,
+        need_convert)
+
+    TAllowedLoginInterfaces:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TAllowedLoginInterfaces.proto_property, errs, need_convert)
+    return self
+end
+
+function TAllowedLoginInterfaces:unpack(_)
+    return self.AllowedLoginInterfaces
+end
+
+AccountPolicy.AllowedLoginInterfaces = TAllowedLoginInterfaces
+
 ---@class AccountPolicy.NamePattern
 ---@field NamePattern string
 local TNamePattern = {}
 TNamePattern.__index = TNamePattern
 TNamePattern.group = {}
 
-local function TNamePattern_from_obj(obj) return setmetatable(obj, TNamePattern) end
+local function TNamePattern_from_obj(obj)
+    return setmetatable(obj, TNamePattern)
+end
 
 function TNamePattern.new(NamePattern)
     return TNamePattern_from_obj({NamePattern = NamePattern or [=[]=]})
@@ -49,27 +104,26 @@ TNamePattern.struct = {{name = 'NamePattern', is_array = false, struct = nil}}
 function TNamePattern:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'NamePattern', self.NamePattern, "string",
-                      false, errs, need_convert)
+    validate.Optional(prefix .. 'NamePattern', self.NamePattern, 'string', false, errs, need_convert)
 
     if self.NamePattern ~= nil then
-        validate.lens(prefix .. 'NamePattern', self.NamePattern, 0, 255, errs,
-                      need_convert)
+        validate.lens(prefix .. 'NamePattern', self.NamePattern, 0, 255, errs, need_convert)
     end
 
     TNamePattern:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TNamePattern.proto_property, errs,
-                                 need_convert)
+    validate.CheckUnknowProperty(self, TNamePattern.proto_property, errs, need_convert)
     return self
 end
 
-function TNamePattern:unpack(_) return self.NamePattern end
+function TNamePattern:unpack(_)
+    return self.NamePattern
+end
 
 AccountPolicy.NamePattern = TNamePattern
 
-AccountPolicy.interface = mdb.register_interface(
-                              'bmc.kepler.AccountService.AccountPolicy',
-                              {NamePattern = {'s', {}, false, '', false}}, {},
-                              {})
+AccountPolicy.interface = mdb.register_interface('bmc.kepler.AccountService.AccountPolicy', {
+    NamePattern = {'s', {}, false, '', false},
+    AllowedLoginInterfaces = {'as', {}, false, {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}, false}
+}, {}, {})
 
 return AccountPolicy

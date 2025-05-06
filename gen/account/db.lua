@@ -177,6 +177,7 @@ local Properties = require "account.json_types.Properties"
 ---@class AccountPolicyTable: Table
 ---@field AccountType FieldBase
 ---@field NamePattern FieldBase
+---@field AllowedLoginInterfaces FieldBase
 
 ---@class AccountDBDatabase
 ---@field db DataBase
@@ -501,7 +502,9 @@ function AccountDBDatabase.new(path, datas)
         AccountType = Col.IntegerField():cid(1):primary_key():persistence_key(
             "protect_power_off"):max_length(8),
         NamePattern = Col.TextField():cid(2)
-            :persistence_key("protect_power_off"):null():default("''")
+            :persistence_key("protect_power_off"):null():default("''"),
+        AllowedLoginInterfaces = Col.IntegerField():cid(3):persistence_key("protect_power_off"):null():max_length(32)
+            :default(223)
     }):create_if_not_exist(datas and datas['t_account_policy'])
 
     obj.tables = db.tables

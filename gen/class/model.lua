@@ -3139,6 +3139,15 @@ local LocalAccountPolicy = {
                     ['write'] = {'SecurityMgmt'}
                 },
                 ['validator'] = account_policy_intf_types.NamePattern
+            },
+            ['AllowedLoginInterfaces'] = {
+                ['baseType'] = 'String[]',
+                ['readOnly'] = false,
+                ['default'] = {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'},
+                ['options'] = {['emitsChangedSignal'] = 'false'},
+                ['description'] = '允许本地用户开启的登录接口',
+                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
+                ['validator'] = account_policy_intf_types.AllowedLoginInterfaces
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -3215,13 +3224,20 @@ local LocalAccountPolicy = {
         '/bmc/kepler/AccountService/AccountPolicies/Local'),
     ['new_mdb_objects'] = mdb.new_objects_builder({
         ['bmc.kepler.AccountService.AccountPolicy'] = {
-            ['property_defaults'] = {['NamePattern'] = ''},
+            ['property_defaults'] = {
+                ['NamePattern'] = '',
+                ['AllowedLoginInterfaces'] = {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}
+            },
             ['privileges'] = {
                 ['path'] = privilege.ReadOnly,
                 ['props'] = {
                     ['NamePattern'] = {
                         ['read'] = privilege.ReadOnly,
                         ['write'] = privilege.SecurityMgmt
+                    },
+                    ['AllowedLoginInterfaces'] = {
+                        ['read'] = privilege.ReadOnly,
+                        ['write'] = privilege.UserMgmt
                     }
                 }
             },
@@ -3254,11 +3270,18 @@ local AccountPolicy = {
             ['default'] = '',
             ['usage'] = {'PoweroffPer'},
             ['validator'] = account_policy_class_types.NamePattern
+        },
+        ['AllowedLoginInterfaces'] = {
+            ['baseType'] = 'U32',
+            ['default'] = 223,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = account_policy_class_types.AllowedLoginInterfaces
         }
     },
     ['default_props'] = {
         ['AccountType'] = account_policy_class_types.AccountType.default[1],
-        ['NamePattern'] = ''
+        ['NamePattern'] = '',
+        ['AllowedLoginInterfaces'] = 223
     }
 }
 

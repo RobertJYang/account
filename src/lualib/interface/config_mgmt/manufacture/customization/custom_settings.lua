@@ -97,6 +97,12 @@ local custom_settings_adapter = {
         import = AccountCustomization.set_vnc_login_rule_ids,
         export = AccountCustomization.get_vnc_login_rule_ids
     },
+    BMCSet_LocalAccountAllowedLoginInterfaces = {
+        import = operation_logger.proxy(function(self, ctx, value)
+            AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, value)
+        end, 'SetAllowedLoginInterfaces'),
+        export = AccountServiceCustomization.get_allowed_login_interfaces
+    },
     BMCSet_LongPasswordEnable = {
         import_convert = AccountServiceCustomization.convert_long_community_enable,
         import = AccountServiceCustomization.set_long_community_enable,
@@ -168,7 +174,7 @@ function CustomSettings:on_import(ctx, object)
         ::continue::
     end
     -- BMCSet_InitialPwdPrompt需要在BMCSet_initialPasswordNeedModify使能时才能开启
-    if custom_settings.BMCSet_InitialPwdPrompt.Value == 'on' then
+    if custom_settings.BMCSet_InitialPwdPrompt and custom_settings.BMCSet_InitialPwdPrompt.Value == 'on' then
         custom_settings_adapter.BMCSet_InitialPwdPrompt.import(self, ctx, true)
         log:notice('ImportBMCSet_initialPwdPrompt successfully for the second time.')
     end

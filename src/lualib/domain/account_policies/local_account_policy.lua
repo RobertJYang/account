@@ -14,6 +14,10 @@ local config = require 'common_config'
 local utils_core = require 'utils.core'
 local account_core = require 'account_core'
 local custom_msg = require 'messages.custom'
+local enum = require 'class.types.types'
+local base_msg = require 'messages.base'
+local log = require 'mc.logging'
+local utils = require 'infrastructure.utils'
 
 local local_account_policy = class()
 
@@ -57,6 +61,33 @@ function local_account_policy:check_user_name(user_name)
     end
 
     return utils_core.g_regex_match(check_config, user_name)
+end
+
+function local_account_policy:get_allowed_login_interfaces()
+    return self.m_db_local_account_policy.AllowedLoginInterfaces
+end
+
+function local_account_policy:set_allowed_login_interfaces(interface_num)
+    if interface_num <= 0 or interface_num == enum.LoginInterface.SFTP:value() then
+        log:error('set allowed login interfaces failed, interfaces must contain at least one valid item except SFTP')
+        error(custom_msg.ArrayPropertyInvalidItem('AllowedLoginInterfaces'))
+    end
+    if interface_num & config.DEFAULT_INTERFACES ~= interface_num then
+        log:error('set allowed login interfaces failed, interfaces : %d not supported', interface_num)
+        error(base_msg.PropertyValueNotInList(interface_num, "LoginInterface"))
+    end
+    self.m_db_local_account_policy.AllowedLoginInterfaces = interface_num
+    self.m_db_local_account_policy:save()
+end
+
+function local_account_policy:check_login_interface_is_allowed(login_interfaces)
+    if login_interfaces == 'table' then
+        login_interfaces = utils.cover_interface_str_to_num(login_interfaces)
+    end
+    if login_interfaces & self.m_db_local_account_policy.AllowedLoginInterfaces ~= login_interfaces then
+        return false
+    end
+    return true
 end
 
 return singleton(local_account_policy)

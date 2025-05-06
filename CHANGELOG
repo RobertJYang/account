@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.70.26] - 2025-05-06
+支持定制本地用户允许开启的登录接口
 
 ## [1.70.25] - 2025-04-29
 新增issue模板

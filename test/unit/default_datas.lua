@@ -280,6 +280,11 @@ M.t_password_policy = {
     {AccountType = 0, Policy = 1, Pattern = [=[]=]}, {AccountType = 3, Policy = 1, Pattern = [=[]=]},
     {AccountType = 7, Policy = 1, Pattern = [=[]=]}
 }
-M.t_account_policy = {{AccountType = 0, NamePattern = [=[]=]}}
-
+M.t_account_policy = {
+    {
+        AccountType = 0,
+        NamePattern = [=[]=],
+        AllowedLoginInterfaces = 223
+    }
+}
 return M

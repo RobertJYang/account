@@ -62,6 +62,16 @@ function global_account_config:init()
     end))
 end
 
+function global_account_config:get_allowed_login_interfaces()
+    return self.m_account_policy:get_allowed_login_interfaces()
+end
+
+function global_account_config:set_allowed_login_interfaces(interface_num)
+    self.m_account_policy:set_allowed_login_interfaces(interface_num)
+    self.m_account_policy.m_config_changed:emit('AllowedLoginInterfaces',
+        utils.convert_num_to_interface_str(interface_num, true))
+end
+
 function global_account_config:get_name_pattern()
     return self.m_account_policy:get_name_pattern()
 end

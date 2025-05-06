@@ -1339,6 +1339,13 @@
                             "write": ["SecurityMgmt"]
                         },
                         "default": ""
+                    },
+                    "AllowedLoginInterfaces": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": ["Web", "SNMP", "IPMI", "SSH", "SFTP", "Local", "Redfish"]
                     }
                 }
             }
@@ -1357,6 +1364,13 @@
             "NamePattern": {
                 "baseType": "String",
                 "default": "",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "AllowedLoginInterfaces": {
+                "baseType": "U32",
+                "default": 223,
                 "usage": [
                     "PoweroffPer"
                 ]
