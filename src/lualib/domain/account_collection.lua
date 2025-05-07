@@ -356,6 +356,14 @@ function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
         log:error('Invalid name(%s) is not allowed', account_info.name)
         error(custom_msg.InvalidUserName())
     end
+    -- AllowedLoginInterfaces仅限制本地用户
+    if not account_info.oem and
+        not self.m_global_account_config.m_account_policy:
+        check_login_interface_is_allowed(utils.cover_interface_enum_to_num(account_info.interface)) then
+        local interfaces_str = utils.interface_enum_table_to_string(account_info.interface)
+        log:error('LoginInterface is illegal, interface : %s', interfaces_str)
+        error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. interfaces_str, '%LoginInterface'))
+    end
     -- account_info中包含oem值时意味着此时新建oem用户
     local account_class = account_info.oem and oem_account or local_account
     local account_id = self:get_valid_account_id(account_info.id, account_class)
@@ -520,7 +528,13 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
         log:error('LoginInterface is illegal!')
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
     end
+    -- 判断本地2-17用户要开启的登录接口是否在AllowedLoginInterfaces内
     local interface_num = utils.cover_interface_str_to_num(interface)
+    if account:get_account_type():value() == enum.AccountType.Local:value() and
+        not self.m_global_account_config.m_account_policy:check_login_interface_is_allowed(interface_num) then
+        log:error('LoginInterface is illegal, interface : %s', table.concat(interface, ', '))
+        error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
+    end
     -- 判断要取消ipmi接口
     if account:is_delete_ipmi_interface(interface_num) then
         -- 清掉ipmi密码， ipmi密码设为空
@@ -625,6 +639,11 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
     local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.SFTP, enum.LoginInterface.Web,
         enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
         enum.LoginInterface.SNMP }
+    -- 如果当前限制了用户允许开启的登录接口(接口数<7), 机机接口新建用户登录接口使用AllowedLoginInterfaces支持的范围
+    local allowed_login_interfaces = self.m_global_account_config:get_allowed_login_interfaces()
+    if allowed_login_interfaces < config.DEFAULT_INTERFACES then
+        interface = utils.convert_num_to_interface_str(allowed_login_interfaces)
+    end
     local account_info = {
         ['id'] = account_id,
         ['name'] = user_name,

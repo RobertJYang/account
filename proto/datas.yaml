@@ -165,3 +165,4 @@ t_password_policy:
 t_account_policy:
 - AccountType: 0
   NamePattern: ''
+  AllowedLoginInterfaces: 223

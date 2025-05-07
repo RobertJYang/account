@@ -11,6 +11,7 @@ local lu = require 'luaunit'
 local config = require 'common_config'
 local file_utils = require 'utils.file'
 local custom_msg = require 'messages.custom'
+local base_msg = require 'messages.base'
 
 local WEAK_PWDDICT_MAX_SUPPORTED_LINES<const> = 1000
 
@@ -269,4 +270,53 @@ function TestAccount:test_when_unsername_invalid_should_check_fail()
     lu.assertIsFalse(self.test_global_account_config.m_account_policy:check_user_name('Administrator\r\n\f'))
     lu.assertIsFalse(self.test_global_account_config.m_account_policy:check_user_name('Administrator\n\n'))
     lu.assertIsFalse(self.test_global_account_config.m_account_policy:check_user_name('Administrator\f\f'))
+end
+
+--- 设置本地用户AllowedLoginInterface合法应成功
+function TestAccount:test_set_allowed_login_interfaces_success()
+    -- 登录接口num:Web:1, SNMP:2, IPMI:4, SSH:8, SFTP:16, Local:64, Redfish:128
+    self.account_policy:set_allowed_login_interfaces(1)
+    self.account_policy:set_allowed_login_interfaces(2)
+    self.account_policy:set_allowed_login_interfaces(4)
+    self.account_policy:set_allowed_login_interfaces(8)
+    self.account_policy:set_allowed_login_interfaces(64)
+    self.account_policy:set_allowed_login_interfaces(128)
+    self.account_policy:set_allowed_login_interfaces(80)
+    self.account_policy:set_allowed_login_interfaces(137)
+    self.account_policy:set_allowed_login_interfaces(223)
+end
+
+--- 设置本地用户AllowedLoginInterface不合法应失败
+function TestAccount:test_set_allowed_login_interfaces_invalid_should_failed()
+    -- 本地用户禁止关闭所有登录接口/只开启SFTP接口
+    lu.assertErrorMsgContains(custom_msg.ArrayPropertyInvalidItemMessage.Name, function ()
+        self.account_policy:set_allowed_login_interfaces(0)
+    end)
+    lu.assertErrorMsgContains(custom_msg.ArrayPropertyInvalidItemMessage.Name, function ()
+        self.account_policy:set_allowed_login_interfaces(16)
+    end)
+    -- 不支持的登录接口
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function ()
+        self.account_policy:set_allowed_login_interfaces(32)
+    end)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function ()
+        self.account_policy:set_allowed_login_interfaces(111)
+    end)
+end
+
+--- 检查登录接口是否在AllowedLoginInterfaces内
+function TestAccount:test_check_login_interface_is_allowed()
+    -- 137:Web,SSH,Redfish
+    self.account_policy:set_allowed_login_interfaces(137)
+    lu.assertIsTrue(self.account_policy:check_login_interface_is_allowed(1))
+    lu.assertIsTrue(self.account_policy:check_login_interface_is_allowed(8))
+    lu.assertIsTrue(self.account_policy:check_login_interface_is_allowed(128))
+    lu.assertIsTrue(self.account_policy:check_login_interface_is_allowed(9))
+    lu.assertIsTrue(self.account_policy:check_login_interface_is_allowed(137))
+    lu.assertIsFalse(self.account_policy:check_login_interface_is_allowed(4))
+    lu.assertIsFalse(self.account_policy:check_login_interface_is_allowed(132))
+    lu.assertIsFalse(self.account_policy:check_login_interface_is_allowed(16))
+    lu.assertIsFalse(self.account_policy:check_login_interface_is_allowed(80))
+    -- 恢复操作
+    self.account_policy:set_allowed_login_interfaces(223)
 end

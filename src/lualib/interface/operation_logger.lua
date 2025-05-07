@@ -267,6 +267,10 @@ local operation_log_map = {
         success = 'Change name pattern successfully',
         fail = 'Change name pattern failed'
     },
+    SetAllowedLoginInterfaces = {
+        success = 'Set allowed login interfaces to ({interfaces}) successfully',
+        fail = 'Set allowed login interfaces failed',
+    },
     ---------------- account_service_mdb end --------------------
 
     ---------------------- login_rule_mdb -----------------------

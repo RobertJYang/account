@@ -40,6 +40,13 @@ end
 ---@param account_info table
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，创建OEM用户时可能包含密码类型等信息
 function AccountService:new_account(ctx, account_info, is_ipmi_or_snmp)
+    -- 如果机机接口新建用户开启所有登录接口且当前限制了用户允许开启的登录接口, 则限制新建用户登录接口为AllowedLoginInterfaces支持的范围
+    local allowed_login_interfaces = self.m_account_config:get_allowed_login_interfaces()
+    local cur_interface_num = utils.cover_interface_enum_to_num(account_info.interface)
+    if (ctx.Interface == 'CLI' or ctx.Interface == 'Redfish') and
+        allowed_login_interfaces < config.DEFAULT_INTERFACES and cur_interface_num == config.DEFAULT_INTERFACES then
+        account_info.interface = utils.convert_num_to_interface_str(allowed_login_interfaces)
+    end
     local role_name = self.m_rc:get_role_name_by_id(account_info.role_id)
     ctx.operation_log.params.name = account_info.name
     ctx.operation_log.params.id = account_info.id
