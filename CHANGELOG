@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.80.1] - 2025-05-08
+支持定制本地用户允许开启的登录接口
+
 ## [1.70.26] - 2025-05-06
 支持定制本地用户允许开启的登录接口
 
