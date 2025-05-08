@@ -106,9 +106,16 @@ function app:ctor()
     self.db_upgrade = db_upgrade.new({['db'] = self.db, ['backup_db'] = self.local_db})
 end
 
+function app:patch()
+    local snmp_patch = require 'patch.snmp_patch'
+    snmp_patch.exec(self.persist, self.db)
+end
+
 function app:init()
     log:notice("account class init start")
     app.super.init(self)
+    -- 打补丁
+    self:patch()
     self:check_dependencies()
     self:register_rpc_methods()
 
