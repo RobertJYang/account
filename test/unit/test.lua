@@ -223,6 +223,7 @@ os.execute_s = function(cmd)
 end
 
 require 'test_account'
+require 'test_profile'
 require 'test_linux_account'
 require 'test_manager_account'
 require 'test_vnc_account'

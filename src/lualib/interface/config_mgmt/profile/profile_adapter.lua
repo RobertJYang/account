@@ -380,6 +380,9 @@ function ProfileAdapter:import_property(ctx, class_name, property_name, property
 end
 
 function ProfileAdapter:import_handle(ctx, class_name, class)
+    if class_name == "User" then
+        AccountProfile.import_account_precheck(self, ctx, class)
+    end
     if is_object_array(class) then
         for _, instance in ipairs(class) do
             local instance_id = instance.Id.Value
