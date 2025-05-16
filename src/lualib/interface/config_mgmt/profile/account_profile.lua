@@ -12,6 +12,7 @@ local log = require 'mc.logging'
 local custom_msg = require 'messages.custom'
 local account_enum = require 'class.types.types'
 local account_utils = require 'infrastructure.utils'
+local enum = require 'class.types.types'
 
 
 local AccountProfile = {}
@@ -22,6 +23,34 @@ local function enable_login_interface_check(old_interfaces, new_interfaces, chec
         return true
     end
     return false
+end
+
+-- 用户导入前的预校验，当前先支持老卡多用户，新卡只有一个用户的导入场景
+function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
+    for _, instance in ipairs(accounts) do
+        local instance_id = instance.Id.Value
+        if profile_adapter.m_account_collection:get_account_data_by_id(instance_id) == nil then
+            local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.SFTP, enum.LoginInterface.Web,
+                enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
+                enum.LoginInterface.SNMP }
+            local account_info = {
+                ['id'] = instance_id,
+                ['name'] = instance.UserName.Value,
+                ['password'] = '',
+                ['role_id'] = enum.RoleType.NoAccess:value(),
+                ['interface'] = interface,
+                ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+            }
+            -- 新建用户，第三个参数为true代表当前新建用户走ipmi流程，不创建密码
+            local ok, err = pcall(function()
+                profile_adapter.m_account_collection:new_account(ctx, account_info, true)
+            end)
+            if not ok then
+                log:error("import account config precheck failed, cannot add account(id:%d), %s", instance_id,
+                    tostring(err))
+            end
+        end
+    end
 end
 
 function AccountProfile.set_account_id(self, ctx, account_id)
