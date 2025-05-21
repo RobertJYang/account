@@ -91,8 +91,7 @@
                         },
                         "usage": [
                             "PoweroffPer"
-                        ],
-                        "description": "密码最短有效期"
+                        ]
                     },
                     "MaxPasswordValidDays": {
                         "default": 0,
@@ -102,11 +101,9 @@
                         },
                         "usage": [
                             "PoweroffPer"
-                        ],
-                        "description": "密码最长有效期"
+                        ]
                     },
                     "EmergencyLoginAccountId": {
-                        "baseType": "U8",
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["UserMgmt"]
@@ -117,7 +114,6 @@
                         ]
                     },
                     "SNMPv3TrapAccountId": {
-                        "baseType": "U8",
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["BasicSetting"]
@@ -158,7 +154,6 @@
                         ]
                     },
                     "HostUserManagementEnabled": {
-                        "baseType": "Boolean",
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["UserMgmt"]
@@ -169,7 +164,6 @@
                         ]
                     },
                     "OSAdministratorPrivilegeEnabled": {
-                        "baseType": "Boolean",
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["UserMgmt"]
@@ -180,36 +174,41 @@
                         ]
                     },
                     "SNMPv3TrapAccountLimitPolicy": {
-                        "baseType": "U8",
-                        "readOnly": false,
-                        "default": 2,
-                        "description": "对trap用户的修改策略.trap版本不为v3,该属性为0,对用户修改不作限制;trap版本为v3,使能关闭,该属性为1,用户不可被删除;trap版本为v3,使能开启,该属性为2,用户不可被删除和更改名字"
+                        "default": 2
                     },
                     "UserNamePasswordPrefixCompareEnabled": {
-                        "baseType": "Boolean",
                         "default": false,
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["SecurityMgmt"]
                         },
-                        "readOnly": false,
                         "usage": [
                             "PoweroffPer"
-                        ],
-                        "description": "密码与用户名前n个字节比较策略使能开关"
+                        ]
                     },
                     "UserNamePasswordPrefixCompareLength": {
-                        "baseType": "U8",
                         "default": 4,
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["SecurityMgmt"]
                         },
-                        "readOnly": false,
                         "usage": [
                             "PoweroffPer"
-                        ],
-                        "description": "密码与用户名前n个字节比较长度"
+                        ]
+                    }
+                },
+                "methods": {
+                    "ImportWeakPasswordDictionary": {
+                        "privilege": ["SecurityMgmt"]
+                    },
+                    "ExportWeakPasswordDictionary": {
+                        "privilege": ["SecurityMgmt"]
+                    },
+                    "GetRequestedPublicKey": {
+                        "privilege": ["ReadOnly"]
+                    },
+                    "RecoverAccount": {
+                        "privilege":["UserMgmt"]
                     }
                 }
             }
@@ -276,7 +275,28 @@
         "path": "/bmc/kepler/AccountService/Accounts",
         "privilege": ["ReadOnly"],
         "interfaces": {
-            "bmc.kepler.AccountService.ManagerAccounts": {}
+            "bmc.kepler.AccountService.ManagerAccounts": {
+                "methods": {
+                    "New": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "NewOEMAccount": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "GetIdByUserName": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "SetAccountWritable": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "GetAccountWritable": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "SetAccountLockState": {
+                        "privilege":["UserMgmt"]
+                    }
+                }
+            }
         }
     },
     "ManagerAccount": {
@@ -397,6 +417,26 @@
                             "write": ["UserMgmt"]
                         }
                     }
+                },
+                "methods": {
+                    "Delete": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "ChangePwd": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "ChangeSnmpPwd": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "ImportSSHPublicKey": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "DeleteSSHPublicKey": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "SetLastLogin": {
+                        "privilege":["ConfigureSelf"]
+                    }
                 }
             },
             "bmc.kepler.AccountService.ManagerAccount.SnmpUser": {
@@ -418,6 +458,17 @@
                             "read": ["ConfigureSelf"],
                             "write": ["UserMgmt"]
                         }
+                    }
+                },
+                "methods": {
+                    "SetAuthenticationProtocol": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "SetEncryptionProtocol": {
+                        "privilege":["ConfigureSelf"]
+                    },
+                    "GetSnmpKeys": {
+                        "privilege":["UserMgmt"]
                     }
                 }
             }
@@ -1089,6 +1140,11 @@
                             "write": ["UserMgmt"]
                         }
                     }
+                },
+                "methods": {
+                    "SetRolePrivilege": {
+                        "privilege":["UserMgmt"]
+                    }
                 }
             }
         },
@@ -1198,8 +1254,7 @@
                         "default": true,
                         "usage": [
                             "PoweroffPer"
-                        ],
-                        "description": ""
+                        ]
                     },
                     "RwCommunityEnabled": {
                         "privilege": {
@@ -1210,6 +1265,20 @@
                         "usage": [
                             "PoweroffPer"
                         ]
+                    }
+                },
+                "methods": {
+                    "SetRwCommunity": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "SetRoCommunity": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "GetSnmpCommunity": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "SetSnmpCommunityLoginRule": {
+                        "privilege":["UserMgmt"]
                     }
                 }
             }
@@ -1229,7 +1298,16 @@
         "path": "/bmc/kepler/AccountService/LocalAccountAuthN",
         "privilege": ["ReadOnly"],
         "interfaces": {
-            "bmc.kepler.AccountService.LocalAccountAuthN": {}
+            "bmc.kepler.AccountService.LocalAccountAuthN": {
+                "methods": {
+                    "LocalAuthenticate": {
+                        "privilege": ["ReadOnly"]
+                    },
+                    "VncAuthenticate": {
+                        "privilege": ["ReadOnly"]
+                    }
+                }
+            }
         }
     },
     "AccountBackup": {

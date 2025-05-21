@@ -65,6 +65,57 @@ function TPrivileges:unpack(_) return self end
 
 IpmiCore.Privileges = TPrivileges
 
+---@class IpmiCore.CustomManufacturerId
+---@field CustomManufacturerId integer
+local TCustomManufacturerId = {}
+TCustomManufacturerId.__index = TCustomManufacturerId
+TCustomManufacturerId.group = {}
+
+local function TCustomManufacturerId_from_obj(obj)
+    return setmetatable(obj, TCustomManufacturerId)
+end
+
+function TCustomManufacturerId.new(CustomManufacturerId)
+    return TCustomManufacturerId_from_obj({
+        CustomManufacturerId = CustomManufacturerId
+    })
+end
+---@param obj IpmiCore.CustomManufacturerId
+function TCustomManufacturerId:init_from_obj(obj)
+    self.CustomManufacturerId = obj.CustomManufacturerId
+end
+
+function TCustomManufacturerId:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TCustomManufacturerId.group)
+end
+
+TCustomManufacturerId.from_obj = TCustomManufacturerId_from_obj
+
+TCustomManufacturerId.proto_property = {'CustomManufacturerId'}
+
+TCustomManufacturerId.default = {0}
+
+TCustomManufacturerId.struct = {
+    {name = 'CustomManufacturerId', is_array = false, struct = nil}
+}
+
+function TCustomManufacturerId:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'CustomManufacturerId',
+                      self.CustomManufacturerId, "uint32", true, errs,
+                      need_convert)
+
+    TCustomManufacturerId:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TCustomManufacturerId.proto_property,
+                                 errs, need_convert)
+    return self
+end
+
+function TCustomManufacturerId:unpack(_) return self.CustomManufacturerId end
+
+IpmiCore.CustomManufacturerId = TCustomManufacturerId
+
 ---@class IpmiCore.ChannelAccesses
 ---@field ChannelAccesses IpmiCore.Privileges
 local TChannelAccesses = {}
@@ -650,7 +701,8 @@ IpmiCore.RequestReq = TRequestReq
 IpmiCore.interface = mdb.register_interface('bmc.kepler.IpmiCore', {
     Version = {'s', {}, true, '2.0', false},
     HostUSBChannelEnabled = {'b', nil, false, false, false},
-    ChannelAccesses = {'a{ss}', nil, true, nil, false}
+    ChannelAccesses = {'a{ss}', nil, true, nil, false},
+    CustomManufacturerId = {'u', nil, true, nil, false}
 }, {
     Request = {'a{ss}yyyyyay', 'yay', TRequestReq, TRequestRsp},
     Route = {'a{ss}ayay', 'ay', TRouteReq, TRouteRsp},

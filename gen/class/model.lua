@@ -418,7 +418,6 @@ local AccountService = {
         ['bmc.kepler.AccountService'] = {
             ['ImportWeakPasswordDictionary'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'SecurityMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'Path'}},
                 ['rsp'] = {
                     {
@@ -426,11 +425,12 @@ local AccountService = {
                         ['description'] = '仅远程上传涉及，任务id',
                         ['param'] = 'TaskId'
                     }
-                }
+                },
+                ['description'] = '导入弱口令字典',
+                ['privilege'] = {'SecurityMgmt'}
             },
             ['ExportWeakPasswordDictionary'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'SecurityMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'Path'}},
                 ['rsp'] = {
                     {
@@ -438,11 +438,12 @@ local AccountService = {
                         ['description'] = '仅远程上传涉及，任务id',
                         ['param'] = 'TaskId'
                     }
-                }
+                },
+                ['description'] = '导出弱口令字典',
+                ['privilege'] = {'SecurityMgmt'}
             },
             ['GetRequestedPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -456,11 +457,12 @@ local AccountService = {
                         ['description'] = '公钥字符串',
                         ['param'] = 'PublicKey'
                     }
-                }
+                },
+                ['description'] = 'web接口登录获取公钥,仅web_backend调用',
+                ['privilege'] = {'ReadOnly'}
             },
             ['RecoverAccount'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -475,7 +477,9 @@ local AccountService = {
                         ['param'] = 'Policy'
                     }
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '根据用户传入id恢复还原点用户信息',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -679,7 +683,6 @@ local ManagerAccounts = {
         ['bmc.kepler.AccountService.ManagerAccounts'] = {
             ['New'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -714,10 +717,11 @@ local ManagerAccounts = {
                         ['param'] = 'FirstLoginPolicy'
                     }
                 },
-                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}}
+                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
+                ['description'] = '新建账户;0表示不指定用户id,默认选择一个用户,不能指定id为1',
+                ['privilege'] = {'UserMgmt'}
             },
             ['NewOEMAccount'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -740,11 +744,12 @@ local ManagerAccounts = {
                         ['param'] = 'ExtraData'
                     }
                 },
-                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}}
+                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
+                ['description'] = '新建OEM用户',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetIdByUserName'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'String',
@@ -753,7 +758,61 @@ local ManagerAccounts = {
                         ['param'] = 'UserName'
                     }
                 },
-                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}}
+                ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
+                ['description'] = '通过用户名获取用户id',
+                ['privilege'] = {'ConfigureSelf'}
+            },
+            ['SetAccountWritable'] = {
+                ['initiator'] = true,
+                ['req'] = {
+                    {
+                        ['baseType'] = 'U8',
+                        ['maximum'] = 115,
+                        ['minimum'] = 2,
+                        ['param'] = 'AccountId'
+                    }, {
+                        ['baseType'] = 'Dictionary',
+                        ['$ref'] = '#/defs/PropertyWritable',
+                        ['param'] = 'PropertiesWritable'
+                    }
+                },
+                ['rsp'] = {},
+                ['description'] = '设置某用户某属性是否可修改,当前定制化需求仅需支持UserName/Password',
+                ['privilege'] = {'UserMgmt'}
+            },
+            ['GetAccountWritable'] = {
+                ['initiator'] = true,
+                ['req'] = {
+                    {
+                        ['baseType'] = 'U8',
+                        ['maximum'] = 115,
+                        ['minimum'] = 2,
+                        ['param'] = 'AccountId'
+                    }
+                },
+                ['rsp'] = {
+                    {
+                        ['baseType'] = 'Dictionary',
+                        ['$ref'] = '#/defs/PropertyWritable',
+                        ['param'] = 'PropertiesWritable'
+                    }
+                },
+                ['description'] = '获取某用户某属性是否可被修改',
+                ['privilege'] = {'UserMgmt'}
+            },
+            ['SetAccountLockState'] = {
+                ['initiator'] = true,
+                ['req'] = {
+                    {
+                        ['baseType'] = 'U8',
+                        ['maximum'] = 115,
+                        ['minimum'] = 2,
+                        ['param'] = 'AccountId'
+                    }, {['baseType'] = 'Boolean', ['param'] = 'Lockstatus'}
+                },
+                ['rsp'] = {},
+                ['description'] = '设置用户锁定状态',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetUidGidByUserName'] = {
                 ['initiator'] = true,
@@ -768,56 +827,8 @@ local ManagerAccounts = {
                 ['rsp'] = {
                     {['baseType'] = 'U32', ['param'] = 'UID'},
                     {['baseType'] = 'U32', ['param'] = 'GID'}
-                }
-            },
-            ['SetAccountWritable'] = {
-                ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
-                ['req'] = {
-                    {
-                        ['baseType'] = 'U8',
-                        ['maximum'] = 115,
-                        ['minimum'] = 2,
-                        ['param'] = 'AccountId'
-                    }, {
-                        ['baseType'] = 'Dictionary',
-                        ['$ref'] = '#/defs/PropertyWritable',
-                        ['param'] = 'PropertiesWritable'
-                    }
                 },
-                ['rsp'] = {}
-            },
-            ['GetAccountWritable'] = {
-                ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
-                ['req'] = {
-                    {
-                        ['baseType'] = 'U8',
-                        ['maximum'] = 115,
-                        ['minimum'] = 2,
-                        ['param'] = 'AccountId'
-                    }
-                },
-                ['rsp'] = {
-                    {
-                        ['baseType'] = 'Dictionary',
-                        ['$ref'] = '#/defs/PropertyWritable',
-                        ['param'] = 'PropertiesWritable'
-                    }
-                }
-            },
-            ['SetAccountLockState'] = {
-                ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
-                ['req'] = {
-                    {
-                        ['baseType'] = 'U8',
-                        ['maximum'] = 115,
-                        ['minimum'] = 2,
-                        ['param'] = 'AccountId'
-                    }, {['baseType'] = 'Boolean', ['param'] = 'Lockstatus'}
-                },
-                ['rsp'] = {}
+                ['description'] = '通过用户名查找用户id,组id'
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -1158,13 +1169,13 @@ local ManagerAccount = {
         ['bmc.kepler.AccountService.ManagerAccount'] = {
             ['Delete'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '删除账户',
+                ['privilege'] = {'UserMgmt'}
             },
             ['ChangePwd'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8[]',
@@ -1174,11 +1185,12 @@ local ManagerAccount = {
                         ['param'] = 'Password'
                     }
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '修改账户密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['ChangeSnmpPwd'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8[]',
@@ -1188,11 +1200,12 @@ local ManagerAccount = {
                         ['param'] = 'Password'
                     }
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '修改本地用户SNMP密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['ImportSSHPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'String',
@@ -1210,17 +1223,19 @@ local ManagerAccount = {
                         ['description'] = '远程上传时代表任务Id，否则为0',
                         ['param'] = 'TaskId'
                     }
-                }
+                },
+                ['description'] = '导入SSH公钥',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['DeleteSSHPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {},
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '删除SSH公钥',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['SetLastLogin'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'String',
@@ -1238,13 +1253,14 @@ local ManagerAccount = {
                         ['description'] = '处理结果',
                         ['param'] = 'Result'
                     }
-                }
+                },
+                ['description'] = '提供给第三方认证用于记录上次登录记录',
+                ['privilege'] = {'ConfigureSelf'}
             }
         },
         ['bmc.kepler.AccountService.ManagerAccount.SnmpUser'] = {
             ['SetAuthenticationProtocol'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -1264,11 +1280,12 @@ local ManagerAccount = {
                         ['param'] = 'EncryPassword'
                     }
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置snmp鉴权算法、鉴权密码和加密密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['SetEncryptionProtocol'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -1276,10 +1293,11 @@ local ManagerAccount = {
                         ['param'] = 'SNMPEncryptionProtocol'
                     }
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置snmp加密算法',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['GetSnmpKeys'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
                 ['rsp'] = {
                     {
@@ -1291,7 +1309,9 @@ local ManagerAccount = {
                         ['description'] = 'SNMP加密密码 Ku',
                         ['param'] = 'EncryptionKey'
                     }
-                }
+                },
+                ['description'] = '获取鉴权key和加密key',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2449,12 +2469,13 @@ local Role = {
         ['bmc.kepler.AccountService.Role'] = {
             ['SetRolePrivilege'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['param'] = 'PrivilegeType'},
                     {['baseType'] = 'Boolean', ['param'] = 'PrivilegeValue'}
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置角色权限',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2606,29 +2627,33 @@ local SnmpCommunity = {
     ['mdb_method_configs'] = {
         ['bmc.kepler.Managers.SnmpService.SnmpCommunity'] = {
             ['SetRwCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'RwCommunity'}},
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置rw snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['SetRoCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'RwCommunity'}},
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置ro snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetSnmpCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
                 ['rsp'] = {
                     {['baseType'] = 'String', ['param'] = 'RwCommunity'},
                     {['baseType'] = 'String', ['param'] = 'RoCommunity'}
-                }
+                },
+                ['description'] = '获取snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['SetSnmpCommunityLoginRule'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'String[]', ['param'] = 'LoginRuleIds'}
                 },
-                ['rsp'] = {}
+                ['rsp'] = {},
+                ['description'] = '设置snmp团体名登录规则',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2757,7 +2782,6 @@ local LocalAccountAuthN = {
         ['bmc.kepler.AccountService.LocalAccountAuthN'] = {
             ['LocalAuthenticate'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
                     {
                         ['baseType'] = 'String',
@@ -2777,14 +2801,22 @@ local LocalAccountAuthN = {
                         ['$ref'] = '#/defs/AccountData',
                         ['param'] = 'AccountData'
                     }
-                }
+                },
+                ['description'] = '本地用户认证',
+                ['privilege'] = {'ReadOnly'}
             },
             ['VncAuthenticate'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
-                    {['baseType'] = 'String', ['param'] = 'CipherText'},
-                    {['baseType'] = 'String', ['param'] = 'AuthChallenge'}
+                    {
+                        ['baseType'] = 'String',
+                        ['description'] = '密文',
+                        ['param'] = 'CipherText'
+                    }, {
+                        ['baseType'] = 'String',
+                        ['description'] = '挑战码',
+                        ['param'] = 'AuthChallenge'
+                    }
                 },
                 ['rsp'] = {
                     {
@@ -2792,52 +2824,96 @@ local LocalAccountAuthN = {
                         ['$ref'] = '#/defs/AccountData',
                         ['param'] = 'AccountData'
                     }
-                }
+                },
+                ['description'] = 'vnc用户认证',
+                ['privilege'] = {'ReadOnly'}
             },
             ['GenRmcp20Code'] = {
                 ['initiator'] = true,
                 ['req'] = {
-                    {['baseType'] = 'U8', ['param'] = 'AuthAlgo'}, {
+                    {
+                        ['baseType'] = 'U8',
+                        ['description'] = '加密算法',
+                        ['param'] = 'AuthAlgo'
+                    }, {
                         ['baseType'] = 'String',
                         ['maxLength'] = 32,
                         ['minLength'] = 1,
+                        ['description'] = '用户名',
                         ['param'] = 'UserName'
-                    }, {['baseType'] = 'U32', ['param'] = 'ConsoleSid'},
-                    {['baseType'] = 'U32', ['param'] = 'ManagedSid'}, {
+                    }, {
+                        ['baseType'] = 'U32',
+                        ['description'] = '控制台端会话id',
+                        ['param'] = 'ConsoleSid'
+                    }, {
+                        ['baseType'] = 'U32',
+                        ['description'] = '服务端系统身份id',
+                        ['param'] = 'ManagedSid'
+                    }, {
                         ['baseType'] = 'U8[]',
                         ['maxLength'] = 16,
                         ['minLength'] = 16,
+                        ['description'] = '控制随机数',
                         ['param'] = 'ConsoleRandom'
                     }, {
                         ['baseType'] = 'U8[]',
                         ['maxLength'] = 16,
                         ['minLength'] = 16,
+                        ['description'] = 'BMC随机数',
                         ['param'] = 'ManagedRandom'
                     }, {
                         ['baseType'] = 'U8[]',
                         ['maxLength'] = 16,
                         ['minLength'] = 16,
+                        ['description'] = '服务端设备身份id',
                         ['param'] = 'ManagedGuid'
-                    }, {['baseType'] = 'U8', ['param'] = 'Role'},
-                    {['baseType'] = 'String', ['param'] = 'Ip'}
+                    },
+                    {
+                        ['baseType'] = 'U8',
+                        ['description'] = '角色权限',
+                        ['param'] = 'Role'
+                    },
+                    {
+                        ['baseType'] = 'String',
+                        ['description'] = 'IP地址',
+                        ['param'] = 'Ip'
+                    }
                 },
                 ['rsp'] = {
                     {['baseType'] = 'U8[]', ['param'] = 'Rap2AuthCode'},
                     {['baseType'] = 'U8[]', ['param'] = 'Sik'},
                     {['baseType'] = 'U8[]', ['param'] = 'Rap3AuthCode'}
-                }
+                },
+                ['description'] = 'IPMI2.0 rmcp+认证,根据用户密码一次生成三个认证参数'
             },
             ['GenRmcp15Code'] = {
                 ['initiator'] = true,
                 ['req'] = {
-                    {['baseType'] = 'U8', ['param'] = 'AuthAlgo'}, {
+                    {
+                        ['baseType'] = 'U8',
+                        ['description'] = '加密算法',
+                        ['param'] = 'AuthAlgo'
+                    }, {
                         ['baseType'] = 'U8[]',
                         ['maxLength'] = 255,
                         ['minLength'] = 1,
+                        ['description'] = '有效负载',
                         ['param'] = 'PayLoad'
-                    }, {['baseType'] = 'U8', ['param'] = 'AccountId'},
-                    {['baseType'] = 'U32', ['param'] = 'SessionId'},
-                    {['baseType'] = 'U32', ['param'] = 'SessionSequence'}
+                    },
+                    {
+                        ['baseType'] = 'U8',
+                        ['description'] = '用户id',
+                        ['param'] = 'AccountId'
+                    },
+                    {
+                        ['baseType'] = 'U32',
+                        ['description'] = '会话id',
+                        ['param'] = 'SessionId'
+                    }, {
+                        ['baseType'] = 'U32',
+                        ['description'] = 'RMCP会话的序列号',
+                        ['param'] = 'SessionSequence'
+                    }
                 },
                 ['rsp'] = {{['baseType'] = 'U8[]', ['param'] = 'AuthCode'}},
                 ['description'] = 'IPMI1.5版本用户认证方法'
@@ -3143,10 +3219,15 @@ local LocalAccountPolicy = {
             ['AllowedLoginInterfaces'] = {
                 ['baseType'] = 'String[]',
                 ['readOnly'] = false,
-                ['default'] = {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'},
+                ['default'] = {
+                    'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'
+                },
                 ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['description'] = '允许本地用户开启的登录接口',
-                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
+                ['privilege'] = {
+                    ['read'] = {'ReadOnly'},
+                    ['write'] = {'UserMgmt'}
+                },
                 ['validator'] = account_policy_intf_types.AllowedLoginInterfaces
             }
         },
@@ -3226,7 +3307,9 @@ local LocalAccountPolicy = {
         ['bmc.kepler.AccountService.AccountPolicy'] = {
             ['property_defaults'] = {
                 ['NamePattern'] = '',
-                ['AllowedLoginInterfaces'] = {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}
+                ['AllowedLoginInterfaces'] = {
+                    'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'
+                }
             },
             ['privileges'] = {
                 ['path'] = privilege.ReadOnly,
@@ -3430,21 +3513,6 @@ function M.ImplManagerAccountsManagerAccountsGetIdByUserName(cb)
 end
 
 -- The callback needs to be registered during app initialization
-function M.ImplManagerAccountsManagerAccountsGetUidGidByUserName(cb)
-    class('ManagerAccounts')['bmc.kepler.AccountService.ManagerAccounts']
-        .GetUidGidByUserName = function(obj, ctx, ...)
-        local req =
-            manager_accounts_intf_types.GetUidGidByUserNameReq.new(...):validate(
-                nil, nil, true)
-        local rsp = manager_accounts_intf_types.GetUidGidByUserNameRsp.new(cb(
-                                                                               obj,
-                                                                               ctx,
-                                                                               req:unpack())):validate()
-        return rsp:unpack(true)
-    end
-end
-
--- The callback needs to be registered during app initialization
 function M.ImplManagerAccountsManagerAccountsSetAccountWritable(cb)
     class('ManagerAccounts')['bmc.kepler.AccountService.ManagerAccounts']
         .SetAccountWritable = function(obj, ctx, ...)
@@ -3482,6 +3550,21 @@ function M.ImplManagerAccountsManagerAccountsSetAccountLockState(cb)
             manager_accounts_intf_types.SetAccountLockStateReq.new(...):validate(
                 nil, nil, true)
         local rsp = manager_accounts_intf_types.SetAccountLockStateRsp.new(cb(
+                                                                               obj,
+                                                                               ctx,
+                                                                               req:unpack())):validate()
+        return rsp:unpack(true)
+    end
+end
+
+-- The callback needs to be registered during app initialization
+function M.ImplManagerAccountsManagerAccountsGetUidGidByUserName(cb)
+    class('ManagerAccounts')['bmc.kepler.AccountService.ManagerAccounts']
+        .GetUidGidByUserName = function(obj, ctx, ...)
+        local req =
+            manager_accounts_intf_types.GetUidGidByUserNameReq.new(...):validate(
+                nil, nil, true)
+        local rsp = manager_accounts_intf_types.GetUidGidByUserNameRsp.new(cb(
                                                                                obj,
                                                                                ctx,
                                                                                req:unpack())):validate()

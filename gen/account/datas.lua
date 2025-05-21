@@ -15,9 +15,25 @@
 local M = {}
 
 M.t_login_rule = {
-    {RuleId = 1, IpRule = [=[]=], TimeRule = [=[]=], MacRule = [=[]=], Enabled = false},
-    {RuleId = 2, IpRule = [=[]=], TimeRule = [=[]=], MacRule = [=[]=], Enabled = false},
-    {RuleId = 3, IpRule = [=[]=], TimeRule = [=[]=], MacRule = [=[]=], Enabled = false}
+    {
+        RuleId = 1,
+        IpRule = [=[]=],
+        TimeRule = [=[]=],
+        MacRule = [=[]=],
+        Enabled = false
+    }, {
+        RuleId = 2,
+        IpRule = [=[]=],
+        TimeRule = [=[]=],
+        MacRule = [=[]=],
+        Enabled = false
+    }, {
+        RuleId = 3,
+        IpRule = [=[]=],
+        TimeRule = [=[]=],
+        MacRule = [=[]=],
+        Enabled = false
+    }
 }
 M.t_role = {
     {
@@ -44,11 +60,33 @@ M.t_role = {
         PowerMgmt = true,
         DiagnoseMgmt = false,
         ConfigureSelf = true
-    }, {Id = 2, RoleName = [=[CommonUser]=], ReadOnly = true, ConfigureSelf = true},
-    {Id = 0, RoleName = [=[NoAccess]=]}, {Id = 5, RoleName = [=[CustomRole1]=], ReadOnly = true, ConfigureSelf = true},
-    {Id = 6, RoleName = [=[CustomRole2]=], ReadOnly = true, ConfigureSelf = true},
-    {Id = 7, RoleName = [=[CustomRole3]=], ReadOnly = true, ConfigureSelf = true},
-    {Id = 8, RoleName = [=[CustomRole4]=], ReadOnly = true, ConfigureSelf = true}
+    },
+    {Id = 2, RoleName = [=[CommonUser]=], ReadOnly = true, ConfigureSelf = true},
+    {Id = 0, RoleName = [=[NoAccess]=]},
+    {
+        Id = 5,
+        RoleName = [=[CustomRole1]=],
+        ReadOnly = true,
+        ConfigureSelf = true
+    },
+    {
+        Id = 6,
+        RoleName = [=[CustomRole2]=],
+        ReadOnly = true,
+        ConfigureSelf = true
+    },
+    {
+        Id = 7,
+        RoleName = [=[CustomRole3]=],
+        ReadOnly = true,
+        ConfigureSelf = true
+    },
+    {
+        Id = 8,
+        RoleName = [=[CustomRole4]=],
+        ReadOnly = true,
+        ConfigureSelf = true
+    }
 }
 M.t_account_service = {
     {
@@ -61,7 +99,9 @@ M.t_account_service = {
         AccountLockoutThreshold = 5
     }
 }
-M.t_snmp_community = {{Id = 1, LongCommunityEnabled = true, RwCommunityEnabled = true}}
+M.t_snmp_community = {
+    {Id = 1, LongCommunityEnabled = true, RwCommunityEnabled = true}
+}
 M.t_manager_account = {
     {
         Id = 2,
@@ -144,9 +184,12 @@ M.t_snmp_user_info = {
 }
 M.t_ipmi_user_info = {{AccountId = 2}, {AccountId = 18}, {AccountId = 19}}
 M.t_password_policy = {
-    {AccountType = 0, Policy = 1, Pattern = [=[]=]}, {AccountType = 3, Policy = 1, Pattern = [=[]=]},
+    {AccountType = 0, Policy = 1, Pattern = [=[]=]},
+    {AccountType = 3, Policy = 1, Pattern = [=[]=]},
     {AccountType = 7, Policy = 1, Pattern = [=[]=]}
 }
-M.t_account_policy = {{AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223}}
+M.t_account_policy = {
+    {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223}
+}
 
 return M

@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.4] - 2025-05-22
+支持安全管理满足资源树协作接口关键字规范要求
+
 ## [1.80.3] - 2025-05-21
 bugfix: 修复配置导入导出无法删除用户的场景
 

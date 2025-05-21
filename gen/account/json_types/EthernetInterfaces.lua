@@ -592,6 +592,90 @@ function TSLAACAddressList:unpack(_) return self.SLAACAddressList end
 
 EthernetInterfaces.SLAACAddressList = TSLAACAddressList
 
+---@class EthernetInterfaces.MaxVLANId
+---@field MaxVLANId integer
+local TMaxVLANId = {}
+TMaxVLANId.__index = TMaxVLANId
+TMaxVLANId.group = {}
+
+local function TMaxVLANId_from_obj(obj) return setmetatable(obj, TMaxVLANId) end
+
+function TMaxVLANId.new(MaxVLANId)
+    return TMaxVLANId_from_obj({MaxVLANId = MaxVLANId})
+end
+---@param obj EthernetInterfaces.MaxVLANId
+function TMaxVLANId:init_from_obj(obj) self.MaxVLANId = obj.MaxVLANId end
+
+function TMaxVLANId:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TMaxVLANId.group)
+end
+
+TMaxVLANId.from_obj = TMaxVLANId_from_obj
+
+TMaxVLANId.proto_property = {'MaxVLANId'}
+
+TMaxVLANId.default = {0}
+
+TMaxVLANId.struct = {{name = 'MaxVLANId', is_array = false, struct = nil}}
+
+function TMaxVLANId:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'MaxVLANId', self.MaxVLANId, "uint16", true,
+                      errs, need_convert)
+
+    TMaxVLANId:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TMaxVLANId.proto_property, errs,
+                                 need_convert)
+    return self
+end
+
+function TMaxVLANId:unpack(_) return self.MaxVLANId end
+
+EthernetInterfaces.MaxVLANId = TMaxVLANId
+
+---@class EthernetInterfaces.MinVLANId
+---@field MinVLANId integer
+local TMinVLANId = {}
+TMinVLANId.__index = TMinVLANId
+TMinVLANId.group = {}
+
+local function TMinVLANId_from_obj(obj) return setmetatable(obj, TMinVLANId) end
+
+function TMinVLANId.new(MinVLANId)
+    return TMinVLANId_from_obj({MinVLANId = MinVLANId})
+end
+---@param obj EthernetInterfaces.MinVLANId
+function TMinVLANId:init_from_obj(obj) self.MinVLANId = obj.MinVLANId end
+
+function TMinVLANId:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TMinVLANId.group)
+end
+
+TMinVLANId.from_obj = TMinVLANId_from_obj
+
+TMinVLANId.proto_property = {'MinVLANId'}
+
+TMinVLANId.default = {0}
+
+TMinVLANId.struct = {{name = 'MinVLANId', is_array = false, struct = nil}}
+
+function TMinVLANId:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'MinVLANId', self.MinVLANId, "uint16", true,
+                      errs, need_convert)
+
+    TMinVLANId:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TMinVLANId.proto_property, errs,
+                                 need_convert)
+    return self
+end
+
+function TMinVLANId:unpack(_) return self.MinVLANId end
+
+EthernetInterfaces.MinVLANId = TMinVLANId
+
 ---@class EthernetInterfaces.VLANId
 ---@field VLANId integer
 local TVLANId = {}
@@ -2031,6 +2115,8 @@ EthernetInterfaces.interface = mdb.register_interface(
         PortId = {'y', {}, true, nil, false},
         VLANEnable = {'b', nil, true, nil, false},
         VLANId = {'q', nil, true, nil, false},
+        MinVLANId = {'q', {}, true, nil, false},
+        MaxVLANId = {'q', {}, true, nil, false},
         SLAACAddressList = {'as', nil, true, nil, false},
         LinkLocalAddress = {'s', nil, true, nil, false},
         BackupIpActivated = {'b', nil, true, nil, false},
