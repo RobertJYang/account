@@ -27,8 +27,11 @@ end
 
 -- 用户导入前的预校验，当前先支持老卡多用户，新卡只有一个用户的导入场景
 function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
+    local filter_deleted_accounts = {}
     for _, instance in ipairs(accounts) do
         local instance_id = instance.Id.Value
+        local instance_name = instance.UserName.Value
+        -- 配置导入存在用户，但是环境不存在，需要新建用户
         if profile_adapter.m_account_collection:get_account_data_by_id(instance_id) == nil then
             local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.SFTP, enum.LoginInterface.Web,
                 enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
@@ -50,7 +53,21 @@ function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
                     tostring(err))
             end
         end
+        -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
+        if instance_name == '' and profile_adapter.m_account_collection:get_account_data_by_id(instance_id) ~= nil then
+            local ok, ret = pcall(function()
+                profile_adapter.m_account_collection:delete_account(ctx, instance_id)
+            end)
+            if not ok then
+                log:error("import account config precheck failed, cannot delete account(id:%d), %s", instance_id,
+                    tostring(ret))
+            end
+        else
+            -- 无需删除的用户，过滤后返回继续处理
+            filter_deleted_accounts[#filter_deleted_accounts+1] = instance
+        end
     end
+    return filter_deleted_accounts
 end
 
 function AccountProfile.set_account_id(self, ctx, account_id)

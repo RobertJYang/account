@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.3] - 2025-05-21
+bugfix: 修复配置导入导出无法删除用户的场景
+
 ## [1.80.2] - 2025-05-08
 bugfix: 修复配置导入导出无法增加用户的场景
 
