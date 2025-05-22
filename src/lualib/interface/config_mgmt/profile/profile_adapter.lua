@@ -379,12 +379,12 @@ function ProfileAdapter:import_property(ctx, class_name, property_name, property
     end
 end
 
-function ProfileAdapter:import_handle(ctx, class_name, class)
+function ProfileAdapter:import_handle(ctx, class_name, class_data)
     if class_name == "User" then
-        AccountProfile.import_account_precheck(self, ctx, class)
+        class_data = AccountProfile.import_account_precheck(self, ctx, class_data)
     end
-    if is_object_array(class) then
-        for _, instance in ipairs(class) do
+    if is_object_array(class_data) then
+        for _, instance in ipairs(class_data) do
             local instance_id = instance.Id.Value
             local ok = pcall(function()
                 profile_adapter[class_name].Id.import(self, ctx, instance_id)
@@ -398,7 +398,7 @@ function ProfileAdapter:import_handle(ctx, class_name, class)
             end
         end
     else
-        for property_name, property_value in pairs(class) do
+        for property_name, property_value in pairs(class_data) do
             self:import_property(ctx, class_name, property_name, property_value.Value)
         end
     end
@@ -407,23 +407,23 @@ end
 function ProfileAdapter:on_import(ctx, object)
     ctx.operation_log = { params = {} }
 
-    for class_name, class in pairs(object) do
+    for class_name, class_data in pairs(object) do
         if not profile_adapter[class_name] then
             goto continue
         end
-        self:import_handle(ctx, class_name, class)
+        self:import_handle(ctx, class_name, class_data)
         ::continue::
     end
 
     ctx.operation_log = nil
 end
 
-function ProfileAdapter:export_instances(export_data, class_name, class, instance_id)
-    if not class.Id.export(self, instance_id) then
+function ProfileAdapter:export_instances(export_data, class_name, class_data, instance_id)
+    if not class_data.Id.export(self, instance_id) then
         goto continue
     end
     local instance = {}
-    for property_name, property in pairs(class) do
+    for property_name, property in pairs(class_data) do
         if type(property) == 'table' and property.export then
             instance[property_name] = property.export(self, instance_id)
         end
@@ -435,14 +435,14 @@ end
 function ProfileAdapter:on_export(ctx)
     local export_data = {}
 
-    for class_name, class in pairs(profile_adapter) do
+    for class_name, class_data in pairs(profile_adapter) do
         export_data[class_name] = {}
-        if class.isObjectArray then
-            for _, instance_id in ipairs(class.instance_ids) do
-                self:export_instances(export_data, class_name, class, instance_id)
+        if class_data.isObjectArray then
+            for _, instance_id in ipairs(class_data.instance_ids) do
+                self:export_instances(export_data, class_name, class_data, instance_id)
             end
         else
-            for property_name, property in pairs(class) do
+            for property_name, property in pairs(class_data) do
                 export_data[class_name][property_name] = property.export(self)
             end
         end
