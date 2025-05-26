@@ -52,16 +52,12 @@ ELogLevel.ERROR = ELogLevel.new(2)
 def_types.LogLevel = ELogLevel
 
 ---@class def_types.SNMPv3TrapAccountLimitPolicy: Enum
-local ESNMPv3TrapAccountLimitPolicy = create_enum_type(
-                                          'SNMPv3TrapAccountLimitPolicy')
-ESNMPv3TrapAccountLimitPolicy.default = ESNMPv3TrapAccountLimitPolicy.new(
-                                            2147483647)
+local ESNMPv3TrapAccountLimitPolicy = create_enum_type('SNMPv3TrapAccountLimitPolicy')
+ESNMPv3TrapAccountLimitPolicy.default = ESNMPv3TrapAccountLimitPolicy.new(2147483647)
 ESNMPv3TrapAccountLimitPolicy.struct = nil
 ESNMPv3TrapAccountLimitPolicy.Modifiable = ESNMPv3TrapAccountLimitPolicy.new(0)
-ESNMPv3TrapAccountLimitPolicy.NameModifiable =
-    ESNMPv3TrapAccountLimitPolicy.new(1)
-ESNMPv3TrapAccountLimitPolicy.NotModifiable =
-    ESNMPv3TrapAccountLimitPolicy.new(2)
+ESNMPv3TrapAccountLimitPolicy.NameModifiable = ESNMPv3TrapAccountLimitPolicy.new(1)
+ESNMPv3TrapAccountLimitPolicy.NotModifiable = ESNMPv3TrapAccountLimitPolicy.new(2)
 
 def_types.SNMPv3TrapAccountLimitPolicy = ESNMPv3TrapAccountLimitPolicy
 
@@ -94,23 +90,15 @@ EIpType.All = EIpType.new(2)
 def_types.IpType = EIpType
 
 ---@class def_types.IpmiAccountServiceConfiguration: Enum
-local EIpmiAccountServiceConfiguration = create_enum_type(
-                                             'IpmiAccountServiceConfiguration')
-EIpmiAccountServiceConfiguration.default =
-    EIpmiAccountServiceConfiguration.new(2147483647)
+local EIpmiAccountServiceConfiguration = create_enum_type('IpmiAccountServiceConfiguration')
+EIpmiAccountServiceConfiguration.default = EIpmiAccountServiceConfiguration.new(2147483647)
 EIpmiAccountServiceConfiguration.struct = nil
-EIpmiAccountServiceConfiguration.WeakPasswdCheck =
-    EIpmiAccountServiceConfiguration.new(1)
-EIpmiAccountServiceConfiguration.UserFirstLoginPasswdModifyPolicy =
-    EIpmiAccountServiceConfiguration.new(2)
-EIpmiAccountServiceConfiguration.HistoryPasswdCheckCount =
-    EIpmiAccountServiceConfiguration.new(3)
-EIpmiAccountServiceConfiguration.WebTimeOut =
-    EIpmiAccountServiceConfiguration.new(4)
-EIpmiAccountServiceConfiguration.EmergencyLoginAccount =
-    EIpmiAccountServiceConfiguration.new(5)
-EIpmiAccountServiceConfiguration.InitialPasswordPromptEnable =
-    EIpmiAccountServiceConfiguration.new(6)
+EIpmiAccountServiceConfiguration.WeakPasswdCheck = EIpmiAccountServiceConfiguration.new(1)
+EIpmiAccountServiceConfiguration.UserFirstLoginPasswdModifyPolicy = EIpmiAccountServiceConfiguration.new(2)
+EIpmiAccountServiceConfiguration.HistoryPasswdCheckCount = EIpmiAccountServiceConfiguration.new(3)
+EIpmiAccountServiceConfiguration.WebTimeOut = EIpmiAccountServiceConfiguration.new(4)
+EIpmiAccountServiceConfiguration.EmergencyLoginAccount = EIpmiAccountServiceConfiguration.new(5)
+EIpmiAccountServiceConfiguration.InitialPasswordPromptEnable = EIpmiAccountServiceConfiguration.new(6)
 
 def_types.IpmiAccountServiceConfiguration = EIpmiAccountServiceConfiguration
 
@@ -169,10 +157,8 @@ ERemoteGroupType.GROUP_TYPE_KERBEROS = ERemoteGroupType.new(1)
 def_types.RemoteGroupType = ERemoteGroupType
 
 ---@class def_types.IpmiSetUserSNMPV3PrivacyPwd: Enum
-local EIpmiSetUserSNMPV3PrivacyPwd = create_enum_type(
-                                         'IpmiSetUserSNMPV3PrivacyPwd')
-EIpmiSetUserSNMPV3PrivacyPwd.default = EIpmiSetUserSNMPV3PrivacyPwd.new(
-                                           2147483647)
+local EIpmiSetUserSNMPV3PrivacyPwd = create_enum_type('IpmiSetUserSNMPV3PrivacyPwd')
+EIpmiSetUserSNMPV3PrivacyPwd.default = EIpmiSetUserSNMPV3PrivacyPwd.new(2147483647)
 EIpmiSetUserSNMPV3PrivacyPwd.struct = nil
 EIpmiSetUserSNMPV3PrivacyPwd.SET_PASSWORD = EIpmiSetUserSNMPV3PrivacyPwd.new(0)
 EIpmiSetUserSNMPV3PrivacyPwd.TEST_PASSWORD = EIpmiSetUserSNMPV3PrivacyPwd.new(1)
@@ -281,8 +267,7 @@ EIpmiPwdComplexityEnum.default = EIpmiPwdComplexityEnum.new(2147483647)
 EIpmiPwdComplexityEnum.struct = nil
 EIpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE = EIpmiPwdComplexityEnum.new(0)
 EIpmiPwdComplexityEnum.PWD_COMPLEXITY_ENABLE = EIpmiPwdComplexityEnum.new(1)
-EIpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE =
-    EIpmiPwdComplexityEnum.new(2)
+EIpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE = EIpmiPwdComplexityEnum.new(2)
 
 def_types.IpmiPwdComplexityEnum = EIpmiPwdComplexityEnum
 
@@ -364,6 +349,7 @@ EAccountType.KerberosSSO = EAccountType.new(5)
 EAccountType.IPMI_INNER = EAccountType.new(6)
 EAccountType.SnmpCommunity = EAccountType.new(7)
 EAccountType.OEM = EAccountType.new(8)
+EAccountType.InterChassis = EAccountType.new(9)
 
 def_types.AccountType = EAccountType
 
@@ -527,10 +513,8 @@ ESNMPEncryptionProtocols.AES256 = ESNMPEncryptionProtocols.new(3)
 def_types.SNMPEncryptionProtocols = ESNMPEncryptionProtocols
 
 ---@class def_types.SNMPAuthenticationProtocols: Enum
-local ESNMPAuthenticationProtocols = create_enum_type(
-                                         'SNMPAuthenticationProtocols')
-ESNMPAuthenticationProtocols.default = ESNMPAuthenticationProtocols.new(
-                                           2147483647)
+local ESNMPAuthenticationProtocols = create_enum_type('SNMPAuthenticationProtocols')
+ESNMPAuthenticationProtocols.default = ESNMPAuthenticationProtocols.new(2147483647)
 ESNMPAuthenticationProtocols.struct = nil
 ESNMPAuthenticationProtocols.None = ESNMPAuthenticationProtocols.new(0)
 ESNMPAuthenticationProtocols.MD5 = ESNMPAuthenticationProtocols.new(1)

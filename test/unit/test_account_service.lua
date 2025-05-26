@@ -107,7 +107,7 @@ end
 function TestAccount:test_account_service_init()
     lu.assertNotIsNil(self.test_account_collection)
     -- test_account_collection.collection[1] is nil and cnt
-    lu.assertEquals(table_length(self.test_account_collection.collection), 6)
+    lu.assertEquals(table_length(self.test_account_collection.collection), 7)
 end
 
 -- 测试可以通过id获取用户集合中的指定用户
@@ -116,7 +116,7 @@ function TestAccount:test_get_account_by_id()
     lu.assertNotIsNil(test_account)
     lu.assertEquals(test_account.m_account_data.Id, 2)
     lu.assertEquals(test_account.m_account_data.UserName, 'Administrator')
-    test_account = self.test_account_collection.collection[23]
+    test_account = self.test_account_collection.collection[25]
     lu.assertIsNil(test_account)
     test_account = self.test_account_collection.collection[0]
     lu.assertIsNil(test_account)
@@ -146,8 +146,8 @@ end
 -- 测试增加用户从2-17
 function TestAccount:test_add_account_full()
     local interface = make_interface()
-    -- 包含默认的一个Administrator和一个VNC用户, IPMI用户与2个snmp community, 一个redfish专用用户
-    local table_cnt = 6
+    -- 包含默认的一个Administrator和一个VNC用户, IPMI用户与2个snmp community, 一个redfish专用用户，一个设备间内部通信用户
+    local table_cnt = 7
     for id = 3, 17 do
         local account_info = {
             ['id'] = id,

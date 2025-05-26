@@ -35,6 +35,7 @@ local ipmi_account = require 'domain.manager_account.ipmi_account'
 local vnc_account = require 'domain.manager_account.vnc_account'
 local oem_account = require 'domain.manager_account.oem_account'
 local snmp_community = require 'domain.manager_account.snmp_community'
+local inter_chassis_account = require 'domain.manager_account.inter_chassis_account'
 local core = require 'account_core'
 local cert_service_enum = require 'account.json_types.CertificateService'
 
@@ -43,7 +44,8 @@ local account_type_map = {
     [enum.AccountType.IPMI_INNER:value()] = ipmi_account,
     [enum.AccountType.VNC:value()] = vnc_account,
     [enum.AccountType.SnmpCommunity:value()] = snmp_community,
-    [enum.AccountType.OEM:value()] = oem_account
+    [enum.AccountType.OEM:value()] = oem_account,
+    [enum.AccountType.InterChassis:value()] = inter_chassis_account
 }
 
 local PATH_CERT_SERVICE = '/bmc/kepler/CertificateService'

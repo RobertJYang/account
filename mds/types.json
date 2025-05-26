@@ -117,7 +117,8 @@
             "KerberosSSO": 5,
             "IPMI_INNER": 6,
             "SnmpCommunity": 7,
-            "OEM": 8
+            "OEM": 8,
+            "InterChassis": 9
         },
         "LoginInterface": {
             "Invalid": 0,

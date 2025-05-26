@@ -64,6 +64,21 @@ function TestAccount:test_passwordcomplexity_check()
     lu.assertEquals(res, true)
 end
 
+function TestAccount:test_inter_chassis_account_set_role_id()
+    local inter_account_id = 23
+    local inter_account = self.test_account_collection:get_account_by_account_id(inter_account_id)
+    -- 默认权限管理员
+    lu.assertEquals(inter_account:get_role_id(), enum.RoleType.Administrator:value())
+
+    -- 设置操作员
+    self.test_account_collection:set_role_id(self.ctx, inter_account_id, enum.RoleType.Operator:value())
+    lu.assertEquals(inter_account:get_role_id(), enum.RoleType.Operator:value())
+
+    -- 恢复默认
+    self.test_account_collection:set_role_id(self.ctx, inter_account_id, enum.RoleType.Administrator:value())
+    lu.assertEquals(inter_account:get_role_id(), enum.RoleType.Administrator:value())
+end
+
 --- 当文件操作者角色为Administrator，检验成功
 function TestAccount:test_when_fileowner_matchs_caller_role_is_admin_should_check_success()
     local temp_file = self.test_data_dir .. '/temp_file'
