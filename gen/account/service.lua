@@ -243,9 +243,6 @@ function account_service:ImplManagerAccountsManagerAccountsGetIdByUserName(cb)
     model.ImplManagerAccountsManagerAccountsGetIdByUserName(cb)
 end
 
-function account_service:ImplManagerAccountsManagerAccountsGetUidGidByUserName(
-    cb) model.ImplManagerAccountsManagerAccountsGetUidGidByUserName(cb) end
-
 function account_service:ImplManagerAccountsManagerAccountsSetAccountWritable(cb)
     model.ImplManagerAccountsManagerAccountsSetAccountWritable(cb)
 end
@@ -256,6 +253,9 @@ end
 
 function account_service:ImplManagerAccountsManagerAccountsSetAccountLockState(
     cb) model.ImplManagerAccountsManagerAccountsSetAccountLockState(cb) end
+
+function account_service:ImplManagerAccountsManagerAccountsGetUidGidByUserName(
+    cb) model.ImplManagerAccountsManagerAccountsGetUidGidByUserName(cb) end
 
 function account_service:ImplManagerAccountsPropertiesGetOptions(cb)
     model.ImplManagerAccountsPropertiesGetOptions(cb)

@@ -28,7 +28,9 @@ local function TAllowedLoginInterfaces_from_obj(obj)
 end
 
 function TAllowedLoginInterfaces.new(AllowedLoginInterfaces)
-    return TAllowedLoginInterfaces_from_obj({AllowedLoginInterfaces = AllowedLoginInterfaces or 223})
+    return TAllowedLoginInterfaces_from_obj({
+        AllowedLoginInterfaces = AllowedLoginInterfaces or 223
+    })
 end
 ---@param obj MAccountPolicy.AllowedLoginInterfaces
 function TAllowedLoginInterfaces:init_from_obj(obj)
@@ -45,22 +47,24 @@ TAllowedLoginInterfaces.proto_property = {'AllowedLoginInterfaces'}
 
 TAllowedLoginInterfaces.default = {0}
 
-TAllowedLoginInterfaces.struct = {{name = 'AllowedLoginInterfaces', is_array = false, struct = nil}}
+TAllowedLoginInterfaces.struct = {
+    {name = 'AllowedLoginInterfaces', is_array = false, struct = nil}
+}
 
 function TAllowedLoginInterfaces:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'AllowedLoginInterfaces', self.AllowedLoginInterfaces, 'uint32', false, errs,
-        need_convert)
+    validate.Optional(prefix .. 'AllowedLoginInterfaces',
+                      self.AllowedLoginInterfaces, "uint32", false, errs,
+                      need_convert)
 
     TAllowedLoginInterfaces:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TAllowedLoginInterfaces.proto_property, errs, need_convert)
+    validate.CheckUnknowProperty(self, TAllowedLoginInterfaces.proto_property,
+                                 errs, need_convert)
     return self
 end
 
-function TAllowedLoginInterfaces:unpack(_)
-    return self.AllowedLoginInterfaces
-end
+function TAllowedLoginInterfaces:unpack(_) return self.AllowedLoginInterfaces end
 
 MAccountPolicy.AllowedLoginInterfaces = TAllowedLoginInterfaces
 
@@ -70,9 +74,7 @@ local TNamePattern = {}
 TNamePattern.__index = TNamePattern
 TNamePattern.group = {}
 
-local function TNamePattern_from_obj(obj)
-    return setmetatable(obj, TNamePattern)
-end
+local function TNamePattern_from_obj(obj) return setmetatable(obj, TNamePattern) end
 
 function TNamePattern.new(NamePattern)
     return TNamePattern_from_obj({NamePattern = NamePattern or [=[]=]})
@@ -97,16 +99,16 @@ TNamePattern.struct = {{name = 'NamePattern', is_array = false, struct = nil}}
 function TNamePattern:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'NamePattern', self.NamePattern, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'NamePattern', self.NamePattern, "string",
+                      false, errs, need_convert)
 
     TNamePattern:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TNamePattern.proto_property, errs, need_convert)
+    validate.CheckUnknowProperty(self, TNamePattern.proto_property, errs,
+                                 need_convert)
     return self
 end
 
-function TNamePattern:unpack(_)
-    return self.NamePattern
-end
+function TNamePattern:unpack(_) return self.NamePattern end
 
 MAccountPolicy.NamePattern = TNamePattern
 
@@ -116,17 +118,13 @@ local TAccountType = {}
 TAccountType.__index = TAccountType
 TAccountType.group = {}
 
-local function TAccountType_from_obj(obj)
-    return setmetatable(obj, TAccountType)
-end
+local function TAccountType_from_obj(obj) return setmetatable(obj, TAccountType) end
 
 function TAccountType.new(AccountType)
     return TAccountType_from_obj({AccountType = AccountType})
 end
 ---@param obj MAccountPolicy.AccountType
-function TAccountType:init_from_obj(obj)
-    self.AccountType = obj.AccountType
-end
+function TAccountType:init_from_obj(obj) self.AccountType = obj.AccountType end
 
 function TAccountType:remove_error_props(errs, obj)
     utils.remove_obj_error_property(obj, errs, TAccountType.group)
@@ -143,16 +141,16 @@ TAccountType.struct = {{name = 'AccountType', is_array = false, struct = nil}}
 function TAccountType:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Required(prefix .. 'AccountType', self.AccountType, 'uint8', false, errs, need_convert)
+    validate.Required(prefix .. 'AccountType', self.AccountType, "uint8", false,
+                      errs, need_convert)
 
     TAccountType:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TAccountType.proto_property, errs, need_convert)
+    validate.CheckUnknowProperty(self, TAccountType.proto_property, errs,
+                                 need_convert)
     return self
 end
 
-function TAccountType:unpack(_)
-    return self.AccountType
-end
+function TAccountType:unpack(_) return self.AccountType end
 
 MAccountPolicy.AccountType = TAccountType
 

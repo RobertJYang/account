@@ -162,6 +162,110 @@ function TPasswordChangedSignalSignature:unpack(_) return self.AccountId end
 
 ManagerAccounts.PasswordChangedSignalSignature = TPasswordChangedSignalSignature
 
+---@class ManagerAccounts.GetUidGidByUserNameRsp
+---@field UID integer
+---@field GID integer
+local TGetUidGidByUserNameRsp = {}
+TGetUidGidByUserNameRsp.__index = TGetUidGidByUserNameRsp
+TGetUidGidByUserNameRsp.group = {}
+
+local function TGetUidGidByUserNameRsp_from_obj(obj)
+    return setmetatable(obj, TGetUidGidByUserNameRsp)
+end
+
+function TGetUidGidByUserNameRsp.new(UID, GID)
+    return TGetUidGidByUserNameRsp_from_obj({UID = UID, GID = GID})
+end
+---@param obj ManagerAccounts.GetUidGidByUserNameRsp
+function TGetUidGidByUserNameRsp:init_from_obj(obj)
+    self.UID = obj.UID
+    self.GID = obj.GID
+end
+
+function TGetUidGidByUserNameRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetUidGidByUserNameRsp.group)
+end
+
+TGetUidGidByUserNameRsp.from_obj = TGetUidGidByUserNameRsp_from_obj
+
+TGetUidGidByUserNameRsp.proto_property = {'UID', 'GID'}
+
+TGetUidGidByUserNameRsp.default = {0, 0}
+
+TGetUidGidByUserNameRsp.struct = {
+    {name = 'UID', is_array = false, struct = nil},
+    {name = 'GID', is_array = false, struct = nil}
+}
+
+function TGetUidGidByUserNameRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'UID', self.UID, "uint32", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'GID', self.GID, "uint32", false, errs,
+                      need_convert)
+
+    TGetUidGidByUserNameRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetUidGidByUserNameRsp.proto_property,
+                                 errs, need_convert)
+    return self
+end
+
+function TGetUidGidByUserNameRsp:unpack(_) return self.UID, self.GID end
+
+ManagerAccounts.GetUidGidByUserNameRsp = TGetUidGidByUserNameRsp
+
+---@class ManagerAccounts.GetUidGidByUserNameReq
+---@field UserName string
+local TGetUidGidByUserNameReq = {}
+TGetUidGidByUserNameReq.__index = TGetUidGidByUserNameReq
+TGetUidGidByUserNameReq.group = {}
+
+local function TGetUidGidByUserNameReq_from_obj(obj)
+    return setmetatable(obj, TGetUidGidByUserNameReq)
+end
+
+function TGetUidGidByUserNameReq.new(UserName)
+    return TGetUidGidByUserNameReq_from_obj({UserName = UserName})
+end
+---@param obj ManagerAccounts.GetUidGidByUserNameReq
+function TGetUidGidByUserNameReq:init_from_obj(obj) self.UserName = obj.UserName end
+
+function TGetUidGidByUserNameReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetUidGidByUserNameReq.group)
+end
+
+TGetUidGidByUserNameReq.from_obj = TGetUidGidByUserNameReq_from_obj
+
+TGetUidGidByUserNameReq.proto_property = {'UserName'}
+
+TGetUidGidByUserNameReq.default = {''}
+
+TGetUidGidByUserNameReq.struct = {
+    {name = 'UserName', is_array = false, struct = nil}
+}
+
+function TGetUidGidByUserNameReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'UserName', self.UserName, "string", false,
+                      errs, need_convert)
+
+    if self.UserName ~= nil then
+        validate.lens(prefix .. 'UserName', self.UserName, 1, 32, errs,
+                      need_convert)
+    end
+
+    TGetUidGidByUserNameReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetUidGidByUserNameReq.proto_property,
+                                 errs, need_convert)
+    return self
+end
+
+function TGetUidGidByUserNameReq:unpack(_) return self.UserName end
+
+ManagerAccounts.GetUidGidByUserNameReq = TGetUidGidByUserNameReq
+
 ---@class ManagerAccounts.SetAccountLockStateRsp
 local TSetAccountLockStateRsp = {}
 TSetAccountLockStateRsp.__index = TSetAccountLockStateRsp
@@ -353,110 +457,6 @@ end
 function TSetAccountWritableRsp:unpack(_) end
 
 ManagerAccounts.SetAccountWritableRsp = TSetAccountWritableRsp
-
----@class ManagerAccounts.GetUidGidByUserNameRsp
----@field UID integer
----@field GID integer
-local TGetUidGidByUserNameRsp = {}
-TGetUidGidByUserNameRsp.__index = TGetUidGidByUserNameRsp
-TGetUidGidByUserNameRsp.group = {}
-
-local function TGetUidGidByUserNameRsp_from_obj(obj)
-    return setmetatable(obj, TGetUidGidByUserNameRsp)
-end
-
-function TGetUidGidByUserNameRsp.new(UID, GID)
-    return TGetUidGidByUserNameRsp_from_obj({UID = UID, GID = GID})
-end
----@param obj ManagerAccounts.GetUidGidByUserNameRsp
-function TGetUidGidByUserNameRsp:init_from_obj(obj)
-    self.UID = obj.UID
-    self.GID = obj.GID
-end
-
-function TGetUidGidByUserNameRsp:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TGetUidGidByUserNameRsp.group)
-end
-
-TGetUidGidByUserNameRsp.from_obj = TGetUidGidByUserNameRsp_from_obj
-
-TGetUidGidByUserNameRsp.proto_property = {'UID', 'GID'}
-
-TGetUidGidByUserNameRsp.default = {0, 0}
-
-TGetUidGidByUserNameRsp.struct = {
-    {name = 'UID', is_array = false, struct = nil},
-    {name = 'GID', is_array = false, struct = nil}
-}
-
-function TGetUidGidByUserNameRsp:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'UID', self.UID, "uint32", false, errs,
-                      need_convert)
-    validate.Optional(prefix .. 'GID', self.GID, "uint32", false, errs,
-                      need_convert)
-
-    TGetUidGidByUserNameRsp:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TGetUidGidByUserNameRsp.proto_property,
-                                 errs, need_convert)
-    return self
-end
-
-function TGetUidGidByUserNameRsp:unpack(_) return self.UID, self.GID end
-
-ManagerAccounts.GetUidGidByUserNameRsp = TGetUidGidByUserNameRsp
-
----@class ManagerAccounts.GetUidGidByUserNameReq
----@field UserName string
-local TGetUidGidByUserNameReq = {}
-TGetUidGidByUserNameReq.__index = TGetUidGidByUserNameReq
-TGetUidGidByUserNameReq.group = {}
-
-local function TGetUidGidByUserNameReq_from_obj(obj)
-    return setmetatable(obj, TGetUidGidByUserNameReq)
-end
-
-function TGetUidGidByUserNameReq.new(UserName)
-    return TGetUidGidByUserNameReq_from_obj({UserName = UserName})
-end
----@param obj ManagerAccounts.GetUidGidByUserNameReq
-function TGetUidGidByUserNameReq:init_from_obj(obj) self.UserName = obj.UserName end
-
-function TGetUidGidByUserNameReq:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TGetUidGidByUserNameReq.group)
-end
-
-TGetUidGidByUserNameReq.from_obj = TGetUidGidByUserNameReq_from_obj
-
-TGetUidGidByUserNameReq.proto_property = {'UserName'}
-
-TGetUidGidByUserNameReq.default = {''}
-
-TGetUidGidByUserNameReq.struct = {
-    {name = 'UserName', is_array = false, struct = nil}
-}
-
-function TGetUidGidByUserNameReq:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'UserName', self.UserName, "string", false,
-                      errs, need_convert)
-
-    if self.UserName ~= nil then
-        validate.lens(prefix .. 'UserName', self.UserName, 1, 32, errs,
-                      need_convert)
-    end
-
-    TGetUidGidByUserNameReq:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TGetUidGidByUserNameReq.proto_property,
-                                 errs, need_convert)
-    return self
-end
-
-function TGetUidGidByUserNameReq:unpack(_) return self.UserName end
-
-ManagerAccounts.GetUidGidByUserNameReq = TGetUidGidByUserNameReq
 
 ---@class ManagerAccounts.GetIdByUserNameRsp
 ---@field AccountId integer
@@ -1084,9 +1084,6 @@ ManagerAccounts.interface = mdb.register_interface(
         GetIdByUserName = {
             'a{ss}s', 'y', TGetIdByUserNameReq, TGetIdByUserNameRsp
         },
-        GetUidGidByUserName = {
-            'a{ss}s', 'uu', TGetUidGidByUserNameReq, TGetUidGidByUserNameRsp
-        },
         SetAccountWritable = {
             'a{ss}ya{sb}', '', TSetAccountWritableReq, TSetAccountWritableRsp
         },
@@ -1095,6 +1092,9 @@ ManagerAccounts.interface = mdb.register_interface(
         },
         SetAccountLockState = {
             'a{ss}yb', '', TSetAccountLockStateReq, TSetAccountLockStateRsp
+        },
+        GetUidGidByUserName = {
+            'a{ss}s', 'uu', TGetUidGidByUserNameReq, TGetUidGidByUserNameRsp
         }
     }, {PasswordChangedSignal = 'a{ss}y', SnmpPasswordChangedSignal = 'a{ss}y'})
 

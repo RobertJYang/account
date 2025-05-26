@@ -15,8 +15,8 @@
 local Databases = require 'database'
 local Col = require 'database.column'
 
-local def_types = require "class.types.types"
 local Properties = require "account.json_types.Properties"
+local def_types = require "class.types.types"
 
 ---@class AccountServiceTable: Table
 ---@field AccountLockoutCounterResetAfter FieldBase
@@ -503,8 +503,8 @@ function AccountDBDatabase.new(path, datas)
             "protect_power_off"):max_length(8),
         NamePattern = Col.TextField():cid(2)
             :persistence_key("protect_power_off"):null():default("''"),
-        AllowedLoginInterfaces = Col.IntegerField():cid(3):persistence_key("protect_power_off"):null():max_length(32)
-            :default(223)
+        AllowedLoginInterfaces = Col.IntegerField():cid(3):persistence_key(
+            "protect_power_off"):null():max_length(32):default(223)
     }):create_if_not_exist(datas and datas['t_account_policy'])
 
     obj.tables = db.tables

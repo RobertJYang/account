@@ -1378,6 +1378,213 @@ function TExportCSRReq:unpack(_) return self.Path end
 
 CertificateService.ExportCSRReq = TExportCSRReq
 
+---@class CertificateService.GenerateCSRRsp
+---@field FilePath string
+---@field TaskId integer
+---@field CSRString string
+local TGenerateCSRRsp = {}
+TGenerateCSRRsp.__index = TGenerateCSRRsp
+TGenerateCSRRsp.group = {}
+
+local function TGenerateCSRRsp_from_obj(obj)
+    return setmetatable(obj, TGenerateCSRRsp)
+end
+
+function TGenerateCSRRsp.new(FilePath, TaskId, CSRString)
+    return TGenerateCSRRsp_from_obj({
+        FilePath = FilePath,
+        TaskId = TaskId,
+        CSRString = CSRString
+    })
+end
+---@param obj CertificateService.GenerateCSRRsp
+function TGenerateCSRRsp:init_from_obj(obj)
+    self.FilePath = obj.FilePath
+    self.TaskId = obj.TaskId
+    self.CSRString = obj.CSRString
+end
+
+function TGenerateCSRRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGenerateCSRRsp.group)
+end
+
+TGenerateCSRRsp.from_obj = TGenerateCSRRsp_from_obj
+
+TGenerateCSRRsp.proto_property = {'FilePath', 'TaskId', 'CSRString'}
+
+TGenerateCSRRsp.default = {'', 0, ''}
+
+TGenerateCSRRsp.struct = {
+    {name = 'FilePath', is_array = false, struct = nil},
+    {name = 'TaskId', is_array = false, struct = nil},
+    {name = 'CSRString', is_array = false, struct = nil}
+}
+
+function TGenerateCSRRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'FilePath', self.FilePath, "string", false,
+                      errs, need_convert)
+    validate.Optional(prefix .. 'TaskId', self.TaskId, "uint32", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'CSRString', self.CSRString, "string", false,
+                      errs, need_convert)
+
+    TGenerateCSRRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGenerateCSRRsp.proto_property, errs,
+                                 need_convert)
+    return self
+end
+
+function TGenerateCSRRsp:unpack(_)
+    return self.FilePath, self.TaskId, self.CSRString
+end
+
+CertificateService.GenerateCSRRsp = TGenerateCSRRsp
+
+---@class CertificateService.GenerateCSRReq
+---@field Country string
+---@field State string
+---@field Location string
+---@field OrgName string
+---@field OrgUnit string
+---@field CommonName string
+---@field AlternativeNames string[]
+---@field KeyUsage string[]
+---@field KeyBitLength integer
+---@field Options CertificateService.CSRProperty
+local TGenerateCSRReq = {}
+TGenerateCSRReq.__index = TGenerateCSRReq
+TGenerateCSRReq.group = {}
+
+local function TGenerateCSRReq_from_obj(obj)
+    return setmetatable(obj, TGenerateCSRReq)
+end
+
+function TGenerateCSRReq.new(Country, State, Location, OrgName, OrgUnit,
+                             CommonName, AlternativeNames, KeyUsage,
+                             KeyBitLength, Options)
+    return TGenerateCSRReq_from_obj({
+        Country = Country,
+        State = State,
+        Location = Location,
+        OrgName = OrgName,
+        OrgUnit = OrgUnit,
+        CommonName = CommonName,
+        AlternativeNames = AlternativeNames,
+        KeyUsage = KeyUsage,
+        KeyBitLength = KeyBitLength,
+        Options = Options
+    })
+end
+---@param obj CertificateService.GenerateCSRReq
+function TGenerateCSRReq:init_from_obj(obj)
+    self.Country = obj.Country
+    self.State = obj.State
+    self.Location = obj.Location
+    self.OrgName = obj.OrgName
+    self.OrgUnit = obj.OrgUnit
+    self.CommonName = obj.CommonName
+    self.AlternativeNames = obj.AlternativeNames
+    self.KeyUsage = obj.KeyUsage
+    self.KeyBitLength = obj.KeyBitLength
+    self.Options = obj.Options
+end
+
+function TGenerateCSRReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGenerateCSRReq.group)
+end
+
+TGenerateCSRReq.from_obj = TGenerateCSRReq_from_obj
+
+TGenerateCSRReq.proto_property = {
+    'Country', 'State', 'Location', 'OrgName', 'OrgUnit', 'CommonName',
+    'AlternativeNames', 'KeyUsage', 'KeyBitLength', 'Options'
+}
+
+TGenerateCSRReq.default = {
+    '', '', '', '', '', '', {}, {}, 0, CertificateService.CSRProperty.default
+}
+
+TGenerateCSRReq.struct = {
+    {name = 'Country', is_array = false, struct = nil},
+    {name = 'State', is_array = false, struct = nil},
+    {name = 'Location', is_array = false, struct = nil},
+    {name = 'OrgName', is_array = false, struct = nil},
+    {name = 'OrgUnit', is_array = false, struct = nil},
+    {name = 'CommonName', is_array = false, struct = nil},
+    {name = 'AlternativeNames', is_array = true, struct = nil},
+    {name = 'KeyUsage', is_array = true, struct = nil},
+    {name = 'KeyBitLength', is_array = false, struct = nil}, {
+        name = 'Options',
+        is_array = false,
+        struct = CertificateService.CSRProperty.struct
+    }
+}
+
+function TGenerateCSRReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    CertificateService.CSRProperty.new(self.Options):validate(prefix, errs,
+                                                              need_convert)
+
+    validate.Optional(prefix .. 'Country', self.Country, "string", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'State', self.State, "string", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'Location', self.Location, "string", false,
+                      errs, need_convert)
+    validate.Optional(prefix .. 'OrgName', self.OrgName, "string", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'OrgUnit', self.OrgUnit, "string", false, errs,
+                      need_convert)
+    validate.Optional(prefix .. 'CommonName', self.CommonName, "string", false,
+                      errs, need_convert)
+    validate.OptionalArray(prefix .. 'AlternativeNames', self.AlternativeNames,
+                           "string", false, errs, need_convert)
+    validate.OptionalArray(prefix .. 'KeyUsage', self.KeyUsage, "string", false,
+                           errs, need_convert)
+    validate.Optional(prefix .. 'KeyBitLength', self.KeyBitLength, "int32",
+                      false, errs, need_convert)
+
+    if self.Country ~= nil then
+        validate.lens(prefix .. 'Country', self.Country, 1, 2, errs,
+                      need_convert)
+    end
+    if self.State ~= nil then
+        validate.lens(prefix .. 'State', self.State, 0, 128, errs, need_convert)
+    end
+    if self.Location ~= nil then
+        validate.lens(prefix .. 'Location', self.Location, 0, 128, errs,
+                      need_convert)
+    end
+    if self.OrgName ~= nil then
+        validate.lens(prefix .. 'OrgName', self.OrgName, 0, 64, errs,
+                      need_convert)
+    end
+    if self.OrgUnit ~= nil then
+        validate.lens(prefix .. 'OrgUnit', self.OrgUnit, 0, 64, errs,
+                      need_convert)
+    end
+    if self.CommonName ~= nil then
+        validate.lens(prefix .. 'CommonName', self.CommonName, 1, 64, errs,
+                      need_convert)
+    end
+
+    TGenerateCSRReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGenerateCSRReq.proto_property, errs,
+                                 need_convert)
+    return self
+end
+
+function TGenerateCSRReq:unpack(_)
+    return self.Country, self.State, self.Location, self.OrgName, self.OrgUnit,
+           self.CommonName, self.AlternativeNames, self.KeyUsage,
+           self.KeyBitLength, self.Options
+end
+
+CertificateService.GenerateCSRReq = TGenerateCSRReq
+
 ---@class CertificateService.StartGenerateCSRRsp
 ---@field FilePath string
 ---@field TaskId integer
@@ -1955,6 +2162,9 @@ CertificateService.interface = mdb.register_interface(
         },
         StartGenerateCSR = {
             'a{ss}ssssssas', 'su', TStartGenerateCSRReq, TStartGenerateCSRRsp
+        },
+        GenerateCSR = {
+            'a{ss}ssssssasasia{ss}', 'sus', TGenerateCSRReq, TGenerateCSRRsp
         },
         ExportCSR = {'a{ss}s', 'u', TExportCSRReq, TExportCSRRsp},
         ExportCertKeyByFIFO = {

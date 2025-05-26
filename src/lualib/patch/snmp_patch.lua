@@ -27,7 +27,7 @@ function snmp_patch.exec(persist, db)
 
         -- 强制落盘
         if snmp_info.AccountId == 2 then
-            persist.per_save(sqlite3.UPDATE, 't_snmp_user_info', {{'AccountId', snmp_info.AccountId}},
+            persist:per_save(sqlite3.UPDATE, 't_snmp_user_info', {{'AccountId', snmp_info.AccountId}},
             {['AuthenticationProtocol'] = {value = snmp_info.AuthenticationProtocol:value(),
                                         persist_type = 'protect_power_off'}})
         end
