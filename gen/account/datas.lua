@@ -170,6 +170,17 @@ M.t_manager_account = {
         LoginInterface = 128,
         LoginRuleIds = 0,
         Deletable = false
+    }, {
+        Id = 23,
+        RoleId = 4,
+        UserName = [=[<inter chassis>]=],
+        Password = [=[]=],
+        IpmiPassword = [=[]=],
+        FirstLoginPolicy = [=[PromptPasswordReset]=],
+        AccountType = 9,
+        LoginInterface = 128,
+        LoginRuleIds = 0,
+        Deletable = false
     }
 }
 M.t_snmp_user_info = {

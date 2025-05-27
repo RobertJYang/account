@@ -12,7 +12,7 @@ local sqlite3 = require 'lsqlite3'
 
 function TestAccount:test_account_db()
     local v = self.db:select(self.db.ManagerAccountDB):where(self.db.ManagerAccountDB.Id:eq(2)):first()
-    lu.assertEquals(self.db.ManagerAccountDB:get_count(), 6)
+    lu.assertEquals(self.db.ManagerAccountDB:get_count(), 7)
     lu.assertEquals(v.UserName, 'Administrator')
     lu.assertEquals(self.db.SNMPUserInfo:get_count(), 1)
     lu.assertEquals(self.db.Role:get_count(), 8)

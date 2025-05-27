@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.5] - 2025-05-26
+支持新增内部用户，用于框内设备间通信
+
 ## [1.80.4] - 2025-05-22
 支持安全管理满足资源树协作接口关键字规范要求
 
