@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.6] - 2025-05-27
+自动生成代码更新&支持增删自定义用户角色自动生成代码
+
 ## [1.80.5] - 2025-05-26
 支持新增内部用户，用于框内设备间通信
 

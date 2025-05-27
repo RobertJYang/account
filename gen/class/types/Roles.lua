@@ -10,9 +10,9 @@
 local validate = require 'mc.validate'
 local utils = require 'mc.utils'
 
-local MSnmpCommunity = {}
+local MRoles = {}
 
----@class MSnmpCommunity.Id
+---@class MRoles.Id
 ---@field Id integer
 local TId = {}
 TId.__index = TId
@@ -25,7 +25,7 @@ end
 function TId.new(Id)
     return TId_from_obj({Id = Id})
 end
----@param obj MSnmpCommunity.Id
+---@param obj MRoles.Id
 function TId:init_from_obj(obj)
     self.Id = obj.Id
 end
@@ -56,6 +56,6 @@ function TId:unpack(_)
     return self.Id
 end
 
-MSnmpCommunity.Id = TId
+MRoles.Id = TId
 
-return MSnmpCommunity
+return MRoles

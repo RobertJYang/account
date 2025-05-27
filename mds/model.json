@@ -1120,6 +1120,40 @@
             }
         }
     },
+    "Roles": {
+        "tableName": "t_roles",
+        "path": "/bmc/kepler/AccountService/Roles",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.Roles": {
+                "properties": {
+                    "ExtendedCustomRoleEnabled": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": false,
+                        "usage": ["PoweroffPer"]
+                    }
+                },
+                "methods": {
+                    "New": {
+                        "privilege": ["UserMgmt"]
+                    }
+                }
+            }
+        },
+        "properties": {
+            "Id": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "持久化主键,无实际作用,Roles仅有一条数据"
+            }
+        }
+    },
     "Role": {
         "tableName": "t_role",
         "path": "/bmc/kepler/AccountService/Roles/:Id",
@@ -1143,6 +1177,9 @@
                 },
                 "methods": {
                     "SetRolePrivilege": {
+                        "privilege":["UserMgmt"]
+                    },
+                    "Delete": {
                         "privilege":["UserMgmt"]
                     }
                 }
