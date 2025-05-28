@@ -7,20 +7,18 @@
 -- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
-
 local class = require 'mc.class'
 local singleton = require 'mc.singleton'
 local log = require 'mc.logging'
-local cls_mng = require 'mc.class_mgnt'
 local context = require 'mc.context'
 local base_msg = require 'messages.base'
+local service = require 'account.service'
+local enum = require 'class.types.types'
 local operation_logger = require 'interface.operation_logger'
 local utils = require 'infrastructure.utils'
 
-local INTERFACE_ACCOUNT_POLICY = 'bmc.kepler.AccountService.AccountPolicy'
-
 local c_object = require 'mc.orm.object'
-local account_policy_obj = c_object('AccountPolicy')
+local account_policy_obj = c_object('AccountPolicyDB')
 
 -- ORM会尝试调用create_mdb_object将模型类上库
 -- 手动实现用户的各模型类create_mdb_object, 避免刷日志
@@ -28,70 +26,83 @@ function account_policy_obj.create_mdb_object(value)
     return value
 end
 
-local account_policy_mdb = class()
+local INTERFACE_ACCOUNT_POLICY = 'bmc.kepler.AccountService.AccountPolicy'
 
-function account_policy_mdb:ctor(m_account_config)
-    self.m_account_config = m_account_config
+local AccountPolicyMdb = class()
+
+local account_type_name_map = {
+    [enum.AccountType.Local:value()] = 'Local',
+    [enum.AccountType.OEM:value()] = 'OemAccount'
+}
+
+function AccountPolicyMdb:ctor(account_policy_collection)
+    self.m_policy_collection = account_policy_collection
+    self.m_mdb_policys = {}
 end
 
-function account_policy_mdb:init()
-    local config_mdb = {}
-    local global_config = self.m_account_config
-    config_mdb.NamePattern = global_config:get_name_pattern()
-    config_mdb.AllowedLoginInterfaces =
-        utils.convert_num_to_interface_str(global_config:get_allowed_login_interfaces(), true)
-    self:new_config_to_mdb_tree(config_mdb)
+function AccountPolicyMdb:init()
+    for _, policy in pairs(self.m_policy_collection.collection) do
+        self:new_policy_to_mdb_tree(policy:get_obj())
+    end
 
-    self.m_account_config.m_account_policy.m_config_changed:on(function(...)
-        self:config_mdb_update(...)
+    self.m_policy_collection.m_config_changed:on(function(...)
+        self:policy_mdb_update(...)
     end)
 end
 
 -- 属性监听钩子
-account_policy_mdb.watch_property_hook = {
+AccountPolicyMdb.watch_property_hook = {
     NamePattern = operation_logger.proxy(function(self, ctx, value)
-        self.m_account_config:set_name_pattern(value)
+        self.m_policy_collection:set_name_pattern(value)
     end, 'NamePatternChange'),
     AllowedLoginInterfaces = operation_logger.proxy(function(self, ctx, value)
         ctx.operation_log.params = { interfaces = table.concat(value, ', ') }
         local interface_num = utils.cover_interface_str_to_num(value)
-        self.m_account_config:set_allowed_login_interfaces(interface_num)
-    end, 'SetAllowedLoginInterfaces')
+        self.m_policy_collection:set_allowed_login_interfaces(interface_num)
+    end, 'SetAllowedLoginInterfaces'),
+    Visible = operation_logger.proxy(function(self, ctx, account_type, value)
+        self.m_policy_collection:set_visible(ctx, account_type, value)
+    end, 'VisibleChange'),
+    Deletable = operation_logger.proxy(function(self, ctx, account_type, value)
+        self.m_policy_collection:set_deletable(ctx, account_type, value)
+    end, 'DeletableChange'),
 }
 
-function account_policy_mdb:watch_service_property(service)
-    service[INTERFACE_ACCOUNT_POLICY].property_before_change:on(function(name, value, sender)
+function AccountPolicyMdb:watch_policy_property(policy, account_type)
+    policy[INTERFACE_ACCOUNT_POLICY].property_before_change:on(function(name, value, sender)
         if not sender then
-            log:info('change the manager accounts policy property(%s) to value(%s), sender is nil',
-                name, tostring(value))
+            log:info('change the property(%s), sender is nil', name)
             return true
         end
 
         if not self.watch_property_hook[name] then
-            log:error('change the property(%s) to value(%s), invalid', name, tostring(value))
+            log:error('change the property(%s), invalid', name)
             error(base_msg.InternalError())
         end
-
-        log:info('change the property(%s) to value(%s)', name, tostring(value))
+        log:info('change the property(%s)', name)
         local ctx = context.get_context() or context.new('WEB', 'NA', 'NA')
-        self.watch_property_hook[name](self, ctx, value)
+        self.watch_property_hook[name](self, ctx, account_type, value)
         return true
     end)
 end
 
-function account_policy_mdb:new_config_to_mdb_tree(user_config)
-    local cls_config = cls_mng('LocalAccountPolicy'):get("/bmc/kepler/AccountService/AccountPolicies/Local")
-    cls_config[INTERFACE_ACCOUNT_POLICY].NamePattern = user_config.NamePattern
-    cls_config[INTERFACE_ACCOUNT_POLICY].AllowedLoginInterfaces = user_config.AllowedLoginInterfaces
-    self:watch_service_property(cls_config)
+function AccountPolicyMdb:new_policy_to_mdb_tree(policy_info)
+    local account_type_name = account_type_name_map[policy_info.AccountType]
+    local cur_policy = service:CreateAccountPolicy(account_type_name, function(policy)
+        policy.NamePattern = policy_info.NamePattern
+        policy.AllowedLoginInterfaces = utils.convert_num_to_interface_str(policy_info.AllowedLoginInterfaces, true)
+        policy.Visible  = policy_info.Visible
+        policy.Deletable = policy_info.Deletable
+        self:watch_policy_property(policy, policy_info.AccountType)
+    end)
+    self.m_mdb_policys[policy_info.AccountType] = cur_policy
 end
 
-function account_policy_mdb:config_mdb_update(property, value)
-    local cls_config = cls_mng('LocalAccountPolicy'):get("/bmc/kepler/AccountService/AccountPolicies/Local")
-    if cls_config[INTERFACE_ACCOUNT_POLICY][property] == nil then
+function AccountPolicyMdb:policy_mdb_update(account_type, property, value)
+    if self.m_mdb_policys[account_type] == nil then
         return
     end
-    cls_config[INTERFACE_ACCOUNT_POLICY][property] = value
+    self.m_mdb_policys[account_type][INTERFACE_ACCOUNT_POLICY][property] = value
 end
 
-return singleton(account_policy_mdb)
+return singleton(AccountPolicyMdb)

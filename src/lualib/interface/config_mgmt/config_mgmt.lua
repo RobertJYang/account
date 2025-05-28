@@ -15,6 +15,7 @@ local account_collection = require 'domain.account_collection'
 local account_service = require 'service.account_service'
 local global_account_config = require 'domain.global_account_config'
 local password_validator_collection = require 'domain.password_validator_collection'
+local account_policy_collection = require 'domain.account_policy_collection'
 
 local ConfigMgmt = class()
 
@@ -24,6 +25,7 @@ function ConfigMgmt:ctor()
     self.m_account_service = account_service.get_instance()
     self.m_account_config = global_account_config.get_instance()
     self.m_password_validator_collection = password_validator_collection.get_instance()
+    self.m_account_policy_collection = account_policy_collection.get_instance()
 end
 
 return ConfigMgmt

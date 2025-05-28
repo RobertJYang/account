@@ -32,11 +32,10 @@ local PROP_NOT_USE = 0 -- 设置为0代表该属性不生效
 
 local global_account_config = class()
 
-function global_account_config:ctor(db, file_transfer, account_policy)
+function global_account_config:ctor(db, file_transfer)
     self.m_db_account_service = db:select(db.AccountService):first()
     self.m_snmp_community = db:select(db.SnmpCommunity):first()
     self.m_file_transfer = file_transfer
-    self.m_account_policy = account_policy
     self.m_weak_password_dictionary = {}
     self.m_weak_password_dictionary_config_status = enum.WeakPwdDictEnum.WEAK_PWDDICT_COMPELETE
 end
@@ -60,24 +59,6 @@ function global_account_config:init()
             self.m_weak_password_dictionary[#self.m_weak_password_dictionary + 1] = line
         end
     end))
-end
-
-function global_account_config:get_allowed_login_interfaces()
-    return self.m_account_policy:get_allowed_login_interfaces()
-end
-
-function global_account_config:set_allowed_login_interfaces(interface_num)
-    self.m_account_policy:set_allowed_login_interfaces(interface_num)
-    self.m_account_policy.m_config_changed:emit('AllowedLoginInterfaces',
-        utils.convert_num_to_interface_str(interface_num, true))
-end
-
-function global_account_config:get_name_pattern()
-    return self.m_account_policy:get_name_pattern()
-end
-
-function global_account_config:set_name_pattern(pattern)
-    self.m_account_policy:set_name_pattern(pattern)
 end
 
 function global_account_config:get_password_max_length()

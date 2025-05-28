@@ -29,6 +29,7 @@ require 'account.json_types.Role'
 require 'account.json_types.Rule'
 require 'account.json_types.LocalAccountAuthN'
 require 'account.json_types.SnmpUser'
+require 'account.json_types.AccountPolicy'
 
 log:set_log_module_name('account_IT')
 log:set_debug_log_type(log.OUT_TYPE_LOCAL)

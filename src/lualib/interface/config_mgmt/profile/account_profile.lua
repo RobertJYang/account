@@ -84,7 +84,7 @@ function AccountProfile.get_account_id(self, account_id)
 end
 
 function AccountProfile.set_user_name(self, ctx, account_id, value)
-    if not self.m_account_config.m_account_policy:check_user_name(value) and value ~= '' then
+    if not self.m_account_policy_collection:check_user_name(value) and value ~= '' then
         error(custom_msg.InvalidUserName())
     end
     self.m_account_collection:set_user_name(ctx, account_id, value)

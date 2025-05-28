@@ -151,7 +151,8 @@ M.t_password_policy = {
     {AccountType = 7, Policy = 1, Pattern = [=[]=]}
 }
 M.t_account_policy = {
-    {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223}
+    {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = true, Deletable = true},
+    {AccountType = 8, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = false, Deletable = false}
 }
 
 return M

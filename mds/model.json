@@ -1442,9 +1442,9 @@
             }
         }
     },
-    "LocalAccountPolicy": {
+    "AccountPolicy": {
         "privilege": ["ReadOnly"],
-        "path": "/bmc/kepler/AccountService/AccountPolicies/Local",
+        "path": "/bmc/kepler/AccountService/AccountPolicies/:AccountType",
         "interfaces": {
             "bmc.kepler.AccountService.AccountPolicy": {
                 "properties": {
@@ -1461,12 +1461,26 @@
                             "write": ["UserMgmt"]
                         },
                         "default": ["Web", "SNMP", "IPMI", "SSH", "SFTP", "Local", "Redfish"]
+                    },
+                    "Visible": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": false
+                    },
+                    "Deletable": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": false
                     }
                 }
             }
         }
     },
-    "AccountPolicy": {
+    "AccountPolicyDB": {
         "tableName": "t_account_policy",
         "properties": {
             "AccountType": {
@@ -1486,6 +1500,20 @@
             "AllowedLoginInterfaces": {
                 "baseType": "U32",
                 "default": 223,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Visible": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Deletable": {
+                "baseType": "Boolean",
+                "default": false,
                 "usage": [
                     "PoweroffPer"
                 ]

@@ -31,12 +31,12 @@ local utils = require 'infrastructure.utils'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
 local role_collection = require 'domain.role'
 local global_account_config = require 'domain.global_account_config'
-local account_policy = require 'domain.account_policies.local_account_policy'
 local account_recover = require 'service.account_recover'
 local account_collection = require 'domain.account_collection'
 local account_permanent_backup = require 'domain.account_permanent_backup'
 local file_synchronization = require 'domain.file_synchronization'
 local password_validator_collection = require 'domain.password_validator_collection'
+local account_policy_collection = require 'domain.account_policy_collection'
 local account_service = require 'service.account_service'
 local local_authentication = require 'service.local_authentication'
 local operation_logger = require 'interface.operation_logger'
@@ -183,9 +183,9 @@ function app:service_init()
     self.role_privilege_mdb:regist_role_privilege_signals()
     log:notice("role privilege init end, account config init start")
     -- 用户配置
-    self.account_policy = account_policy.new(self.db)
-    self.global_account_config = global_account_config.new(self.db, self.file_transfer, self.account_policy)
+    self.global_account_config = global_account_config.new(self.db, self.file_transfer)
     self.password_validator_collection = password_validator_collection.new(self.db, self.global_account_config)
+    self.account_policy_collection = account_policy_collection.new(self.db, self.global_account_config)
     log:notice("account config init end, account manager init start")
     -- 用户管理
     local linux_file_path = {
@@ -195,7 +195,8 @@ function app:service_init()
         ['ipmi'] = skynet.getenv('IPMI_FILE')
     }
     self.account_collection = account_collection.new(self.persist, self.db, self.global_account_config,
-        self.role_collection, self.host_privilege_limit, self.password_validator_collection, linux_file_path)
+        self.role_collection, self.host_privilege_limit, self.password_validator_collection,
+        self.account_policy_collection, linux_file_path)
     self.account_permanent_backup = account_permanent_backup.new(self.db, self.account_collection)
     log:notice("account manager init end, linux file manager init start")
     -- 文件管理
@@ -203,7 +204,7 @@ function app:service_init()
     log:notice("linux file manager init end, account service init start")
     -- 用户服务
     self.account_service = account_service.new(self.global_account_config, self.account_collection,
-        self.file_synchronization, self.role_collection)
+        self.file_synchronization, self.role_collection, self.account_policy_collection)
     self.account_recover = account_recover.new(self.db, self.account_backup_db, self.account_service)
     self.local_authentication = local_authentication.new(self.account_collection, self.global_account_config)
     log:notice("account service init end, interface init start")
@@ -215,7 +216,7 @@ function app:service_init()
     self.account_service_mdb:regist_account_signals()
     self.snmp_community_mdb = snmp_community_mdb.new(self.account_service)
     self.password_validator_mdb = password_validator_mdb.new(self.password_validator_collection)
-    self.account_policy_mdb = account_policy_mdb.new(self.global_account_config)
+    self.account_policy_mdb = account_policy_mdb.new(self.account_policy_collection)
     self.account_service_ipmi = account_service_ipmi.new()
     self.password_validator_ipmi = password_validator_ipmi.new(self.password_validator_collection)
     self.account_service_snmp = account_service_snmp.new(self.account_service)

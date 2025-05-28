@@ -56,7 +56,9 @@ function TestAccount:test_add_oem_administrator_account_should_success()
     self.test_account_collection:delete_account(tmp_ctx, 3)
 
     -- 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
     test_account = self.test_account_collection.collection[OEM_ACCOUNT_ID]
     lu.assertIsNil(test_account)
 end
@@ -89,7 +91,9 @@ function TestAccount:test_add_oem_account_interface_and_role_not_writable_should
     end)
 
     -- 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
 end
 
@@ -119,7 +123,9 @@ function TestAccount:test_verify_not_pwd_encrypted_oem_account_should_match_succ
     end)
 
     -- 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
 end
 
@@ -150,6 +156,8 @@ function TestAccount:test_verify_pwd_encrypted_oem_account_should_match_success_
     end)
 
     -- 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
 end
