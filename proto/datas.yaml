@@ -15,6 +15,10 @@ t_login_rule:
     MacRule: ''
     Enabled: false
 
+t_roles:
+  - Id: 1
+    ExtendedCustomRoleEnabled: false
+
 t_role:
   - Id: 4
     RoleName: Administrator

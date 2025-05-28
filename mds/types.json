@@ -97,7 +97,19 @@
             "CustomRole1": 5,
             "CustomRole2": 6,
             "CustomRole3": 7,
-            "CustomRole4": 8
+            "CustomRole4": 8,
+            "CustomRole5": 9,
+            "CustomRole6": 10,
+            "CustomRole7": 11,
+            "CustomRole8": 12,
+            "CustomRole9": 13,
+            "CustomRole10": 14,
+            "CustomRole11": 15,
+            "CustomRole12": 16,
+            "CustomRole13": 17,
+            "CustomRole14": 18,
+            "CustomRole15": 19,
+            "CustomRole16": 20
         },
         "IpmiPrivilege": {
             "RESERVED": 0,
