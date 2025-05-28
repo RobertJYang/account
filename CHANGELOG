@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.7] - 2025-05-28
+修复ipmi删除用户操作日志格式不对的问题
+
 ## [1.80.6] - 2025-05-27
 自动生成代码更新&支持增删自定义用户角色自动生成代码
 

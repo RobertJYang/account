@@ -146,7 +146,8 @@ local operation_log_map = {
     },
     IpmiDeleteAccount = {
         success = "Delete user{id}'s username ({name}) successfully",
-        fail = "Delete user{id}'s username ({name}) failed"
+        fail = "Delete user{id}'s username ({name}) failed",
+        user_mgnt_disabled = "Delete user{id} failed"
     },
     IpmiSetUserAccess = {
         success = 'Modify user({name}|user{id}) privilege to ({privilege}) successfully',
