@@ -26,11 +26,13 @@ local privilege = require 'domain.privilege'
 -- AccountService
 local AccountService = class()
 
-function AccountService:ctor(global_account_config, account_collection, file_synchronization, role_collection)
+function AccountService:ctor(global_account_config, account_collection, file_synchronization,
+    role_collection, account_policy_collection)
     self.m_account_config = global_account_config
     self.m_account_collection = account_collection
     self.m_file_synchronization = file_synchronization
     self.m_rc = role_collection
+    self.account_policy_collection = account_policy_collection
     self.m_config_added = signal.new()
     self.m_config_changed = signal.new()
 end
@@ -41,7 +43,7 @@ end
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，创建OEM用户时可能包含密码类型等信息
 function AccountService:new_account(ctx, account_info, is_ipmi_or_snmp)
     -- 如果机机接口新建用户开启所有登录接口且当前限制了用户允许开启的登录接口, 则限制新建用户登录接口为AllowedLoginInterfaces支持的范围
-    local allowed_login_interfaces = self.m_account_config:get_allowed_login_interfaces()
+    local allowed_login_interfaces = self.account_policy_collection:get_allowed_login_interfaces()
     local cur_interface_num = utils.cover_interface_enum_to_num(account_info.interface)
     if (ctx.Interface == 'CLI' or ctx.Interface == 'Redfish') and
         allowed_login_interfaces < config.DEFAULT_INTERFACES and cur_interface_num == config.DEFAULT_INTERFACES then
@@ -72,7 +74,7 @@ function AccountService:get_account_data_by_name(user_name)
 end
 
 function AccountService:get_id_by_user_name(ctx, user_name)
-    if not self.m_account_config.m_account_policy:check_user_name(user_name) then
+    if not self.account_policy_collection:check_user_name(user_name) then
         error(custom_msg.UserNotExist(user_name))
     end
     -- 上下文为：telnet的root用户、HOST、有UserMgm权限的用户，才允许获取user_name的account_id

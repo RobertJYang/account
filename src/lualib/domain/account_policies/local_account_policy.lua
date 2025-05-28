@@ -9,7 +9,6 @@
 -- See the Mulan PSL v2 for more details.
 local singleton = require 'mc.singleton'
 local class = require 'mc.class'
-local signal = require 'mc.signal'
 local config = require 'common_config'
 local utils_core = require 'utils.core'
 local account_core = require 'account_core'
@@ -18,30 +17,22 @@ local enum = require 'class.types.types'
 local base_msg = require 'messages.base'
 local log = require 'mc.logging'
 local utils = require 'infrastructure.utils'
+local account_policy = require 'domain.account_policies.account_policy'
 
-local local_account_policy = class()
+local LocalAccountPolicy = class(account_policy)
 
-function local_account_policy:ctor(db)
-    self.m_db_local_account_policy = db:select(db.AccountPolicy):first()
-    self.m_config_changed = signal.new()
-end
-
-function local_account_policy:get_name_pattern()
-    return self.m_db_local_account_policy.NamePattern
-end
-
-function local_account_policy:set_name_pattern(pattern)
+function LocalAccountPolicy:set_name_pattern(pattern)
     if string.len(pattern) > 255 then
         error(custom_msg.StringValueTooLong("NamePattern", 255))
     end
     if string.len(pattern) ~= 0 and not account_core.check_pattern(pattern) then
         error(custom_msg.InvalidValue(pattern, "NamePattern"))
     end
-    self.m_db_local_account_policy.NamePattern = pattern
-    self.m_db_local_account_policy:save()
+    self.data.NamePattern = pattern
+    self.data:save()
 end
 
-function local_account_policy:check_user_name(user_name)
+function LocalAccountPolicy:check_user_name(user_name)
     local check_config = self:get_name_pattern()
     if check_config == "" then
         check_config = "^(?!.*[<>&,'/\\%:\" ])(?=[A-Za-z0-9`~!@#$%^&*()_+-={};[\\]?.|])" ..
@@ -63,11 +54,7 @@ function local_account_policy:check_user_name(user_name)
     return utils_core.g_regex_match(check_config, user_name)
 end
 
-function local_account_policy:get_allowed_login_interfaces()
-    return self.m_db_local_account_policy.AllowedLoginInterfaces
-end
-
-function local_account_policy:set_allowed_login_interfaces(interface_num)
+function LocalAccountPolicy:set_allowed_login_interfaces(interface_num)
     if interface_num <= 0 or interface_num == enum.LoginInterface.SFTP:value() then
         log:error('set allowed login interfaces failed, interfaces must contain at least one valid item except SFTP')
         error(custom_msg.ArrayPropertyInvalidItem('AllowedLoginInterfaces'))
@@ -76,18 +63,18 @@ function local_account_policy:set_allowed_login_interfaces(interface_num)
         log:error('set allowed login interfaces failed, interfaces : %d not supported', interface_num)
         error(base_msg.PropertyValueNotInList(interface_num, "LoginInterface"))
     end
-    self.m_db_local_account_policy.AllowedLoginInterfaces = interface_num
-    self.m_db_local_account_policy:save()
+    self.data.AllowedLoginInterfaces = interface_num
+    self.data:save()
 end
 
-function local_account_policy:check_login_interface_is_allowed(login_interfaces)
+function LocalAccountPolicy:check_login_interface_is_allowed(login_interfaces)
     if login_interfaces == 'table' then
         login_interfaces = utils.cover_interface_str_to_num(login_interfaces)
     end
-    if login_interfaces & self.m_db_local_account_policy.AllowedLoginInterfaces ~= login_interfaces then
+    if login_interfaces & self.data.AllowedLoginInterfaces ~= login_interfaces then
         return false
     end
     return true
 end
 
-return singleton(local_account_policy)
+return singleton(LocalAccountPolicy)

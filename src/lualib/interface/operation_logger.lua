@@ -272,6 +272,16 @@ local operation_log_map = {
         success = 'Set allowed login interfaces to ({interfaces}) successfully',
         fail = 'Set allowed login interfaces failed',
     },
+    VisibleChange = {
+        success = 'Set {account_type} visible to ({status}) successfully',
+        fail = 'Set {account_type} visible failed',
+        invalid_account_type = 'Set visible failed'
+    },
+    DeletableChange = {
+        success = 'Set {account_type} deletable to ({status}) successfully',
+        fail = 'Set {account_type} deletable failed',
+        invalid_account_type = 'Set deletable failed'
+    },
     ---------------- account_service_mdb end --------------------
 
     ---------------------- login_rule_mdb -----------------------

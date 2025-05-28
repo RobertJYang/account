@@ -295,7 +295,16 @@ M.t_account_policy = {
     {
         AccountType = 0,
         NamePattern = [=[]=],
-        AllowedLoginInterfaces = 223
+        AllowedLoginInterfaces = 223,
+        Visible = true,
+        Deletable = true
+    },
+    {
+        AccountType = 8,
+        NamePattern = [=[]=],
+        AllowedLoginInterfaces = 223,
+        Visible = false,
+        Deletable = false
     }
 }
 return M

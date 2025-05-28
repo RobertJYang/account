@@ -28,9 +28,9 @@ local account_backup_db = require 'infrastructure.account_backup_db'
 local ipmi_running_record = require 'infrastructure.ipmi_running_record'
 local role_collection = require 'domain.role'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
-local account_policy = require 'domain.account_policies.local_account_policy'
 local global_account_config = require 'domain.global_account_config'
 local password_validator_collection = require 'domain.password_validator_collection'
+local account_policy_collection = require 'domain.account_policy_collection'
 local manager_account = require 'domain.manager_account.manager_account'
 local account_collection = require 'domain.account_collection'
 local account_permanent_backup = require 'domain.account_permanent_backup'
@@ -126,19 +126,20 @@ function TestAccount:setupClass()
     os.execute('mkdir -p ' .. self.tally_dir)
     self.db = open_db(test_data_dir .. '/account.test.db', datas)
     self.test_kmc_client = kmc_client.new(nil, nil, true)
-    self.account_policy = account_policy.new(self.db)
-    self.test_global_account_config = global_account_config.new(self.db, nil, self.account_policy)
+    self.test_global_account_config = global_account_config.new(self.db, nil)
     self.test_password_validator_collection = password_validator_collection.new(self.db,
         self.test_global_account_config)
+    self.test_account_policy_collection = account_policy_collection.new(self.db, self.test_global_account_config)
     self.test_login_rule_collection = login_rule_collection.new(nil, self.db)
     self.test_role_collection = role_collection.new(self.db)
     self.test_account_collection = account_collection.new(nil, self.db, self.test_global_account_config,
-        self.test_role_collection, nil, self.test_password_validator_collection, {})
+        self.test_role_collection, nil, self.test_password_validator_collection,
+        self.test_account_policy_collection, {})
     self.test_account_permanent_backup = account_permanent_backup.new(self.db, self.test_account_collection)
     self.test_file_synchronization = file_synchronization.new(self.db, self.test_account_collection, {})
     self.test_file_synchronization:regist_file_sync_signals()
     self.test_account_service = account_service.new(self.test_global_account_config, self.test_account_collection,
-        self.test_file_synchronization, self.test_role_collection)
+        self.test_file_synchronization, self.test_role_collection, self.test_account_policy_collection)
     self.ipmi_running_record = ipmi_running_record.new()
     self.test_account_backup_db = account_backup_db.new(self.db)
     self.test_account_recover = account_recover.new(self.db, self.test_account_backup_db, self.test_account_service)
@@ -244,6 +245,7 @@ require 'test_utils'
 require 'test_account_recover'
 require 'test_account_permanent_backup'
 require 'test_password_validator'
+require 'test_account_policy'
 -- OEM测试文件，裁剪时请注意
 require 'test_oem_account'
 

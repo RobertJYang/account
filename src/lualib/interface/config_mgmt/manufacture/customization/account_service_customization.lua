@@ -161,11 +161,11 @@ function AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, val
     end
     local login_interfaces_str = utils.convert_num_to_interface_str(value, true)
     ctx.operation_log.params = { interfaces = table.concat(login_interfaces_str, ', ') }
-    self.m_account_config:set_allowed_login_interfaces(value)
+    self.m_account_policy_collection:set_allowed_login_interfaces(value)
 end
 
 function AccountServiceCustomization.get_allowed_login_interfaces(self)
-    return self.m_account_config:get_allowed_login_interfaces()
+    return self.m_account_policy_collection:get_allowed_login_interfaces()
 end
 
 function AccountServiceCustomization.set_long_community_enable(self, ctx, value)

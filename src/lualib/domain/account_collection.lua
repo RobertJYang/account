@@ -55,7 +55,7 @@ local DEFAULT_MAX_USER_NUM = 17
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
-    password_validator_collection, linux_file_path)
+    password_validator_collection, account_policy_collection, linux_file_path)
     self.persist = persist
     self.db = db
     self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
@@ -72,6 +72,7 @@ function AccountCollection:ctor(persist, db, global_account_config, role_collect
     self.m_rc = role_collection
     self.m_host_privilege_limit = host_privilege_limit
     self.password_validator_collection = password_validator_collection
+    self.account_policy_collection = account_policy_collection
 end
 
 AccountCollection.operation_type_check = {
@@ -354,13 +355,13 @@ end
 ---@param is_ipmi_or_snmp boolean 是否通过IPMI或SNMP接口新建用户
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，以及是否为定制化用户等信息
 function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
-    if not self.m_global_account_config.m_account_policy:check_user_name(account_info.name) then
+    if not self.account_policy_collection:check_user_name(account_info.name) then
         log:error('Invalid name(%s) is not allowed', account_info.name)
         error(custom_msg.InvalidUserName())
     end
     -- AllowedLoginInterfaces仅限制本地用户
     if not account_info.oem and
-        not self.m_global_account_config.m_account_policy:
+        not self.account_policy_collection:
         check_login_interface_is_allowed(utils.cover_interface_enum_to_num(account_info.interface)) then
         local interfaces_str = utils.interface_enum_table_to_string(account_info.interface)
         log:error('LoginInterface is illegal, interface : %s', interfaces_str)
@@ -476,6 +477,13 @@ function AccountCollection:delete_account(ctx, account_id)
             log:error('Delete account failed, account (user%d) is snmp v3 trap account.', account_id)
             error(custom_msg.AccountForbidRemoved())
         end
+
+        --判断该类型用户是否可被删除account_policy中的Deletable属性
+        if not self.account_policy_collection:get_deletable(account.m_account_data.AccountType:value()) then
+            log:error('Delete account failed, account (user%d) is not deletable.', account_id)
+            error(custom_msg.AccountForbidRemoved())
+        end
+
         local username = account:get_user_name()
 
         -- 清除历史密码
@@ -533,7 +541,7 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
     -- 判断本地2-17用户要开启的登录接口是否在AllowedLoginInterfaces内
     local interface_num = utils.cover_interface_str_to_num(interface)
     if account:get_account_type():value() == enum.AccountType.Local:value() and
-        not self.m_global_account_config.m_account_policy:check_login_interface_is_allowed(interface_num) then
+        not self.account_policy_collection:check_login_interface_is_allowed(interface_num) then
         log:error('LoginInterface is illegal, interface : %s', table.concat(interface, ', '))
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
     end
@@ -630,7 +638,7 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
         ctx.operation_log.operation = 'IpmiNewAccount'
     end
     -- 用户名特殊字符校验下沉
-    if not self.m_global_account_config.m_account_policy:check_user_name(user_name) then
+    if not self.account_policy_collection:check_user_name(user_name) then
         error(custom_msg.IPMIInvalidFieldRequest())
     end
     -- 判断用户是否已经存在
@@ -642,7 +650,7 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
         enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
         enum.LoginInterface.SNMP }
     -- 如果当前限制了用户允许开启的登录接口(接口数<7), 机机接口新建用户登录接口使用AllowedLoginInterfaces支持的范围
-    local allowed_login_interfaces = self.m_global_account_config:get_allowed_login_interfaces()
+    local allowed_login_interfaces = self.account_policy_collection:get_allowed_login_interfaces()
     if allowed_login_interfaces < config.DEFAULT_INTERFACES then
         interface = utils.convert_num_to_interface_str(allowed_login_interfaces)
     end
@@ -675,7 +683,7 @@ function AccountCollection:set_user_name(ctx, account_id, user_name)
         ctx.operation_log.operation = 'ChangeUserName'
         ctx.operation_log.params.oldName = old_user_name
         -- 用户名特殊字符校验下沉
-        if not self.m_global_account_config.m_account_policy:check_user_name(user_name) then
+        if not self.account_policy_collection:check_user_name(user_name) then
             error(custom_msg.InvalidUserName())
         end
         -- 判断用户是否已经存在
@@ -708,7 +716,7 @@ function AccountCollection:change_user_name(account_id, user_name)
     if self.collection[account_id] == nil then
         error(err.invalid_account_id())
     end
-    if not self.m_global_account_config.m_account_policy:check_user_name(user_name) then
+    if not self.account_policy_collection:check_user_name(user_name) then
         error(custom_msg.InvalidUserName())
     end
     local old_username = self.collection[account_id]:get_user_name()
