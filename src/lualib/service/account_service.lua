@@ -455,16 +455,19 @@ function AccountService:set_ipmi_user_name(req, ctx)
     local user_id = req.UserId
     -- 由于协议对用户名进行了填充0x00，因此去掉
     local ret = self.m_account_config:check_ipmi_host_user_mgnt_enabled(ctx)
+    user_name = mc_utils.trim_tail_zero(user_name)
+    if user_name == '' then
+        ctx.operation_log.operation = "IpmiDeleteAccount"
+        log:info("Delete user %d by IPMI ", user_id)
+    end
     if not ret then
         log:error("Check host user management failed")
+        ctx.operation_log.operation = 'user_mgnt_disabled'
         ctx.operation_log.params.id = user_id
         ctx.operation_log.params.name = user_name
         error(err.host_user_management_diabled())
     end
-    user_name = mc_utils.trim_tail_zero(user_name)
-    if user_name == '' then
-        log:info("Delete user %d by IPMI ", user_id)
-    end
+
     utils.queue(function()
         local ok, err_code = pcall(function()
             self.m_account_collection:set_user_name(ctx, user_id, user_name)
