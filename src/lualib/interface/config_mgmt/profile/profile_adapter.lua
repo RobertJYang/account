@@ -81,7 +81,10 @@ local profile_adapter = {
     UserRole = {
         isObjectArray = true,
         instance_ids = { 'NoAccess', 'CommonUser', 'Operator', 'Administrator',
-            'CustomRole1', 'CustomRole2', 'CustomRole3', 'CustomRole4' },
+            'CustomRole1', 'CustomRole2', 'CustomRole3', 'CustomRole4' ,
+            'CustomRole5', 'CustomRole6', 'CustomRole7', 'CustomRole8' ,
+            'CustomRole9', 'CustomRole10', 'CustomRole11', 'CustomRole12' ,
+            'CustomRole13', 'CustomRole14', 'CustomRole15', 'CustomRole16' },
         Id = {
             import = RolePrivilegeProfile.set_role_name,
             export = RolePrivilegeProfile.get_role_name
@@ -381,10 +384,29 @@ function ProfileAdapter:import_property(ctx, class_name, property_name, property
     end
 end
 
-function ProfileAdapter:import_handle(ctx, class_name, class_data)
-    if class_name == "User" then
-        class_data = AccountProfile.import_account_precheck(self, ctx, class_data)
+-- 针对动态增加或者删除的对象进行预处理
+function ProfileAdapter:_import_dynamic_object_precheck(ctx, object)
+    -- 为了保证新用户存在新角色，先处理自定义角色
+    if object["UserRole"] ~= nil then
+        RolePrivilegeProfile.import_precheck(self, ctx, object["UserRole"])
     end
+    if object["User"] ~= nil then
+        AccountProfile.import_precheck(self, ctx, object["User"])
+    end
+end
+
+-- 针对动态删除的对象在实际导入阶段进行过滤
+function ProfileAdapter:_import_dynamic_object_filter(ctx, class_name, class_data)
+    -- 为了保证新用户存在新角色，先处理自定义角色
+    if class_name == "UserRole" then
+        return RolePrivilegeProfile.import_filter(self, ctx, class_data)
+    end
+    if class_name == "User" then
+        return AccountProfile.import_filter(self, ctx, class_data)
+    end
+end
+
+function ProfileAdapter:import_handle(ctx, class_name, class_data)
     if is_object_array(class_data) then
         for _, instance in ipairs(class_data) do
             local instance_id = instance.Id.Value
@@ -408,11 +430,14 @@ end
 
 function ProfileAdapter:on_import(ctx, object)
     ctx.operation_log = { params = {} }
-
+    -- 预先处理需要新增的动态对象
+    self:_import_dynamic_object_precheck(ctx, object)
     for class_name, class_data in pairs(object) do
         if not profile_adapter[class_name] then
             goto continue
         end
+        -- 预先丢弃已经删除的配置数据
+        class_data = self:_import_dynamic_object_filter(ctx, class_name, class_data)
         self:import_handle(ctx, class_name, class_data)
         ::continue::
     end

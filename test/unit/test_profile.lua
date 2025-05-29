@@ -37,6 +37,8 @@ function TestAccount:test_when_import_account_config_then_add_user_should_succes
     lu.assertNotEquals(file, nil)
     local config_data = file:read("a")
     local object = cjson.decode(config_data).ConfigData
+    -- 仅测试User
+    object['UserRole'] = nil
 
     local config_service = profile_adapter.new()
     config_service:on_import(ctx, object)
@@ -54,6 +56,8 @@ function TestAccount:test_when_import_account_config_then_delete_user_should_suc
     lu.assertNotEquals(file, nil)
     local config_data = file:read("a")
     local object = cjson.decode(config_data).ConfigData
+    -- 仅测试User
+    object['UserRole'] = nil
 
     -- 首先添加3号用户
     local interface = make_interface()
@@ -89,6 +93,8 @@ function TestAccount:test_when_import_emergency_account_config_then_set_name_sho
     lu.assertNotEquals(file, nil)
     local config_data = file:read("a")
     local object = cjson.decode(config_data).ConfigData
+    -- 仅测试User
+    object['UserRole'] = nil
 
     -- 首先添加3号用户
     local interface = make_interface()
@@ -126,6 +132,8 @@ function TestAccount:test_when_import_account_config_then_change2operator_add3ad
     lu.assertNotEquals(file, nil)
     local config_data = file:read("a")
     local object = cjson.decode(config_data).ConfigData
+    -- 仅测试User
+    object['UserRole'] = nil
 
     -- 使用配置导入修改2号用户为操作员，同时新增3号管理员
     object['User'][1]['UserRoleId']['Value'] = "Operator"
@@ -141,4 +149,43 @@ function TestAccount:test_when_import_account_config_then_change2operator_add3ad
 
     --恢复环境
     teardown_account_data(self.ctx, self.test_account_collection, 3)
+end
+
+function TestAccount:test_when_add_custom_role_then_export_should_success()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    self.test_role_collection:set_extended_custom_role_enabled(true)
+    self.test_role_collection:new_role(self.ctx, 9, {'ReadOnly', 'ConfigureSelf'}, {"SecurityMgmt"})
+    local config_service = profile_adapter.new()
+    local export_res = config_service:on_export(ctx)
+    lu.assertEquals(export_res ~= nil, true)
+    lu.assertEquals(export_res['UserRole'][9].Id == 'CustomRole5', true)
+    --恢复环境
+    self.test_role_collection:set_extended_custom_role_enabled(false)
+    self.test_role_collection:clear_extended_custom_role(self.ctx)
+end
+
+function TestAccount:test_when_not_exist_custom_role_then_import_should_success()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local PROJECT_DIR = os.getenv('PROJECT_DIR')
+
+    local file = io.open(PROJECT_DIR .. "/test/unit/test_data/config_add_user.json")
+    lu.assertNotEquals(file, nil)
+    local config_data = file:read("a")
+    local object = cjson.decode(config_data).ConfigData
+    -- 仅测试UserRole
+    self.test_role_collection:set_extended_custom_role_enabled(true)
+    object['User'] = nil
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local data = self.test_role_collection:get_role_data_by_id(9)
+    lu.assertEquals(data.RoleName, 'CustomRole5')
+    lu.assertEquals(data.ReadOnly, true)
+    lu.assertEquals(data.BasicSetting, false)
+    lu.assertEquals(data.UserMgmt, false)
+    lu.assertEquals(self.test_role_collection:get_role_name_by_id(10), 'CustomRole6')
+    lu.assertEquals(self.test_role_collection:get_role_name_by_id(11), 'CustomRole7')
+    --恢复环境
+    self.test_role_collection:set_extended_custom_role_enabled(false)
+    self.test_role_collection:clear_extended_custom_role(self.ctx)
 end

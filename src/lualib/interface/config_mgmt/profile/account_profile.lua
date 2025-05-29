@@ -25,9 +25,8 @@ local function enable_login_interface_check(old_interfaces, new_interfaces, chec
     return false
 end
 
--- 用户导入前的预校验，当前先支持老卡多用户，新卡只有一个用户的导入场景
-function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
-    local filter_deleted_accounts = {}
+-- 用户导入前的预校验，支持新增和删除用户
+function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
     for _, instance in ipairs(accounts) do
         local instance_id = instance.Id.Value
         local instance_name = instance.UserName.Value
@@ -63,7 +62,17 @@ function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
                 log:error("import account config precheck failed, cannot delete account(id:%d), %s", instance_id,
                     tostring(ret))
             end
-        else
+        end
+    end
+end
+
+-- 导入前过滤已删除的用户配置
+function AccountProfile.import_filter(profile_adapter, ctx, accounts)
+    local filter_deleted_accounts = {}
+    for _, instance in ipairs(accounts) do
+        local instance_name = instance.UserName.Value
+        -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
+        if instance_name ~= '' then
             -- 无需删除的用户，过滤后返回继续处理
             filter_deleted_accounts[#filter_deleted_accounts+1] = instance
         end
