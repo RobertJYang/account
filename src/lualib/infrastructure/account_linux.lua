@@ -571,7 +571,7 @@ end
 ---@param gid number
 function HomeDir:create(user_name, uid, gid)
     local home_dir_path = self:get(user_name)
-    if file_utils.check_real_path_s(home_dir_path) == -1 then
+    if file_utils.check_real_path_s(home_dir_path) ~= 0 then
         utils_core.mkdir(home_dir_path, mc_utils.S_IRWXU)
 
         if not file_proxy.proxy_chown(home_dir_path, uid, gid) then

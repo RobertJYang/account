@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.9] - 2025-05-29
+修改文件操作函数返回值校验
+
 ## [1.80.8] - 2025-05-28
 支持OEM用户原子能力
 
