@@ -127,7 +127,7 @@ end
 ---@param caller_username string
 ---@param caller_role_id number
 function utils.check_fileowner_matchs_caller(file_path, caller_username, caller_role_id)
-    if file_utils.check_real_path_s(file_path) == -1 then
+    if file_utils.check_real_path_s(file_path) ~= 0 then
         log:error('check fileowner matchs caller: check file path failed')
         return false
     end
@@ -262,7 +262,7 @@ function utils.check_import_path(path, header)
         log:error('File path is dir path.')
         return false
     end
-    if file_utils.check_real_path_s(path, header .. '/') == -1 then
+    if file_utils.check_real_path_s(path, header .. '/') ~= 0 then
         log:error('check realpath faild.')
         return false
     end

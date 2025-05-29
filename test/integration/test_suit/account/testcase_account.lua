@@ -315,11 +315,11 @@ end
 function AccountCases.test_when_new_account_should_create_account_root_folder(bus)
     local root_folder_path =
         account_core.format_realpath(table.concat({ skynet.getenv('DATA_HOME_PATH'), 'test3' }, '/'))
-    assert(file_utils.check_real_path_s(root_folder_path) == -1)
+    assert(file_utils.check_real_path_s(root_folder_path) ~= 0)
     test_case_utils.call_account_new(bus, 3, 'test3', 'Admin@9000', 4, make_interface(), 1)
     assert(file_utils.check_real_path_s(root_folder_path) == 0)
     test_case_utils.call_account_delete(bus, 3)
-    assert(file_utils.check_real_path_s(root_folder_path) == -1)
+    assert(file_utils.check_real_path_s(root_folder_path) ~= 0)
 end
 
 --- 当没有ConfigureSelf权限用户，修改自身密码应该失败 (在框架层拦截)

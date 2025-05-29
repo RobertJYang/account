@@ -23,7 +23,7 @@ function Dump:ctor()
 end
 
 function Dump:log_dump(ctx, path)
-    if file_utils.check_real_path_s(path) == -1 then
+    if file_utils.check_real_path_s(path) ~= 0 then
         log:error('Dump path is invalid')
         error(base_msg.InternalError())
     end

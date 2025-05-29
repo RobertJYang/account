@@ -21,7 +21,7 @@ local ssh_publickey = class()
 
 local function get_ssh_keygen_command_path()
     local ssh_keygen = '/usr/sbin/ssh-keygen'
-    if file_utils.check_real_path_s(ssh_keygen) == -1 then
+    if file_utils.check_real_path_s(ssh_keygen) ~= 0 then
         ssh_keygen = '/usr/bin/ssh-keygen'
     end
     return ssh_keygen
@@ -32,7 +32,7 @@ end
 ---@param dest_path string
 function ssh_publickey.generate_openssh_format_public_key(src_path, dest_path)
     if src_path ~= config.SSH_PUBLIC_KEY_PARSE_PATH then
-        if file_utils.check_real_path_s(src_path, config.TMP_PATH) == -1 then
+        if file_utils.check_real_path_s(src_path, config.TMP_PATH) ~= 0 then
             log:error('File should be in the tmp path')
             error(base_msg.PropertyValueFormatError('******', 'Path'))
         end
@@ -73,7 +73,7 @@ end
 ---@param key_path string
 ---@param hash_path string
 function ssh_publickey.generate_public_key_hash(key_path, hash_path)
-    if file_utils.check_real_path_s(key_path) == -1 then
+    if file_utils.check_real_path_s(key_path) ~= 0 then
         error(custom_msg.PublicKeyImportFailed())
     end
     local cmd = { get_ssh_keygen_command_path(), '-l', '-E', 'SHA256', '-f', key_path, '>', hash_path }
@@ -120,7 +120,7 @@ end
 ---@param uid number
 ---@param gid number
 function ssh_publickey.generate_authentication_public_key_file(key_path, home_path, uid, gid)
-    if file_utils.check_real_path_s(key_path) == -1 then
+    if file_utils.check_real_path_s(key_path) ~= 0 then
         log:error('path must be file path')
         error(custom_msg.PublicKeyImportFailed())
     end

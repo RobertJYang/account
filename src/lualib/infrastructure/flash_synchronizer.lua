@@ -34,7 +34,7 @@ function flash_synchronizer.write_flash(flash_path, tmp_flash_path)
     -- 校验内容不一致则拷贝替换，否则删除tmp文件
     if not data or data ~= tmp_data then
         local ret = file_utils.move_file_s(tmp_flash_path, flash_path)
-        if ret == -1 then
+        if ret ~= 0 then
             error(base_msg.InternalError())
         end
     else
