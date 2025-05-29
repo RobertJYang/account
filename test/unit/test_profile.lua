@@ -63,7 +63,8 @@ function TestAccount:test_when_import_account_config_then_delete_user_should_suc
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -97,7 +98,8 @@ function TestAccount:test_when_import_emergency_account_config_then_set_name_sho
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 设置3号用户为逃生用户

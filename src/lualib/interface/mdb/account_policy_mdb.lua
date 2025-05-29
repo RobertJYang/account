@@ -52,13 +52,13 @@ end
 
 -- 属性监听钩子
 AccountPolicyMdb.watch_property_hook = {
-    NamePattern = operation_logger.proxy(function(self, ctx, value)
-        self.m_policy_collection:set_name_pattern(value)
+    NamePattern = operation_logger.proxy(function(self, ctx, account_type, value)
+        self.m_policy_collection:set_name_pattern(account_type, value)
     end, 'NamePatternChange'),
-    AllowedLoginInterfaces = operation_logger.proxy(function(self, ctx, value)
+    AllowedLoginInterfaces = operation_logger.proxy(function(self, ctx, account_type, value)
         ctx.operation_log.params = { interfaces = table.concat(value, ', ') }
         local interface_num = utils.cover_interface_str_to_num(value)
-        self.m_policy_collection:set_allowed_login_interfaces(interface_num)
+        self.m_policy_collection:set_allowed_login_interfaces(account_type, interface_num)
     end, 'SetAllowedLoginInterfaces'),
     Visible = operation_logger.proxy(function(self, ctx, account_type, value)
         self.m_policy_collection:set_visible(ctx, account_type, value)

@@ -99,9 +99,9 @@ local custom_settings_adapter = {
     },
     BMCSet_LocalAccountAllowedLoginInterfaces = {
         import = operation_logger.proxy(function(self, ctx, value)
-            AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, value)
+            AccountServiceCustomization.set_local_allowed_login_interfaces(self, ctx, value)
         end, 'SetAllowedLoginInterfaces'),
-        export = AccountServiceCustomization.get_allowed_login_interfaces
+        export = AccountServiceCustomization.get_local_allowed_login_interfaces
     },
     BMCSet_LongPasswordEnable = {
         import_convert = AccountServiceCustomization.convert_long_community_enable,

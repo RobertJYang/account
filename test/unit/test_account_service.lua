@@ -131,7 +131,8 @@ function TestAccount:test_add_account()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -155,7 +156,8 @@ function TestAccount:test_add_account_full()
             ['password'] = "Huawei12#$%",
             ['role_id'] = enum.RoleType.Operator:value(),
             ['interface'] = interface,
-            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+            ['account_type'] = enum.AccountType.Local:value()
         }
         self.test_account_collection:new_account(self.ctx, account_info, false)
         table_cnt = table_cnt + 1
@@ -180,7 +182,8 @@ function TestAccount:test_user_file_sync()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local account = self.test_account_collection.collection[4]
@@ -209,7 +212,8 @@ function TestAccount:test_user_file_sync_dfx()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local account = self.test_account_collection.collection[4]
@@ -252,7 +256,8 @@ function TestAccount:test_change_interface()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local interface = { "IPMI", "Web" }
@@ -275,7 +280,8 @@ function TestAccount:test_change_role_id()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_role_id(self.ctx, 3, 4)
@@ -293,7 +299,8 @@ function TestAccount:test_change_user_name()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_user_name(self.ctx, 3, "test3_new")
@@ -312,7 +319,8 @@ function TestAccount:test_change_user_pwd()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     account_data = self.test_account_collection:get_account_data_by_id(3)
@@ -334,7 +342,8 @@ function TestAccount:test_change_user_pwd_in_weak_password_dictionary()
         ['password'] = last_password,
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     lu.assertErrorMsgContains(custom_msg.PasswordInWeakPWDDictMessage.Name, function()
@@ -431,7 +440,8 @@ function TestAccount:test_set_ipmi_login_interface()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local req = {}
@@ -456,7 +466,8 @@ function TestAccount:test_set_user_password()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local account = self.test_account_collection:get_account_by_account_id(3)
@@ -515,7 +526,8 @@ function TestAccount:test_change_self_pwd_while_in_password_min_valid_limit()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 设置最短有效期10天
@@ -548,7 +560,8 @@ function TestAccount:test_set_emergency_user()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     account_info = {
@@ -557,7 +570,8 @@ function TestAccount:test_set_emergency_user()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -600,7 +614,8 @@ function TestAccount:test_set_emergency_user_by_username()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     account_info = {
@@ -609,7 +624,8 @@ function TestAccount:test_set_emergency_user_by_username()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     lu.assertErrorMsgContains(custom_msg.EmergencyLoginUserSettingFailMessage.Name, function()
@@ -679,7 +695,8 @@ function TestAccount:test_set_auth_protocol()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_service:set_user_auth_protocol(self.ctx, 2, 3,
@@ -700,7 +717,8 @@ function TestAccount:test_set_encrypt_protocol()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_service:set_user_encrypt_protocol(self.ctx, 3, enum.SNMPEncryptionProtocols.AES256)
@@ -718,7 +736,8 @@ function TestAccount:test_set_snmp_password()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_service:set_user_snmp_pwd(self.ctx, 3, "Paswd@90011")
@@ -735,7 +754,8 @@ function TestAccount:test_set_snmp_invalid_length_password_should_fail()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 本用例仅检测关闭密码复杂度检查时的长度校验
@@ -765,7 +785,8 @@ function TestAccount:test_account_service_add_account()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
 
@@ -789,7 +810,8 @@ function TestAccount:test_update_user_inactive_start_time()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     account_info = {
@@ -798,7 +820,8 @@ function TestAccount:test_update_user_inactive_start_time()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local cur_timestamp = vos.vos_get_cur_time_stamp()
@@ -833,7 +856,8 @@ function TestAccount:test_set_account_snmp_privacy_pwd_init_status()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local req = {}
@@ -884,7 +908,8 @@ function TestAccount:test_ipmi_set_user_access_success()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false,false)
     self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
@@ -914,7 +939,8 @@ function TestAccount:test_ipmi_get_user_access_success()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
@@ -958,7 +984,8 @@ function TestAccount:test_ipmi_set_user_access_failed()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
@@ -989,7 +1016,8 @@ function TestAccount:test_ipmi_set_user_access_failed2()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
@@ -1026,7 +1054,8 @@ function TestAccount:test_get_valid_account_id_should_same_to_min_valid_id_when_
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     account_id = self.test_account_collection:get_valid_account_id(0, nil)
@@ -1047,7 +1076,8 @@ function TestAccount:test_get_valid_account_id_should_be_nil_when_user_is_full()
             ['password'] = "Paswd@9001",
             ['role_id'] = enum.RoleType.Operator:value(),
             ['interface'] = interface,
-            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+            ['account_type'] = enum.AccountType.Local:value()
         }
         self.test_account_collection:new_account(self.ctx, account_info, false)
     end
@@ -1084,7 +1114,8 @@ function TestAccount:test_set_same_with_name_password_when_default_should_succes
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_account_collection:set_user_name(self.ctx, 3, "test3_new")
@@ -1109,7 +1140,8 @@ function TestAccount:test_set_invalid_password_when_username_pwd_compare_on_shou
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     self.test_global_account_config:set_user_name_password_compared_enabled(true)
@@ -1122,7 +1154,8 @@ function TestAccount:test_set_invalid_password_when_username_pwd_compare_on_shou
         ['password'] = "test111@132",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     lu.assertErrorMsgContains(custom_msg.PasswordComplexityCheckFailMessage.Name, function()
         self.test_account_collection:new_account(self.ctx, account_info, false)
@@ -1150,7 +1183,8 @@ function TestAccount:test_set_password_when_username_pwd_compare_on_and_username
         ['password'] = "test111@132",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -1175,7 +1209,8 @@ function TestAccount:test_set_invalid_snmp_password_when_username_pwd_compare_on
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     lu.assertErrorMsgContains(custom_msg.PasswordComplexityCheckFailMessage.Name, function()
@@ -1206,7 +1241,8 @@ function TestAccount:test_when_new_account_password_change_required_should_be_tr
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -1234,7 +1270,8 @@ function TestAccount:test_when_new_account_privilege_with_different_initial_poli
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 
@@ -1268,7 +1305,8 @@ function TestAccount:test_when_change_password_should_update_privilege()
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 

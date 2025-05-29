@@ -61,7 +61,8 @@ function TestAccount:test_when_new_account_should_insert_history_password()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
     local history_password_list = self.db:select(self.db.HistoryPassword)
@@ -191,7 +192,8 @@ function TestAccount:test_when_set_password_in_history_password_should_set_fail(
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
     self.test_account_service:set_history_password_count(2)
@@ -225,7 +227,8 @@ function TestAccount:test_when_set_history_password_0_to_5_should_change_diff_pa
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
     self.test_account_service:set_history_password_count(5)
@@ -247,7 +250,8 @@ function TestAccount:test_when_set_history_password_2_to_1_should_change_same_pa
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
     self.test_account_service:set_history_password_count(2)
@@ -270,7 +274,8 @@ function TestAccount:test_when_close_history_password_check_should_change_same_p
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_service:new_account(self.ctx, account_info, false)
     self.test_account_service:set_history_password_count(0)
@@ -292,7 +297,8 @@ function TestAccount:test_when_delete_account_use_same_id_and_password_should_ne
         ['password'] = "Paswd@9000",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     for _ = 1, 3 do
         self.test_account_service:new_account(self.ctx, account_info, false)

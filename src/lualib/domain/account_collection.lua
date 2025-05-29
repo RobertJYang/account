@@ -355,14 +355,15 @@ end
 ---@param is_ipmi_or_snmp boolean 是否通过IPMI或SNMP接口新建用户
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，以及是否为定制化用户等信息
 function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
-    if not self.account_policy_collection:check_user_name(account_info.name) then
+    if not self.account_policy_collection:check_user_name(account_info.account_type, account_info.name) then
         log:error('Invalid name(%s) is not allowed', account_info.name)
         error(custom_msg.InvalidUserName())
     end
     -- AllowedLoginInterfaces仅限制本地用户
     if not account_info.oem and
         not self.account_policy_collection:
-        check_login_interface_is_allowed(utils.cover_interface_enum_to_num(account_info.interface)) then
+        check_login_interface_is_allowed(account_info.account_type,
+        utils.cover_interface_enum_to_num(account_info.interface)) then
         local interfaces_str = utils.interface_enum_table_to_string(account_info.interface)
         log:error('LoginInterface is illegal, interface : %s', interfaces_str)
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. interfaces_str, '%LoginInterface'))
@@ -540,8 +541,9 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
     end
     -- 判断本地2-17用户要开启的登录接口是否在AllowedLoginInterfaces内
     local interface_num = utils.cover_interface_str_to_num(interface)
-    if account:get_account_type():value() == enum.AccountType.Local:value() and
-        not self.account_policy_collection:check_login_interface_is_allowed(interface_num) then
+    local account_type = account:get_account_type():value()
+    if account_type == enum.AccountType.Local:value() and
+        not self.account_policy_collection:check_login_interface_is_allowed(account_type, interface_num) then
         log:error('LoginInterface is illegal, interface : %s', table.concat(interface, ', '))
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
     end
@@ -637,8 +639,9 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
     if ctx.Interface == nil then
         ctx.operation_log.operation = 'IpmiNewAccount'
     end
+    local account_type = enum.AccountType.Local:value()
     -- 用户名特殊字符校验下沉
-    if not self.account_policy_collection:check_user_name(user_name) then
+    if not self.account_policy_collection:check_user_name(account_type, user_name) then
         error(custom_msg.IPMIInvalidFieldRequest())
     end
     -- 判断用户是否已经存在
@@ -650,7 +653,7 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
         enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
         enum.LoginInterface.SNMP }
     -- 如果当前限制了用户允许开启的登录接口(接口数<7), 机机接口新建用户登录接口使用AllowedLoginInterfaces支持的范围
-    local allowed_login_interfaces = self.account_policy_collection:get_allowed_login_interfaces()
+    local allowed_login_interfaces = self.account_policy_collection:get_allowed_login_interfaces(account_type)
     if allowed_login_interfaces < config.DEFAULT_INTERFACES then
         interface = utils.convert_num_to_interface_str(allowed_login_interfaces)
     end
@@ -660,7 +663,8 @@ local function ipmi_and_snmp_new_account(self, ctx, account_id, user_name)
         ['password'] = '',
         ['role_id'] = enum.RoleType.NoAccess:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = account_type
     }
     -- 新建用户，第三个参数为true代表当前为IPMI与SNMP新建用户
     self:new_account(ctx, account_info, true)
@@ -683,7 +687,7 @@ function AccountCollection:set_user_name(ctx, account_id, user_name)
         ctx.operation_log.operation = 'ChangeUserName'
         ctx.operation_log.params.oldName = old_user_name
         -- 用户名特殊字符校验下沉
-        if not self.account_policy_collection:check_user_name(user_name) then
+        if not self.account_policy_collection:check_user_name(enum.AccountType.Local:value(), user_name) then
             error(custom_msg.InvalidUserName())
         end
         -- 判断用户是否已经存在
@@ -716,7 +720,8 @@ function AccountCollection:change_user_name(account_id, user_name)
     if self.collection[account_id] == nil then
         error(err.invalid_account_id())
     end
-    if not self.account_policy_collection:check_user_name(user_name) then
+    local account_type = self.collection[account_id]:get_account_type():value()
+    if not self.account_policy_collection:check_user_name(account_type, user_name) then
         error(custom_msg.InvalidUserName())
     end
     local old_username = self.collection[account_id]:get_user_name()

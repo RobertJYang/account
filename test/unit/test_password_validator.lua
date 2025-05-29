@@ -102,7 +102,8 @@ function TestAccount:test_local_account_password_validate()
         ['password'] = 'Paswd@9001',
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
 

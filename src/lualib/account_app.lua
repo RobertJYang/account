@@ -574,7 +574,8 @@ function app:NewAccount(ctx, AccountId, UserName, Password, RoleId, Interface, F
             role_id = RoleId:value(),
             interface = Interface,
             first_login_policy = first_login_policy,
-            is_pwd_encrypted = false
+            is_pwd_encrypted = false,
+            account_type = enum.AccountType.Local:value()
         }
         -- 第三个参数：非IPMI与SNMP接口新建用户
         return self.account_service:new_account(ctx, account_info, false)
@@ -594,7 +595,8 @@ function app:NewOEMAccount(ctx, AccountId, UserName, Password, AccountInfo)
         interface = utils.oem_get_user_login_interface(tonumber(AccountInfo.interface)),
         first_login_policy = enum.FirstLoginPolicy.new(tonumber(AccountInfo.first_login_policy)),
         is_pwd_encrypted = tonumber(AccountInfo.is_pwd_encrypted) == 2 or false,
-        oem = true
+        oem = true,
+        account_type = enum.AccountType.OEM:value()
     }
     if account_info.operation == 'New' then
         if self.account_collection.collection[AccountId] then

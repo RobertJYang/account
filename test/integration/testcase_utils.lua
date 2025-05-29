@@ -37,6 +37,9 @@ local INTERFACE_AUTHENTICATION<const> = 'bmc.kepler.AccountService.LocalAccountA
 local PATH_PASSWORD_POLICY<const> = '/bmc/kepler/AccountService/PasswordPolicys/%s'
 local INTERFACE_PASSWORD_POLICY<const> = 'bmc.kepler.AccountService.PasswordPolicy'
 
+local PATH_ACCOUNT_POLICY<const> = '/bmc/kepler/AccountService/AccountPolicies/%s'
+local INTERFACE_ACCOUNT_POLICY<const> = 'bmc.kepler.AccountService.AccountPolicy'
+
 local TestCaseUtils = {}
 
 local function get_initiator_info()
@@ -207,6 +210,23 @@ function TestCaseUtils.set_password_policy_property(bus, account_type_name, prop
     local rpc_path = string.format(PATH_PASSWORD_POLICY, account_type_name)
     local mobj = m_mdb.get_object(bus, rpc_path, INTERFACE_PASSWORD_POLICY)
     log:notice('TestCaseUtils: set %s password_policy property(%s) (%s) to (%s)',
+        account_type_name, prop_name, tostring(mobj[prop_name]), value)
+    mobj[prop_name] = value
+end
+
+-- AccountPolicy
+-- 获取属性
+function TestCaseUtils.get_account_policy_property(bus, account_type_name, prop_name)
+    local rpc_path = string.format(PATH_ACCOUNT_POLICY, account_type_name)
+    local mobj = m_mdb.get_object(bus, rpc_path, INTERFACE_ACCOUNT_POLICY)
+    return mobj[prop_name]
+end
+
+-- 设置属性
+function TestCaseUtils.set_account_policy_property(bus, account_type_name, prop_name, value)
+    local rpc_path = string.format(PATH_ACCOUNT_POLICY, account_type_name)
+    local mobj = m_mdb.get_object(bus, rpc_path, INTERFACE_ACCOUNT_POLICY)
+    log:notice('TestCaseUtils: set %s account_policy property(%s) (%s) to (%s)',
         account_type_name, prop_name, tostring(mobj[prop_name]), value)
     mobj[prop_name] = value
 end

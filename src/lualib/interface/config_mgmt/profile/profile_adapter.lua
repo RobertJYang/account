@@ -275,9 +275,11 @@ local profile_adapter = {
         },
         LocalAccountNamePattern = {
             import = operation_logger.proxy(function(self, ctx, value)
-                AccountServiceProfile.set_name_pattern(self, ctx, value)
+                AccountServiceProfile.set_name_pattern(self, ctx, enum.AccountType.Local:value(), value)
             end, 'NamePatternChange'),
-            export = AccountServiceProfile.get_name_pattern
+            export = function(self, ctx)
+                return AccountServiceProfile.get_name_pattern(self, ctx, enum.AccountType.Local:value())
+            end
         }
     },
     PermitRule = {

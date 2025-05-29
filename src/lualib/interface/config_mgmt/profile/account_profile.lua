@@ -42,7 +42,8 @@ function AccountProfile.import_account_precheck(profile_adapter, ctx, accounts)
                 ['password'] = '',
                 ['role_id'] = enum.RoleType.NoAccess:value(),
                 ['interface'] = interface,
-                ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+                ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+                ['account_type'] = enum.AccountType.Local:value()
             }
             -- 新建用户，第三个参数为true代表当前新建用户走ipmi流程，不创建密码
             local ok, err = pcall(function()
@@ -84,7 +85,7 @@ function AccountProfile.get_account_id(self, account_id)
 end
 
 function AccountProfile.set_user_name(self, ctx, account_id, value)
-    if not self.m_account_policy_collection:check_user_name(value) and value ~= '' then
+    if not self.m_account_policy_collection:check_user_name(enum.AccountType.Local:value(), value) and value ~= '' then
         error(custom_msg.InvalidUserName())
     end
     self.m_account_collection:set_user_name(ctx, account_id, value)
