@@ -40,6 +40,12 @@ local INTERFACE_PASSWORD_POLICY<const> = 'bmc.kepler.AccountService.PasswordPoli
 local PATH_ACCOUNT_POLICY<const> = '/bmc/kepler/AccountService/AccountPolicies/%s'
 local INTERFACE_ACCOUNT_POLICY<const> = 'bmc.kepler.AccountService.AccountPolicy'
 
+local ROLES_PATH<const> = '/bmc/kepler/AccountService/Roles'
+local INTERFACE_ROLES<const> = 'bmc.kepler.AccountService.Roles'
+
+local ROLE_PATH<const> = '/bmc/kepler/AccountService/Roles/%s'
+local INTERFACE_ROLE<const> = 'bmc.kepler.AccountService.Role'
+
 local TestCaseUtils = {}
 
 local function get_initiator_info()
@@ -229,6 +235,48 @@ function TestCaseUtils.set_account_policy_property(bus, account_type_name, prop_
     log:notice('TestCaseUtils: set %s account_policy property(%s) (%s) to (%s)',
         account_type_name, prop_name, tostring(mobj[prop_name]), value)
     mobj[prop_name] = value
+end
+
+-- Role
+-- 获取Roles属性
+function TestCaseUtils.get_roles_property(bus, prop_name)
+    local mobj = m_mdb.get_object(bus, ROLES_PATH, INTERFACE_ROLES)
+    return mobj[prop_name]
+end
+
+-- 设置Roles属性
+function TestCaseUtils.set_roles_property(bus, prop_name, value)
+    local mobj = m_mdb.get_object(bus, ROLES_PATH, INTERFACE_ROLES)
+    log:notice('TestCaseUtils: set roles property(%s) (%s) to (%s)',
+        prop_name, tostring(mobj[prop_name]), value)
+    mobj[prop_name] = value
+end
+
+-- 新增角色
+function TestCaseUtils.call_new_role(bus, ...)
+    local mobj = m_mdb.get_object(bus, ROLES_PATH, INTERFACE_ROLES)
+    return mobj:New_PACKED(TestCaseUtils.initiator, ...):unpack()
+end
+
+-- 获取Role属性
+function TestCaseUtils.get_role_property(bus, role_id, prop_name)
+    local path = string.format(ROLE_PATH, role_id)
+    local mobj = m_mdb.get_object(bus, path, INTERFACE_ROLE)
+    return mobj[prop_name]
+end
+
+-- 删除角色
+function TestCaseUtils.call_delete_role(bus, role_id, ...)
+    local path = string.format(ROLE_PATH, role_id)
+    local mobj = m_mdb.get_object(bus, path, INTERFACE_ROLE)
+    return mobj:Delete_PACKED(TestCaseUtils.initiator, ...):unpack()
+end
+
+-- 设置权限
+function TestCaseUtils.call_set_privilege(bus, role_id, ...)
+    local path = string.format(ROLE_PATH, role_id)
+    local mobj = m_mdb.get_object(bus, path, INTERFACE_ROLE)
+    return mobj:SetRolePrivilege_PACKED(TestCaseUtils.initiator, ...):unpack()
 end
 
 -- ipmitool

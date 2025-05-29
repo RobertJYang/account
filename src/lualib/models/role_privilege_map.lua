@@ -18,6 +18,18 @@ local role_to_privilege_map = {
     [enum.RoleType.CustomRole2:value()] = enum.IpmiPrivilege.OPERATOR:value(),
     [enum.RoleType.CustomRole3:value()] = enum.IpmiPrivilege.OPERATOR:value(),
     [enum.RoleType.CustomRole4:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole5:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole6:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole7:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole8:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole9:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole10:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole11:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole12:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole13:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole14:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole15:value()] = enum.IpmiPrivilege.OPERATOR:value(),
+    [enum.RoleType.CustomRole16:value()] = enum.IpmiPrivilege.OPERATOR:value()
 }
 
 local privilege_to_role_map = {

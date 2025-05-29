@@ -181,6 +181,7 @@ function app:service_init()
     self.role_collection = role_collection.new(self.db)
     self.role_privilege_mdb = role_privilege_mdb.new(self.role_collection)
     self.role_privilege_mdb:regist_role_privilege_signals()
+    self.role_collection:emit_init_role_signal()
     log:notice("role privilege init end, account config init start")
     -- 用户配置
     self.global_account_config = global_account_config.new(self.db, self.file_transfer)
@@ -558,6 +559,14 @@ function app:register_rpc_methods()
     self:ImplLocalAccountAuthNLocalAccountAuthNVncAuthenticate(function(obj, ctx, cipher_text, auth_challenge)
         return self.local_authentication:vnc_authenticate(ctx, cipher_text, auth_challenge)
     end)
+    self:ImplRolesRolesNew(operation_logger.proxy(function(obj, ...)
+        self.role_collection:new_role(...)
+    end, 'NewRole'))
+    self:ImplRoleRoleDelete(operation_logger.proxy(function(obj, ctx)
+        local role_id = string.match(obj.path, "/bmc/kepler/AccountService/Roles/(%d+)")
+        role_id = tonumber(role_id)
+        self.role_collection:delete_role(ctx, role_id)
+    end, 'DeleteRole'))
 end
 
 

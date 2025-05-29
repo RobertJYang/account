@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.11] - 2025-05-29
+支持新增删除自定义角色功能
+
 ## [1.80.10] - 2025-05-29
 AccountPolicy相关方法增加account_type参数
 

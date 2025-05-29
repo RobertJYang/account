@@ -61,7 +61,9 @@ function Privilege.new_from_role_ids(role_ids)
     local role_collection = role.get_instance()
     for _, v in ipairs(role_ids) do
         local temp_role_data = role_collection:get_role_data_by_id(v)
-        res = res + Privilege.new_from_data(temp_role_data)
+        if temp_role_data ~= nil then
+            res = res + Privilege.new_from_data(temp_role_data)
+        end
     end
     return res
 end

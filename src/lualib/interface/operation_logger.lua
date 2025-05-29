@@ -125,6 +125,14 @@ local operation_log_map = {
         success = 'KVM key set successfully',
         fail = 'Failed to set the KVM key'
     },
+    NewRole = {
+        success = 'Add custom user role successfully',
+        fail = 'Add custom user role failed'
+    },
+    DeleteRole = {
+        success = 'Delete custom user role successfully',
+        fail = 'Delete custom user role failed'
+    },
     ------------------------ rpc end ------------------------
 
     ------------------------   Ipmi  ------------------------
@@ -520,6 +528,12 @@ local operation_log_map = {
         success = 'Set {account_type} password pattern successfully',
         fail = 'Set {account_type} password pattern failed',
         invalid_account_type = 'Set password policy failed'
+    },
+    -----------------------    end   -------------------------
+    ---------------  role_privilege_mdb end  -------------------
+    SetExtendedCustomRoleEnabled = {
+        success = 'Set extended custom role {state} successfully',
+        fail = 'Set extended custom role {state} failed'
     },
     -----------------------    end   -------------------------
     ----------------------    other   ------------------------

@@ -16,8 +16,10 @@ local test_case_utils = require 'testcase_utils'
 local account_case = require 'test_suit.account.testcase_account'
 local password_validator_ipmi_case = require 'test_suit.password_validator.testcase_password_validator_ipmi'
 local account_service_ipmi_case = require 'test_suit.account.testcase_account_service_ipmi'
+local role_case = require 'test_suit.role.testcase_role'
 
 require 'account.json_types.PasswordPolicy'
+require 'account.json_types.Roles'
 
 local CommonSuit = class(base_suit)
 
@@ -36,6 +38,7 @@ function CommonSuit:run()
     self:run_case_suit(account_case, self.m_bus)
     self:run_case_suit(password_validator_ipmi_case, self.m_bus)
     self:run_case_suit(account_service_ipmi_case, self.m_bus)
+    self:run_case_suit(role_case, self.m_bus)
     log:notice('================ test base_function_test complete ================')
 end
 
