@@ -24,7 +24,8 @@ local function test_account_info_ctor()
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     return account_info
 end

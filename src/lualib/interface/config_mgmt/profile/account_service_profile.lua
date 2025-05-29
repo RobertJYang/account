@@ -101,12 +101,12 @@ function AccountServiceProfile.get_weak_pwd_dictionary_enable(self)
     return self.m_account_config:get_weak_pwd_dictionary_enable()
 end
 
-function AccountServiceProfile.set_name_pattern(self, ctx, value)
-    self.m_account_policy_collection:set_name_pattern(value)
+function AccountServiceProfile.set_name_pattern(self, ctx, account_type, value)
+    self.m_account_policy_collection:set_name_pattern(account_type, value)
 end
 
-function AccountServiceProfile.get_name_pattern(self)
-    return self.m_account_policy_collection:get_name_pattern()
+function AccountServiceProfile.get_name_pattern(self, ctx, account_type)
+    return self.m_account_policy_collection:get_name_pattern(account_type)
 end
 
 return AccountServiceProfile

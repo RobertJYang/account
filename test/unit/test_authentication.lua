@@ -25,7 +25,8 @@ function TestAccount:test_do_auth()
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish,
             enum.LoginInterface.SFTP, enum.LoginInterface.Web },
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(ctx, account_info, false)
 
@@ -56,7 +57,8 @@ function TestAccount:test_local_authentication_with_login_rule()
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish,
             enum.LoginInterface.SFTP, enum.LoginInterface.Web },
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(ctx, account_info, false)
 
@@ -126,7 +128,8 @@ function TestAccount:test_password()
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish,
             enum.LoginInterface.SFTP, enum.LoginInterface.Web },
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     self.test_account_collection:new_account(ctx, account_info, false)
 

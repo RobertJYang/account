@@ -516,4 +516,39 @@ function AccountCases.test_when_trap_limit_policy_is_2_should_rename_fail_delete
     assert(ok == false, err.name == custom_msg.AccountForbidRemovedMessage.Name)
 end
 
+function AccountCases.test_set_oem_visible_should_success(bus)
+    local account_type_name = 'OemAccount'
+    local default_data = test_case_utils.get_account_policy_property(bus, account_type_name, 'Visible')
+    assert(default_data == false)
+    test_case_utils.set_account_policy_property(bus, account_type_name, 'Visible', true)
+    local change_data = test_case_utils.get_account_policy_property(bus, account_type_name, 'Visible')
+    assert(change_data == true)
+    --恢复环境
+    test_case_utils.set_account_policy_property(bus, account_type_name,'Visible', default_data)
+end
+
+function AccountCases.test_set_oem_deletableble_should_success(bus)
+    local account_type_name = 'OemAccount'
+    local default_data = test_case_utils.get_account_policy_property(bus, account_type_name, 'Deletable')
+    assert(default_data == false)
+    test_case_utils.set_account_policy_property(bus, account_type_name, 'Deletable', true)
+    local change_data = test_case_utils.get_account_policy_property(bus, account_type_name, 'Deletable')
+    assert(change_data == true)
+    --恢复环境
+    test_case_utils.set_account_policy_property(bus, account_type_name, 'Deletable', default_data)
+end
+
+function AccountCases.test_set_local_name_pattern_should_success(bus)
+    local default_data = test_case_utils.get_account_policy_property(bus,
+        tostring(enum.AccountType.Local), 'NamePattern')
+    assert(default_data == '')
+    test_case_utils.set_account_policy_property(bus, tostring(enum.AccountType.Local),
+        'NamePattern', '^[a-zA-Z_][a-zA-Z0-9]{0,15}(?!((\r?\n|(?<!\n)\r)|\f))$')
+    local change_data = test_case_utils.get_account_policy_property(bus,
+        tostring(enum.AccountType.Local), 'NamePattern')
+    assert(change_data == '^[a-zA-Z_][a-zA-Z0-9]{0,15}(?!((\r?\n|(?<!\n)\r)|\f))$')
+    --恢复环境
+    test_case_utils.set_account_policy_property(bus, tostring(enum.AccountType.Local), 'NamePattern', default_data)
+end
+
 return AccountCases

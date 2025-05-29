@@ -34,7 +34,8 @@ function TestAccount:test_add_oem_administrator_account_should_success()
         ['interface'] = interface,
         ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
         ['is_pwd_encrypted'] = true,
-        ['oem'] = true
+        ['oem'] = true,
+        ['account_type'] = enum.AccountType.OEM:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     local test_account = self.test_account_collection.collection[OEM_ACCOUNT_ID]
@@ -47,7 +48,8 @@ function TestAccount:test_add_oem_administrator_account_should_success()
         ['password'] = "Paswd@90001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['account_type'] = enum.AccountType.OEM:value()
     }
     local tmp_ctx = mc_utils.table_copy(self.ctx)
     self.test_account_collection:new_account(tmp_ctx, account_info, false)
@@ -72,7 +74,8 @@ function TestAccount:test_add_oem_account_interface_and_role_not_writable_should
         ['role_id'] = enum.RoleType.Administrator:value(),
         ['interface'] = interface,
         ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
-        ['oem'] = true
+        ['oem'] = true,
+        ['account_type'] = enum.AccountType.OEM:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 创建成功
@@ -107,7 +110,8 @@ function TestAccount:test_verify_not_pwd_encrypted_oem_account_should_match_succ
         ['interface'] = interface,
         ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
         ['oem'] = true,
-        ['is_pwd_encrypted'] = false
+        ['is_pwd_encrypted'] = false,
+        ['account_type'] = enum.AccountType.OEM:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 创建成功
@@ -140,7 +144,8 @@ function TestAccount:test_verify_pwd_encrypted_oem_account_should_match_success_
         ['interface'] = interface,
         ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
         ['oem'] = true,
-        ['is_pwd_encrypted'] = true
+        ['is_pwd_encrypted'] = true,
+        ['account_type'] = enum.AccountType.OEM:value()
     }
     self.test_account_collection:new_account(self.ctx, account_info, false)
     -- 创建成功

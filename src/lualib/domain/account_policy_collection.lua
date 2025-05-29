@@ -48,36 +48,30 @@ function AccountPolicyCollection:ctor(db, global_account_config)
     self.m_config_changed = signal.new()
 end
 
-function AccountPolicyCollection:get_allowed_login_interfaces()
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:get_allowed_login_interfaces(account_type)
     return self.collection[account_type]:get_allowed_login_interfaces()
 end
 
-function AccountPolicyCollection:set_allowed_login_interfaces(interface_num)
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:set_allowed_login_interfaces(account_type, interface_num)
     self.collection[account_type]:set_allowed_login_interfaces(interface_num)
     self.m_config_changed:emit(account_type, 'AllowedLoginInterfaces',
         utils.convert_num_to_interface_str(interface_num, true))
 end
 
-function AccountPolicyCollection:get_name_pattern()
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:get_name_pattern(account_type)
     return self.collection[account_type]:get_name_pattern()
 end
 
-function AccountPolicyCollection:set_name_pattern(pattern)
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:set_name_pattern(account_type, pattern)
     self.collection[account_type]:set_name_pattern(pattern)
     self.m_config_changed:emit(account_type, 'NamePattern', value)
 end
 
-function AccountPolicyCollection:check_user_name(user_name)
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:check_user_name(account_type, user_name)
     return self.collection[account_type]:check_user_name(user_name)
 end
 
-function AccountPolicyCollection:check_login_interface_is_allowed(login_interface)
-    local account_type = enum.AccountType.Local:value()
+function AccountPolicyCollection:check_login_interface_is_allowed(account_type, login_interface)
     return self.collection[account_type]:check_login_interface_is_allowed(login_interface)
 end
 
@@ -88,6 +82,7 @@ function AccountPolicyCollection:set_visible(ctx, account_type, value)
     ctx.operation_log.params.account_type = account_type_map[account_type].name
     ctx.operation_log.params.Status = tostring(value)
     self.collection[account_type]:set_visible(value)
+    self.m_config_changed:emit(account_type, 'Visible', value)
 end
 
 function AccountPolicyCollection:get_visible(account_type)
@@ -104,6 +99,7 @@ function AccountPolicyCollection:set_deletable(ctx, account_type, value)
     ctx.operation_log.params.account_type = account_type_map[account_type].name
     ctx.operation_log.params.Status = tostring(value)
     self.collection[account_type]:set_deletable(value)
+    self.m_config_changed:emit(account_type, 'Deletable', value)
 end
 
 function AccountPolicyCollection:get_deletable(account_type)

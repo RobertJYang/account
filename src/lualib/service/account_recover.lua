@@ -34,7 +34,8 @@ function account_recover:recover_account_while_id_not_exist(ctx, account_id, acc
         ['password'] = '',
         ['role_id'] = account_data.RoleId,
         ['interface'] = account_data.LoginInterface,
-        ['first_login_policy'] = account_data.FirstLoginPolicy
+        ['first_login_policy'] = account_data.FirstLoginPolicy,
+        ['account_type'] = enum.AccountType.Local:value()
     }
 
     -- 判断是否有重名用户，有的话先改名

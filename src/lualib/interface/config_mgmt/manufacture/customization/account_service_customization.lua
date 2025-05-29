@@ -12,6 +12,7 @@ local utils = require 'infrastructure.utils'
 local base_msg = require 'messages.base'
 local log = require 'mc.logging'
 local config = require 'common_config'
+local enum = require 'class.types.types'
 
 local AccountServiceCustomization = {}
 
@@ -153,7 +154,7 @@ function AccountServiceCustomization.get_weak_pwd_dictionary_enable(self)
     return ENABLED_EXPORT_MAP[enabled]
 end
 
-function AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, value)
+function AccountServiceCustomization.set_local_allowed_login_interfaces(self, ctx, value)
     -- 定制接口值含有不支持的接口则需要报错
     if value & config.DEFAULT_INTERFACES ~= value then
         log:error('set allowed login interfaces failed, interfaces num value : %d', value)
@@ -161,11 +162,12 @@ function AccountServiceCustomization.set_allowed_login_interfaces(self, ctx, val
     end
     local login_interfaces_str = utils.convert_num_to_interface_str(value, true)
     ctx.operation_log.params = { interfaces = table.concat(login_interfaces_str, ', ') }
-    self.m_account_policy_collection:set_allowed_login_interfaces(value)
+    self.m_account_policy_collection:set_allowed_login_interfaces(enum.AccountType.Local:value(), value)
 end
 
-function AccountServiceCustomization.get_allowed_login_interfaces(self)
-    return self.m_account_policy_collection:get_allowed_login_interfaces()
+function AccountServiceCustomization.get_local_allowed_login_interfaces(self)
+    local account_type = enum.AccountType.Local:value()
+    return self.m_account_policy_collection:get_allowed_login_interfaces(account_type)
 end
 
 function AccountServiceCustomization.set_long_community_enable(self, ctx, value)

@@ -28,7 +28,8 @@ local function setup_account_data(ctx, account_collection, num)
         ['password'] = "Paswd@9001",
         ['role_id'] = enum.RoleType.Operator:value(),
         ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
     }
     for id = 3, num + 3 do
         account_info.id = id
