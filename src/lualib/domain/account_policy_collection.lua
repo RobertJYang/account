@@ -64,7 +64,7 @@ end
 
 function AccountPolicyCollection:set_name_pattern(account_type, pattern)
     self.collection[account_type]:set_name_pattern(pattern)
-    self.m_config_changed:emit(account_type, 'NamePattern', value)
+    self.m_config_changed:emit(account_type, 'NamePattern', pattern)
 end
 
 function AccountPolicyCollection:check_user_name(account_type, user_name)
