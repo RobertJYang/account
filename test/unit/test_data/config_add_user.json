@@ -1,116 +1,274 @@
 {
-            "ConfigData": {
-                "User": [
-                    {
-                        "IsUserLocked": {
-                            "Value": false,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        },
-                        "Privilege": {
-                            "Value": "Administrator",
-                            "AttributeType": "ExportOnly",
-                            "Import": false
-                        },
-                        "IsUserEnable": {
-                            "Value": true,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        },
-                        "LoginInterface": {
-                            "Value": [
-                                "Web",
-                                "SFTP",
-                                "SSH",
-                                "IPMI",
-                                "SNMP",
-                                "Redfish",
-                                "Local"
-                            ],
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "PermitRuleIds": {
-                            "Value": [],
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "UserRoleId": {
-                            "Value": "Administrator",
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "Id": {
-                            "Value": 2,
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "UserName": {
-                            "Value": "Administrator",
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "SnmpPrivacyPwdInitialState": {
-                            "Value": true,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        }
-                    },
-                    {
-                        "IsUserLocked": {
-                            "Value": false,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        },
-                        "Privilege": {
-                            "Value": "Administrator",
-                            "AttributeType": "ExportOnly",
-                            "Import": false
-                        },
-                        "IsUserEnable": {
-                            "Value": true,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        },
-                        "LoginInterface": {
-                            "Value": [
-                                "Web",
-                                "SFTP",
-                                "SSH",
-                                "IPMI",
-                                "Redfish",
-                                "Local"
-                            ],
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "PermitRuleIds": {
-                            "Value": [],
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "UserRoleId": {
-                            "Value": "Administrator",
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "Id": {
-                            "Value": 3,
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "UserName": {
-                            "Value": "test3",
-                            "AttributeType": "ImportAndExport",
-                            "Import": true
-                        },
-                        "SnmpPrivacyPwdInitialState": {
-                            "Value": false,
-                            "AttributeType": "ImportAndExport",
-                            "Import": false
-                        }
-                    }
-                ]
+    "ConfigData": {
+        "User": [
+            {
+                "IsUserLocked": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                },
+                "Privilege": {
+                    "Value": "Administrator",
+                    "AttributeType": "ExportOnly",
+                    "Import": false
+                },
+                "IsUserEnable": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                },
+                "LoginInterface": {
+                    "Value": [
+                        "Web",
+                        "SFTP",
+                        "SSH",
+                        "IPMI",
+                        "SNMP",
+                        "Redfish",
+                        "Local"
+                    ],
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PermitRuleIds": {
+                    "Value": [],
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserRoleId": {
+                    "Value": "Administrator",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": 2,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserName": {
+                    "Value": "Administrator",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "SnmpPrivacyPwdInitialState": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                }
             },
-            "Description": "Configurations of Account Management"
-        }
+            {
+                "IsUserLocked": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                },
+                "Privilege": {
+                    "Value": "Administrator",
+                    "AttributeType": "ExportOnly",
+                    "Import": false
+                },
+                "IsUserEnable": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                },
+                "LoginInterface": {
+                    "Value": [
+                        "Web",
+                        "SFTP",
+                        "SSH",
+                        "IPMI",
+                        "Redfish",
+                        "Local"
+                    ],
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PermitRuleIds": {
+                    "Value": [],
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserRoleId": {
+                    "Value": "Administrator",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": 3,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserName": {
+                    "Value": "test3",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "SnmpPrivacyPwdInitialState": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": false
+                }
+            }
+        ],
+        "UserRole": [
+            {
+                "SecurityMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "VMMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ConfigureSelf": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": "CustomRole5",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "BasicSetting": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "DiagnoseMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "KVMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PowerMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ReadOnly": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                }
+            },
+            {
+                "SecurityMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "VMMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ConfigureSelf": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": "CustomRole6",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "BasicSetting": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "DiagnoseMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "KVMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PowerMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ReadOnly": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                }
+            },
+            {
+                "SecurityMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "VMMMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ConfigureSelf": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": "CustomRole7",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "BasicSetting": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "DiagnoseMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "KVMMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PowerMgmt": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ReadOnly": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                }
+            }
+        ]
+    },
+    "Description": "Configurations of Account Management"
+}

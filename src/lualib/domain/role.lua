@@ -142,6 +142,21 @@ function RoleCollection:role_to_string_table(ids)
     return res
 end
 
+---获取所有角色信息
+---@return table
+function RoleCollection:get_all_role_names()
+    local roles = {}
+    for role_id, role in pairs(self.m_role_collection) do
+        -- 对于CustomRole5~16,未开启ExtendedCustomRoleEnabled时不获取
+        if role_id >= enum.RoleType.CustomRole5:value() and not self.m_roles_config.ExtendedCustomRoleEnabled then
+            goto continue
+        end
+        roles[#roles+1] = role:get_role_name()
+        ::continue::
+    end
+    return roles
+end
+
 ---通过id获取角色数据
 ---@param role_id number
 ---@return table
@@ -231,12 +246,12 @@ function RoleCollection:set_role_privilege(ctx, role_id, privilege_type, privile
     self.m_role_privilege_changed:emit(role_id)
 end
 
----新建角色
----@param _ table
+---新建角色 -- 基于标准Redfish规范权限
+---@param ctx table
 ---@param role_id number
 ---@param assigned_privs table
 ---@param oem_privs table
-function RoleCollection:new_role(_, role_id, assigned_privs, oem_privs)
+function RoleCollection:new_role(ctx, role_id, assigned_privs, oem_privs)
     if not self.m_roles_config.ExtendedCustomRoleEnabled then
         log:error('new role failed, operation not support')
         error(base_msg.InsufficientPrivilege())
@@ -250,7 +265,15 @@ function RoleCollection:new_role(_, role_id, assigned_privs, oem_privs)
         log:error('new role failed, role already exists')
         error(base_msg.ResourceAlreadyExists())
     end
-    local role_data = {}
+    local role_data = {
+        PowerMgmt = false,
+        SecurityMgmt = false,
+        KVMMgmt = false,
+        VMMMgmt = false,
+        DiagnoseMgmt = false,
+        UserMgmt = false,
+        BasicSetting = false
+    }
     for _, value in pairs(assigned_privs) do
         if not ASSIGNED_PRIV_TAB[value] then
             log:error('new role failed, privileges(%d) is not support', value)
