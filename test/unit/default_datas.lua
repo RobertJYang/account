@@ -104,6 +104,7 @@ M.t_snmp_user_info = {
     }
 }
 M.t_ipmi_user_info = {{AccountId = 2}, {AccountId = 18}, {AccountId = 19}}
+M.t_roles = {{Id = 1, ExtendedCustomRoleEnabled = false}}
 M.t_role = {
     {
         Id = 4,

@@ -359,6 +359,11 @@ function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
         log:error('Invalid name(%s) is not allowed', account_info.name)
         error(custom_msg.InvalidUserName())
     end
+    local role_data = self.m_rc:get_role_data_by_id(account_info.role_id)
+    if not role_data then
+        log:error('new account failed, unknown role id')
+        error(base_msg.PropertyValueNotInList(account_info.role_id, 'RoleId'))
+    end
     -- AllowedLoginInterfaces仅限制本地用户
     if not account_info.oem and
         not self.account_policy_collection:
@@ -611,6 +616,11 @@ function AccountCollection:set_role_id(ctx, account_id, role_id, ipmi_privilege)
         error(base_msg.PropertyValueNotInList('%RoleId:' .. 'Unknown', '%RoleId'))
     end
     local role_name = self.m_rc:get_role_name_by_id(role_id)
+    if not role_name then
+        ctx.operation_log.params.role = 'Unknown'
+        log:error('role id is illegal!')
+        error(base_msg.PropertyValueNotInList('%RoleId:' .. 'Unknown', '%RoleId'))
+    end
     ctx.operation_log.params.role = role_name
     if enum.RoleType.Administrator:value() ~= role_id and self:check_is_last_enabled_admin(account_id) then
         ctx.operation_log.result = 'exclude_user_or_last_admin'
@@ -1291,6 +1301,22 @@ end
 function AccountCollection:update_privileges()
     for _, account in pairs(self.collection) do
         account:update_privileges()
+    end
+end
+
+--- 角色移除后更新对应用户角色为CommonUser
+function AccountCollection:update_role_after_removed(ctx, role_id)
+    for account_id, account in pairs(self.collection) do
+        if account:get_role_id() ~= role_id then
+            goto continue
+        end
+        local common_user_id = enum.RoleType.CommonUser:value()
+        ctx.operation_log.params = {}
+        local ok, result = pcall(self.set_role_id, self, ctx, account_id, common_user_id)
+        if not ok then
+            log:error('update user(%d)\'s role to common user failed, err : %s', account_id, result)
+        end
+        ::continue::
     end
 end
 

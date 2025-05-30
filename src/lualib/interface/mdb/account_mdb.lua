@@ -83,8 +83,11 @@ function account_mdb:regist_account_signals()
         self:snmp_info_mdb_update(...)
     end)
 
-    self.m_role_collection.m_privilege_update_signal:on(function(...)
+    self.m_role_collection.m_role_privilege_changed:on(function(...)
         self.m_account_collection:update_privileges()
+    end)
+    self.m_role_collection.m_role_removed:on(function(...)
+        self.m_account_collection:update_role_after_removed(...)
     end)
 end
 
