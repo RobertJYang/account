@@ -13,6 +13,7 @@ local custom_msg = require 'messages.custom'
 local account_enum = require 'class.types.types'
 local account_utils = require 'infrastructure.utils'
 local enum = require 'class.types.types'
+local operation_logger = require 'interface.operation_logger'
 
 
 local AccountProfile = {}
@@ -27,26 +28,18 @@ end
 
 -- 用户导入前的预校验，支持新增和删除用户
 function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
+    local instance_name
+    local instance_id
     for _, instance in ipairs(accounts) do
-        local instance_id = instance.Id.Value
-        local instance_name = instance.UserName.Value
+        instance_id = instance.Id.Value
+        instance_name = instance.UserName.Value
         -- 配置导入存在用户，但是环境不存在，需要新建用户
         if profile_adapter.m_account_collection:get_account_data_by_id(instance_id) == nil then
-            local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.SFTP, enum.LoginInterface.Web,
-                enum.LoginInterface.SSH, enum.LoginInterface.Redfish, enum.LoginInterface.Local,
-                enum.LoginInterface.SNMP }
-            local account_info = {
-                ['id'] = instance_id,
-                ['name'] = instance.UserName.Value,
-                ['password'] = '',
-                ['role_id'] = enum.RoleType.NoAccess:value(),
-                ['interface'] = interface,
-                ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-                ['account_type'] = enum.AccountType.Local:value()
-            }
             -- 新建用户，第三个参数为true代表当前新建用户走ipmi流程，不创建密码
             local ok, err = pcall(function()
-                profile_adapter.m_account_collection:new_account(ctx, account_info, true)
+                operation_logger.proxy(function(obj, ctx)
+                    AccountProfile.set_user_name(profile_adapter, ctx, instance_id, instance.UserName.Value)
+                end, 'ChangeUserName')(nil, ctx)
             end)
             if not ok then
                 log:error("import account config precheck failed, cannot add account(id:%d), %s", instance_id,
@@ -56,7 +49,9 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
         -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
         if instance_name == '' and profile_adapter.m_account_collection:get_account_data_by_id(instance_id) ~= nil then
             local ok, ret = pcall(function()
-                profile_adapter.m_account_collection:delete_account(ctx, instance_id)
+                operation_logger.proxy(function(obj, ctx)
+                    AccountProfile.set_user_name(profile_adapter, ctx, instance_id, '')
+                end, 'ChangeUserName')(nil, ctx)
             end)
             if not ok then
                 log:error("import account config precheck failed, cannot delete account(id:%d), %s", instance_id,
@@ -69,8 +64,9 @@ end
 -- 导入前过滤已删除的用户配置
 function AccountProfile.import_filter(profile_adapter, ctx, accounts)
     local filter_deleted_accounts = {}
+    local instance_name
     for _, instance in ipairs(accounts) do
-        local instance_name = instance.UserName.Value
+        instance_name = instance.UserName.Value
         -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
         if instance_name ~= '' then
             -- 无需删除的用户，过滤后返回继续处理

@@ -148,6 +148,10 @@ local profile_adapter = {
         ConfigureSelf = {
             import = RolePrivilegeProfile.set_configure_self,
             export = RolePrivilegeProfile.get_configure_self
+        },
+        EnabledStatus = {
+            import = RolePrivilegeProfile.set_enabled_status,
+            export = RolePrivilegeProfile.get_enabled_status
         }
     },
     PasswdSetting = {
@@ -404,6 +408,7 @@ function ProfileAdapter:_import_dynamic_object_filter(ctx, class_name, class_dat
     if class_name == "User" then
         return AccountProfile.import_filter(self, ctx, class_data)
     end
+    return class_data
 end
 
 function ProfileAdapter:import_handle(ctx, class_name, class_data)
