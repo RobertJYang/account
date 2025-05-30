@@ -1,5 +1,9 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.12] - 2025-05-30
+修复配置导入NamePattern资源树未刷新问题
+支持自定义用户组的配置导入导出
+
 ## [1.80.11] - 2025-05-29
 支持新增删除自定义角色功能
 
