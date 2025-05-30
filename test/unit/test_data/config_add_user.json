@@ -129,6 +129,63 @@
                     "Import": true
                 },
                 "ConfigureSelf": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "Id": {
+                    "Value": "CustomRole4",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "BasicSetting": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "DiagnoseMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "KVMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "PowerMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ReadOnly": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "EnabledStatus": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                }
+            },
+            {
+                "SecurityMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "UserMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "VMMMgmt": {
+                    "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "ConfigureSelf": {
                     "Value": false,
                     "AttributeType": "ImportAndExport",
                     "Import": true
@@ -160,6 +217,11 @@
                 },
                 "ReadOnly": {
                     "Value": false,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "EnabledStatus": {
+                    "Value": true,
                     "AttributeType": "ImportAndExport",
                     "Import": true
                 }
@@ -214,6 +276,11 @@
                     "Value": true,
                     "AttributeType": "ImportAndExport",
                     "Import": true
+                },
+                "EnabledStatus": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
                 }
             },
             {
@@ -263,6 +330,11 @@
                     "Import": true
                 },
                 "ReadOnly": {
+                    "Value": true,
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "EnabledStatus": {
                     "Value": true,
                     "AttributeType": "ImportAndExport",
                     "Import": true

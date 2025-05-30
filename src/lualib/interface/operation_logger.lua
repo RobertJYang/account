@@ -126,12 +126,12 @@ local operation_log_map = {
         fail = 'Failed to set the KVM key'
     },
     NewRole = {
-        success = 'Add custom user role successfully',
-        fail = 'Add custom user role failed'
+        success = 'Add custom user role({id}) successfully',
+        fail = 'Add custom user role({id}) failed'
     },
     DeleteRole = {
-        success = 'Delete custom user role successfully',
-        fail = 'Delete custom user role failed'
+        success = 'Delete custom user role({id}) successfully',
+        fail = 'Delete custom user role({id}) failed'
     },
     ------------------------ rpc end ------------------------
 

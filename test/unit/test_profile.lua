@@ -189,3 +189,30 @@ function TestAccount:test_when_not_exist_custom_role_then_import_should_success(
     self.test_role_collection:set_extended_custom_role_enabled(false)
     self.test_role_collection:clear_extended_custom_role(self.ctx)
 end
+
+function TestAccount:test_when_exist_custom_role_then_delete_should_success()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local PROJECT_DIR = os.getenv('PROJECT_DIR')
+
+    local file = io.open(PROJECT_DIR .. "/test/unit/test_data/config_add_user.json")
+    lu.assertNotEquals(file, nil)
+    local config_data = file:read("a")
+    local object = cjson.decode(config_data).ConfigData
+    -- 仅测试UserRole
+    self.test_role_collection:set_extended_custom_role_enabled(true)
+    object['User'] = nil
+    -- 首先添加自定义角色CostomRole5
+    self.test_role_collection:new_role(self.ctx, 9, {'ReadOnly', 'ConfigureSelf'}, {"SecurityMgmt"})
+    -- 再次导入配置，删除9号自定义角色
+    object['UserRole'][2]['EnabledStatus']['Value'] = false
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local data = self.test_role_collection:get_role_data_by_id(9)
+    lu.assertEquals(data, nil)
+    lu.assertEquals(self.test_role_collection:get_role_name_by_id(10), 'CustomRole6')
+    lu.assertEquals(self.test_role_collection:get_role_name_by_id(11), 'CustomRole7')
+    --恢复环境
+    self.test_role_collection:set_extended_custom_role_enabled(false)
+    self.test_role_collection:clear_extended_custom_role(self.ctx)
+end
