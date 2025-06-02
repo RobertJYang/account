@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.14] - 2025-06-02
+修复装备模式下缺失Roles数据问题
+
 ## [1.80.13] - 2025-05-30
 支持自定义用户组的配置导入删除用户组
 
