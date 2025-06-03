@@ -90,7 +90,7 @@ end
 function TestAccount:test_new_role()
     -- 未开启ExtendedCustomRoleEnabled无法新增
     lu.assertIsTrue(self.test_role_collection:get_extended_custom_role_enabled() == false)
-    lu.assertErrorMsgContains(base_msg.InsufficientPrivilegeMessage.Name, function()
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
         self.test_role_collection:new_role(self.ctx, 9, {'ReadOnly', 'ConfigureSelf'}, {})
     end)
     self.test_role_collection:set_extended_custom_role_enabled(true)
@@ -119,7 +119,7 @@ end
 function TestAccount:test_delete_role()
     -- 未开启ExtendedCustomRoleEnabled无法删除
     lu.assertIsTrue(self.test_role_collection:get_extended_custom_role_enabled() == false)
-    lu.assertErrorMsgContains(base_msg.InsufficientPrivilegeMessage.Name, function()
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
         self.test_role_collection:delete_role(self.ctx, 9)
     end)
     self.test_role_collection:set_extended_custom_role_enabled(true)
