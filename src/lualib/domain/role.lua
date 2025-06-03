@@ -254,7 +254,7 @@ end
 function RoleCollection:new_role(ctx, role_id, assigned_privs, oem_privs)
     if not self.m_roles_config.ExtendedCustomRoleEnabled then
         log:error('new role failed, operation not support')
-        error(base_msg.InsufficientPrivilege())
+        error(base_msg.ActionNotSupported('Create Custom Role'))
     end
     if role_id < enum.RoleType.CustomRole5:value() or
         role_id > enum.RoleType.CustomRole16:value() then
@@ -307,7 +307,7 @@ end
 function RoleCollection:delete_role(ctx, role_id)
     if not self.m_roles_config.ExtendedCustomRoleEnabled then
         log:error('new role failed, operation not support')
-        error(base_msg.InsufficientPrivilege())
+        error(base_msg.ActionNotSupported('Delete Custom Role'))
     end
     local role = self.m_role_collection[role_id]
     if not role then

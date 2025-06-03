@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.15] - 2025-06-03
+修改增删自定义角色报错信息
+
 ## [1.80.14] - 2025-06-02
 修复装备模式下缺失Roles数据问题
 
