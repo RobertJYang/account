@@ -33,6 +33,7 @@ install(FILES mds/service.json DESTINATION ${APP_INSTALL_DIR}/mds OPTIONAL)
 if(BUILD_MANUFACTURE OR ENABLE_TEST STREQUAL "ON")
     # 预置信息
     install(FILES manufacture/default_datas.lua RENAME datas.lua DESTINATION ${APP_INSTALL_DIR})
+    install(FILES manufacture/default_password.lua DESTINATION ${APP_INSTALL_DIR})
     install(DIRECTORY gen/${PROJECT_NAME}/ DESTINATION ${APP_INSTALL_DIR} PATTERN datas.lua EXCLUDE)
 else()
     install(DIRECTORY gen/${PROJECT_NAME}/ DESTINATION ${APP_INSTALL_DIR})
