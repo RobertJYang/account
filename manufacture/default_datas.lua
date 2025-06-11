@@ -7,6 +7,7 @@
 -- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
+local default_pwd = require "account.default_password"
 local M = {}
 -- SNMPv3TrapAccountId 在装备包不设置，避免修改用户名失败
 M.t_account_service = {{Id = 1, MaxPasswordLength = 20, SNMPv3TrapAccountId = 2, SNMPv3TrapAccountLimitPolicy = 2,
@@ -17,10 +18,8 @@ M.t_manager_account = {
         RoleId = 4,
         UserName = [=[Administrator]=],
         FirstLoginPolicy = [=[ForcePasswordReset]=],
-        Password = [=[$6$AhtdE42u9JhRdPw1$7e3wQX6sfjwTEJr8UZjmAM3EDJMcM0AuSrK2aN7U]=] ..
-            [=[km0II0Mjm2wR8EAenfBv3SaJ/y4wCu5fqSYCqb4BJfrRd0]=],
-        IpmiPassword = [=[0000000200000000000000060000000500000007c3c90f687c9010341e1ab8ff309cfaad388113c]=] ..
-            [=[66f28f8f6ff48e203bfa7c31f010000010000000000000010126b5c4bb597331e5100ae9da8814a84]=],
+        Password = default_pwd.Admin.Password,
+        IpmiPassword = default_pwd.Admin.IpmiPassword,
         AccountType = 0,
         Enabled = true,
         LoginInterface = 255,
@@ -53,8 +52,7 @@ M.t_manager_account = {
         RoleId = 4,
         UserName = [=[<ro_community>]=],
         Password = [=[]=],
-        IpmiPassword = [=[0000000200000000000000060000000500000007c3c90f687c901034dae1df20fc26413d5b0a09]=] ..
-            [=[53c98d8f63c320bb9a9655eee7010000010000000000000010d2cd60c6dc0e254c2ffd6c138f6e5d19]=],
+        IpmiPassword = default_pwd.RoCommunity.IpmiPassword,
         FirstLoginPolicy = [=[PromptPasswordReset]=],
         AccountType = 7,
         LoginInterface = 0,
@@ -65,8 +63,7 @@ M.t_manager_account = {
         RoleId = 4,
         UserName = [=[<rw_community>]=],
         Password = [=[]=],
-        IpmiPassword = [=[0000000200000000000000060000000500000007c3c90f687c90103440282a7633d3fcdc11bc54cb5c3f]=] ..
-            [=[3e33431e02241ff6f52601000001000000000000001094f0e7e79b93e98993b578df4482ed0e]=],
+        IpmiPassword = default_pwd.RwCommunity.IpmiPassword,
         FirstLoginPolicy = [=[PromptPasswordReset]=],
         AccountType = 7,
         LoginInterface = 0,
@@ -101,10 +98,9 @@ M.t_snmp_user_info = {
         AccountId = 2,
         AuthenticationProtocol = [=[SNMPAuthenticationProtocols_SHA256]=],
         EncryptionProtocol = [=[SNMPEncryptionProtocols_AES128]=],
-        AuthenticationKey = [=[7a2f5b86f20233ec7b7bef49643fbf34d86d0cbf6f1f8f5c52d4f30d4536938b]=],
-        EncryptionKey = [=[7a2f5b86f20233ec7b7bef49643fbf34d86d0cbf6f1f8f5c52d4f30d4536938b]=],
-        SNMPPassword = [=[$6$hqlSg3LmkBvBNpNW$eC4HKBS.8KzMPxFx/gdxhOnnrRUN8n7DDrEX92]=] ..
-            [=[GsMOWfuDCJNuxzVIjkdWwEidlqPhE.dMUmD.wcgSayjC8GF/]=]
+        AuthenticationKey = default_pwd.SnmpUserInfo.AuthenticationKey,
+        EncryptionKey = default_pwd.SnmpUserInfo.EncryptionKey,
+        SNMPPassword = default_pwd.SnmpUserInfo.SNMPPassword
     }
 }
 M.t_ipmi_user_info = {{AccountId = 2}, {AccountId = 18}, {AccountId = 19}}
