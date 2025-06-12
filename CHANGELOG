@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.17] - 2025-06-012
+修改普通用户修改自身密码报错的问题
+
 ## [1.80.16] - 2025-06-03
 支持装备模式的默认密码配置化，以支持定制
 

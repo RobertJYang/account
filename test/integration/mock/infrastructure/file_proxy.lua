@@ -12,6 +12,7 @@ local Singleton = require 'mc.singleton'
 local vos = require 'utils.vos'
 local utils_core = require 'utils.core'
 local file_utils = require 'utils.file'
+local mc_utils = require 'mc.utils'
 
 local file_proxy = class()
 
@@ -19,14 +20,15 @@ function file_proxy:ctor()
 end
 
 function file_proxy.proxy_create(dst_path, open_mode, file_mode, uid, gid)
-    vos.system_s('touch ' .. dst_path)
+    local file = file_utils.open_s(dst_path, open_mode)
+    file:close()
     utils_core.chmod(dst_path, file_mode)
     utils_core.chown(dst_path, uid, gid)
     return true
 end
 
 function file_proxy.proxy_delete(dst_path)
-    vos.system_s('rm ' .. dst_path)
+    mc_utils.remove_file(dst_path)
     return true
 end
 
