@@ -373,10 +373,13 @@ function AccountService:check_ipmi_password_privilege(handle_account_id, account
         return true
     end
     local handler_account = self.m_account_collection:get_account_by_account_id(handle_account_id)
+    if handle_account_id == account_id then
+        return true
+    end
     -- 是首次登录，只可以修改自己密码
     if mc_utils.table_compare(handler_account.current_privileges,
         { tostring(enum.PrivilegeType.ConfigureSelf) }) then
-        return handle_account_id == account_id
+        return false
     end
 
     if handler_account:get_role_id() ~= enum.RoleType.Administrator:value() then
