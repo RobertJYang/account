@@ -457,7 +457,11 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     self:update_within_min_password_days_status()
 end
 
-function AccountCollection:delete_account(ctx, account_id)
+--- 删除用户
+---@param ctx table 上下文信息
+---@param account_id number 用户ID
+---@param validation_skipped boolean 是否是空定制化删除用户，若是，需要跳过部分校验来达到清除用户的效果
+function AccountCollection:delete_account(ctx, account_id, validation_skipped)
     utils.queue(function()
         ctx.operation_log.params.id = account_id
         local account = self.collection[account_id]
@@ -479,13 +483,14 @@ function AccountCollection:delete_account(ctx, account_id)
         end
         if account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() and
             self.m_global_account_config:get_snmp_v3_trap_account_limit_policy() ~=
-            enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value() then
+                enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value() then
             log:error('Delete account failed, account (user%d) is snmp v3 trap account.', account_id)
             error(custom_msg.AccountForbidRemoved())
         end
 
         --判断该类型用户是否可被删除account_policy中的Deletable属性
-        if not self.account_policy_collection:get_deletable(account.m_account_data.AccountType:value()) then
+        if not validation_skipped and
+            not self.account_policy_collection:get_deletable(account.m_account_data.AccountType:value()) then
             log:error('Delete account failed, account (user%d) is not deletable.', account_id)
             error(custom_msg.AccountForbidRemoved())
         end
