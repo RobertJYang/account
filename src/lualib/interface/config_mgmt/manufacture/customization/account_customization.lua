@@ -67,7 +67,7 @@ end
 
 function AccountCustomization.set_oem_account_name(self, ctx, id, value)
     if value == '' then
-        self.m_account_collection:delete_account(ctx, id)
+        self.m_account_collection:delete_account(ctx, id, true)
         return value
     end
     self.m_account_collection:set_user_name(ctx, id, value)
