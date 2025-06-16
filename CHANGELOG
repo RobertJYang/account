@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.80.19] - 2025-06-16
+Copyright注释头使用统一lua注释风格
+
 ## [1.80.18] - 2025-06-15
 修复定制OEM用户后空定制化时无法清除的问题
 
