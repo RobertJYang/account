@@ -56,6 +56,10 @@ AccountPolicyMdb.watch_property_hook = {
     end, 'NamePatternChange'),
     AllowedLoginInterfaces = operation_logger.proxy(function(self, ctx, account_type, value)
         ctx.operation_log.params = { interfaces = table.concat(value, ', ') }
+        if not utils.check_interface_info(value) then
+            log:error('set allowed login interfaces failed, interfaces : %s', table.concat(value, ', '))
+            error(base_msg.PropertyValueNotInList(value, "LoginInterfaces"))
+        end
         local interface_num = utils.cover_interface_str_to_num(value)
         self.m_policy_collection:set_allowed_login_interfaces(account_type, interface_num)
     end, 'SetAllowedLoginInterfaces'),
