@@ -550,4 +550,17 @@ function AccountCases.test_set_local_name_pattern_should_success(bus)
     test_case_utils.set_account_policy_property(bus, tostring(enum.AccountType.Local), 'NamePattern', default_data)
 end
 
+function AccountCases.test_set_local_account_allowed_login_interface_invalid_should_failed(bus)
+    local ok, err = pcall(function()
+        test_case_utils.set_account_policy_property(bus, 'Local', 'AllowedLoginInterfaces',
+                                                    {'Web', 'Redfish', 'SSH', 'Local', 'Web'})
+    end)
+    assert(not ok and err.PropertyValueNotInListMessage.Name)
+    ok, err = pcall(function()
+        test_case_utils.set_account_policy_property(bus, 'Local', 'AllowedLoginInterfaces',
+                                                    {'Web', 'Redfish', 'SSH', 'Local', 'Invalid'})
+    end)
+    assert(not ok and err.PropertyValueNotInListMessage.Name)
+end
+
 return AccountCases
