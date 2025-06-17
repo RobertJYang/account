@@ -160,6 +160,13 @@ function app:init()
     log:notice("account class init end")
 end
 
+local linux_file_path = {
+    ['passwd'] = skynet.getenv('PASSWD_FILE'),
+    ['shadow'] = skynet.getenv('SHADOW_FILE'),
+    ['group'] = skynet.getenv('GROUP_FILE'),
+    ['ipmi'] = skynet.getenv('IPMI_FILE')
+}
+
 function app:service_init()
     -- 基础设施
     log:notice("infrastructure init start")
@@ -188,12 +195,6 @@ function app:service_init()
     self.account_policy_collection = account_policy_collection.new(self.db, self.global_account_config)
     log:notice("account config init end, account manager init start")
     -- 用户管理
-    local linux_file_path = {
-        ['passwd'] = skynet.getenv('PASSWD_FILE'),
-        ['shadow'] = skynet.getenv('SHADOW_FILE'),
-        ['group'] = skynet.getenv('GROUP_FILE'),
-        ['ipmi'] = skynet.getenv('IPMI_FILE')
-    }
     self.account_collection = account_collection.new(self.persist, self.db, self.global_account_config,
         self.role_collection, self.host_privilege_limit, self.password_validator_collection,
         self.account_policy_collection, linux_file_path)
