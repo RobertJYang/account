@@ -555,12 +555,12 @@ function AccountCases.test_set_local_account_allowed_login_interface_invalid_sho
         test_case_utils.set_account_policy_property(bus, 'Local', 'AllowedLoginInterfaces',
                                                     {'Web', 'Redfish', 'SSH', 'Local', 'Web'})
     end)
-    assert(not ok and err.PropertyValueNotInListMessage.Name)
+    assert(not ok and err.name == base_msg.PropertyValueNotInListMessage.Name)
     ok, err = pcall(function()
         test_case_utils.set_account_policy_property(bus, 'Local', 'AllowedLoginInterfaces',
                                                     {'Web', 'Redfish', 'SSH', 'Local', 'Invalid'})
     end)
-    assert(not ok and err.PropertyValueNotInListMessage.Name)
+    assert(not ok and err.name == base_msg.PropertyValueNotInListMessage.Name)
 end
 
 return AccountCases
