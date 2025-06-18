@@ -340,7 +340,14 @@
                     "Import": true
                 }
             }
-        ]
+        ],
+        "SecurityEnhance": {
+            "OldPwdCount": {
+                "Value": 4,
+                "AttributeType": "ImportAndExport",
+                "Import": true
+            }
+        }
     },
     "Description": "Configurations of Account Management"
 }

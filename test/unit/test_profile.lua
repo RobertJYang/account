@@ -42,6 +42,7 @@ function TestAccount:test_when_import_account_config_then_add_user_should_succes
     local config_service = profile_adapter.new()
     config_service:on_import(ctx, object)
     lu.assertEquals(self.test_account_collection:get_user_name(3), 'test3')
+    lu.assertEquals(self.test_global_account_config:get_history_password_count(), 4)
 
     --恢复环境
     teardown_account_data(self.ctx, self.test_account_collection, 3)
