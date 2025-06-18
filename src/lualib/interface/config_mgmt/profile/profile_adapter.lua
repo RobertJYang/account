@@ -353,7 +353,11 @@ local function verify_property_not_change(property_name, property_value, current
     end
 end
 
-function ProfileAdapter:import_instances(ctx, class_name, instance_id, property_name, property_value)
+function ProfileAdapter:import_instances(ctx, class_name, instance_id, property_name, property)
+    if property.Import == false then
+        return
+    end
+    local property_value = property.Value
     local ok = pcall(function()
         if not (profile_adapter[class_name][property_name] and profile_adapter[class_name][property_name].import) then
             return
@@ -413,6 +417,9 @@ end
 function ProfileAdapter:import_handle(ctx, class_name, class_data)
     if is_object_array(class_data) then
         for _, instance in ipairs(class_data) do
+            if instance.Id.Import == false then
+                goto continue
+            end
             local instance_id = instance.Id.Value
             local ok = pcall(function()
                 profile_adapter[class_name].Id.import(self, ctx, instance_id)
@@ -422,8 +429,9 @@ function ProfileAdapter:import_handle(ctx, class_name, class_data)
                 error(custom_messages.CollectingConfigurationErrorDesc(err_msg))
             end
             for property_name, property_value in pairs(instance) do
-                self:import_instances(ctx, class_name, instance_id, property_name, property_value.Value)
+                self:import_instances(ctx, class_name, instance_id, property_name, property_value)
             end
+            ::continue::
         end
     else
         for property_name, property_value in pairs(class_data) do

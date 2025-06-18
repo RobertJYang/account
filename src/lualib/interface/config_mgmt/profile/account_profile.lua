@@ -30,6 +30,9 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
     local instance_name
     local instance_id
     for _, instance in ipairs(accounts) do
+        if instance.Id.Import == false or instance.UserName.Import == false then
+            goto continue
+        end
         instance_id = instance.Id.Value
         instance_name = instance.UserName.Value
         -- 配置导入存在用户，但是环境不存在，需要新建用户
@@ -57,6 +60,7 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
                     tostring(ret))
             end
         end
+        ::continue::
     end
 end
 
