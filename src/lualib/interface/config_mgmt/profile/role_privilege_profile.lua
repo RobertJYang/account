@@ -148,6 +148,9 @@ function RolePrivilegeProfile.import_precheck(profile_adapter, ctx, roles)
     local instance_name
     local role_id
     for _, instance in ipairs(roles) do
+        if instance.Id.Import == false then
+            goto continue
+        end
         instance_name = instance.Id.Value
         role_id = enum.RoleType.new(instance_name):value()
         if role_id < enum.RoleType.CustomRole5:value() or
