@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.80.24] - 2025-06-19
+更改readme描述
 
 ## [1.80.23] - 2025-06-18
 修复配置导入import字段预期不生效的问题
