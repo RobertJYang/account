@@ -103,7 +103,7 @@ function ConfigHandle:on_backup(ctx, filepath)
         end
     end
     self.account_collection:backup_account_info()
-    log:operation(ctx:get_initiator(), 'account', 'Set manufacturer default configuration successfully')
+    log:operation(ctx:get_initiator(), 'account', 'Set account manufacturer default configuration successfully')
     return res
 end
 
