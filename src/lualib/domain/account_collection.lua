@@ -1507,11 +1507,11 @@ end
 function AccountCollection:backup_account_info()
     self.account_db = account_backup_db.get_instance()
     self.account_db:clear()
-    for _, account in pairs(self.collection) do
-        if account.m_account_data.AccountType == enum.AccountType.Local then
-            local account_data, ipmi_data, snmp_data = account:get_backup_info()
-            self.account_db:new_data(account.m_account_data.Id,account_data, ipmi_data, snmp_data)
-            log:notice("[Recover] backup account %s data", account:get_user_name())
+    for _, account_info in pairs(self.collection) do
+        if account_info.m_account_data.AccountType == enum.AccountType.Local then
+            local account_data, ipmi_data, snmp_data = account_info:get_backup_info()
+            self.account_db:new_data(account_info.m_account_data.Id, account_data, ipmi_data, snmp_data)
+            log:notice("[Recover] backup account %s data", account_info:get_user_name())
         end
     end
 end
