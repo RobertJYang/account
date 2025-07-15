@@ -30,7 +30,7 @@ local snmp_community_class_types = require 'class.types.SnmpCommunity'
 local account_backup_class_types = require 'class.types.AccountBackup'
 local password_policy_class_types = require 'class.types.PasswordPolicy'
 local account_policy_db_class_types = require 'class.types.AccountPolicyDB'
-local ipmi_channel_config_db_class_types = require 'class.types.IpmiChannelConfigDB'
+local ipmi_channel_config_class_types = require 'class.types.IpmiChannelConfig'
 local account_service_intf_types = require 'account.json_types.AccountService'
 local properties_intf_types = require 'account.json_types.Properties'
 local manager_accounts_intf_types = require 'account.json_types.ManagerAccounts'
@@ -2857,12 +2857,34 @@ local AccountPolicyDB = {
 }
 
 local IpmiChannelConfig = {
+    ['table_name'] = 't_ipmi_channel_config',
+    ['prop_configs'] = {
+        ['AccountId'] = {
+            ['baseType'] = 'U8',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '用户ID',
+            ['validator'] = ipmi_channel_config_class_types.AccountId
+        },
+        ['ChannelNumber'] = {
+            ['baseType'] = 'U8',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '通道编号',
+            ['validator'] = ipmi_channel_config_class_types.ChannelNumber
+        }
+    },
+    ['default_props'] = {
+        ['AccountId'] = ipmi_channel_config_class_types.AccountId.default[1],
+        ['ChannelNumber'] = ipmi_channel_config_class_types.ChannelNumber.default[1]
+    },
     ['mdb_prop_configs'] = {
         ['bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig'] = {
             ['PrivilegeLimit'] = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '通道权限',
+                ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.PrivilegeLimit
             },
@@ -2870,6 +2892,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'Boolean',
                 ['readOnly'] = true,
                 ['description'] = 'ipmi消息使能',
+                ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['default'] = 'true',
                 ['validator'] = ipmi_channel_config_intf_types.IpmiMessagingEnabled
@@ -2878,6 +2901,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'Boolean',
                 ['readOnly'] = true,
                 ['description'] = '链路身份认证使能',
+                ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['default'] = 'true',
                 ['validator'] = ipmi_channel_config_intf_types.LinkAuthenticationEnabled
@@ -2886,6 +2910,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '回拨权限',
+                ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.CallbackRestriction
             },
@@ -2893,6 +2918,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '通道并发会话限制',
+                ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.SessionLimit
             }
@@ -2984,97 +3010,6 @@ local IpmiChannelConfig = {
     })
 }
 
-local IpmiChannelConfigDB = {
-    ['table_name'] = 't_ipmi_channel_config',
-    ['prop_configs'] = {
-        ['AccountId'] = {
-            ['baseType'] = 'U8',
-            ['primaryKey'] = true,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '用户ID',
-            ['validator'] = ipmi_channel_config_db_class_types.AccountId
-        },
-        ['ChannelNumber'] = {
-            ['baseType'] = 'U8',
-            ['primaryKey'] = true,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '通道编号',
-            ['validator'] = ipmi_channel_config_db_class_types.ChannelNumber
-        },
-        ['Use20BytesPasswd'] = {
-            ['baseType'] = 'U8',
-            ['default'] = 1,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '',
-            ['validator'] = ipmi_channel_config_db_class_types.Use20BytesPasswd
-        },
-        ['IsCallin'] = {
-            ['baseType'] = 'U8',
-            ['default'] = 0,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '',
-            ['validator'] = ipmi_channel_config_db_class_types.IsCallin
-        },
-        ['IsEnableAuth'] = {
-            ['baseType'] = 'U8',
-            ['default'] = 1,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '链路身份认证使能',
-            ['validator'] = ipmi_channel_config_db_class_types.IsEnableAuth
-        },
-        ['IsEnableIpmiMsg'] = {
-            ['baseType'] = 'U8',
-            ['default'] = 1,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = 'ipmi消息使能',
-            ['validator'] = ipmi_channel_config_db_class_types.IsEnableIpmiMsg
-        },
-        ['IsEnableByPasswd'] = {
-            ['baseType'] = 'Enum',
-            ['$ref'] = 'types.json#/defs/IpmiUserEnableByPassword',
-            ['default'] = 'Disable',
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '',
-            ['validator'] = ipmi_channel_config_db_class_types.IsEnableByPasswd
-        },
-        ['Privilege0'] = {
-            ['baseType'] = 'Enum',
-            ['$ref'] = 'types.json#/defs/IpmiPrivilege',
-            ['default'] = 'RESERVED',
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '',
-            ['validator'] = ipmi_channel_config_db_class_types.Privilege0
-        },
-        ['Privilege1'] = {
-            ['baseType'] = 'Enum',
-            ['$ref'] = 'types.json#/defs/IpmiPrivilege',
-            ['default'] = 'RESERVED',
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '通道编号,对应资源树PrivilegeLimit属性',
-            ['validator'] = ipmi_channel_config_db_class_types.Privilege1
-        },
-        ['SessionLimit'] = {
-            ['baseType'] = 'U8',
-            ['default'] = 0,
-            ['usage'] = {'PoweroffPer'},
-            ['description'] = '并发会话数限制',
-            ['validator'] = ipmi_channel_config_db_class_types.SessionLimit
-        }
-    },
-    ['default_props'] = {
-        ['AccountId'] = ipmi_channel_config_db_class_types.AccountId.default[1],
-        ['ChannelNumber'] = ipmi_channel_config_db_class_types.ChannelNumber.default[1],
-        ['Use20BytesPasswd'] = 1,
-        ['IsCallin'] = 0,
-        ['IsEnableAuth'] = 1,
-        ['IsEnableIpmiMsg'] = 1,
-        ['IsEnableByPasswd'] = types.IpmiUserEnableByPassword.Disable:value(),
-        ['Privilege0'] = types.IpmiPrivilege.RESERVED:value(),
-        ['Privilege1'] = types.IpmiPrivilege.RESERVED:value(),
-        ['SessionLimit'] = 0
-    }
-}
-
 local M = {}
 
 function M.init(bus)
@@ -3097,7 +3032,6 @@ function M.init(bus)
     class('AccountPolicy', AccountPolicy):set_bus(bus)
     class('AccountPolicyDB', AccountPolicyDB):set_bus(bus)
     class('IpmiChannelConfig', IpmiChannelConfig):set_bus(bus)
-    class('IpmiChannelConfigDB', IpmiChannelConfigDB):set_bus(bus)
 end
 
 -- The callback needs to be registered during app initialization
