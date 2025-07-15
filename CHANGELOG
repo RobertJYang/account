@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.1] - 2025-07-15
+支持ipmi通道权限配置自动生成代码上库
+
 ## [1.80.25] - 2025-06-20
 更改设置还原点操作日志
 

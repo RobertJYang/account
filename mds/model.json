@@ -1519,5 +1519,133 @@
                 ]
             }
         }
+    },
+    "IpmiChannelConfig": {
+        "path": "/bmc/kepler/AccountService/Accounts/:Id/Channels/:ChannelNumber",
+        "privilege": ["ReadOnly"],
+        "interfaces": {
+            "bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig": {
+                "properties": {
+                    "PrivilegeLimit": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"]
+                        }
+                    },
+                    "IpmiMessagingEnabled": {
+                        "default": "true",
+                        "privilege": {
+                            "read": ["ReadOnly"]
+                        }
+                    },
+                    "LinkAuthenticationEnabled": {
+                        "default": "true",
+                        "privilege": {
+                            "read": ["ReadOnly"]
+                        }
+                    },
+                    "CallbackRestriction": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"]
+                        }
+                    },
+                    "SessionLimit": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "IpmiChannelConfigDB": {
+        "tableName": "t_ipmi_channel_config",
+        "properties": {
+            "AccountId": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "用户ID"
+            },
+            "ChannelNumber": {
+                "baseType": "U8",
+                "primaryKey": true,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "通道编号"
+            },
+            "Use20BytesPasswd": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsCallin": {
+                "baseType": "U8",
+                "default": 0,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "IsEnableAuth": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "链路身份认证使能"
+            },
+            "IsEnableIpmiMsg": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "ipmi消息使能"
+            },
+            "IsEnableByPasswd": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiUserEnableByPassword",
+                "default": "Disable",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Privilege0": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiPrivilege",
+                "default": "RESERVED",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
+            },
+            "Privilege1": {
+                "baseType": "Enum",
+                "$ref": "types.json#/defs/IpmiPrivilege",
+                "default": "RESERVED",
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "通道编号,对应资源树PrivilegeLimit属性"
+            },
+            "SessionLimit": {
+                "baseType": "U8",
+                "default": 0,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": "并发会话数限制"
+            }
+        }
     }
 }

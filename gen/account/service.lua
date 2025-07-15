@@ -38,6 +38,7 @@ local SnmpCommunityTypes = require 'account.json_types.SnmpCommunity'
 local LocalAccountAuthNTypes = require 'account.json_types.LocalAccountAuthN'
 local PasswordPolicyTypes = require 'account.json_types.PasswordPolicy'
 local AccountPolicyTypes = require 'account.json_types.AccountPolicy'
+local IpmiChannelConfigTypes = require 'account.json_types.IpmiChannelConfig'
 
 local AccountService = mdb.register_object('/bmc/kepler/AccountService', {
     {name = 'bmc.kepler.AccountService', interface = AccountServiceTypes.interface},
@@ -130,6 +131,15 @@ function AccountPolicy:ctor(AccountType)
     self.path = '/bmc/kepler/AccountService/AccountPolicies/' .. AccountType
 end
 
+local IpmiChannelConfig = mdb.register_object('/bmc/kepler/AccountService/Accounts/:Id/Channels/:ChannelNumber', {
+    {name = 'bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig', interface = IpmiChannelConfigTypes.interface},
+    {name = 'bmc.kepler.Object.Properties', interface = PropertiesTypes.interface}
+})
+
+function IpmiChannelConfig:ctor(Id, ChannelNumber)
+    self.path = '/bmc/kepler/AccountService/Accounts/' .. Id .. '/Channels/' .. ChannelNumber
+end
+
 local model = require 'class.model'
 
 local account_service = class(app_base.Service)
@@ -164,6 +174,11 @@ end
 function account_service:CreateAccountPolicy(AccountType, prop_setting_cb)
     local path = '/bmc/kepler/AccountService/AccountPolicies/' .. AccountType
     return object_manage.create_object('AccountPolicy', path, path, prop_setting_cb)
+end
+
+function account_service:CreateIpmiChannelConfig(Id, ChannelNumber, prop_setting_cb)
+    local path = '/bmc/kepler/AccountService/Accounts/' .. Id .. '/Channels/' .. ChannelNumber
+    return object_manage.create_object('IpmiChannelConfig', path, path, prop_setting_cb)
 end
 
 function account_service:ImplAccountServiceAccountServiceImportWeakPasswordDictionary(cb)
@@ -370,6 +385,14 @@ function account_service:ImplAccountPolicyPropertiesGetPropertiesByOptions(cb)
     model.ImplAccountPolicyPropertiesGetPropertiesByOptions(cb)
 end
 
+function account_service:ImplIpmiChannelConfigPropertiesGetOptions(cb)
+    model.ImplIpmiChannelConfigPropertiesGetOptions(cb)
+end
+
+function account_service:ImplIpmiChannelConfigPropertiesGetPropertiesByOptions(cb)
+    model.ImplIpmiChannelConfigPropertiesGetPropertiesByOptions(cb)
+end
+
 ---@param AccountId integer
 function account_service:ManagerAccountsManagerAccountsPasswordChangedSignal(AccountId)
     self.bus:signal('/bmc/kepler/AccountService/Accounts', 'bmc.kepler.AccountService.ManagerAccounts',
@@ -429,8 +452,8 @@ end
 
 function account_service:init()
     account_service.super.init(self)
-    object_manage.create_object('AccountService', '/bmc/kepler/AccountService', 
-    '/bmc/kepler/AccountService').ObjectName ='AccountService_0'
+    object_manage.create_object('AccountService', '/bmc/kepler/AccountService',
+     '/bmc/kepler/AccountService').ObjectName ='AccountService_0'
     object_manage.create_object('ManagerAccounts', '/bmc/kepler/AccountService/Accounts',
         '/bmc/kepler/AccountService/Accounts').ObjectName = 'ManagerAccounts_0'
     object_manage.create_object('Roles', '/bmc/kepler/AccountService/Roles', '/bmc/kepler/AccountService/Roles')
