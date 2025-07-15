@@ -30,6 +30,7 @@ function orm_classes.init(db)
     orm_classes.AccountBackup = c_object('AccountBackup')
     orm_classes.PasswordPolicy = c_object('PasswordPolicy')
     orm_classes.AccountPolicyDB = c_object('AccountPolicyDB')
+    orm_classes.IpmiChannelConfigDB = c_object('IpmiChannelConfigDB')
 end
 
 return orm_classes

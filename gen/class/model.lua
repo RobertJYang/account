@@ -30,6 +30,7 @@ local snmp_community_class_types = require 'class.types.SnmpCommunity'
 local account_backup_class_types = require 'class.types.AccountBackup'
 local password_policy_class_types = require 'class.types.PasswordPolicy'
 local account_policy_db_class_types = require 'class.types.AccountPolicyDB'
+local ipmi_channel_config_db_class_types = require 'class.types.IpmiChannelConfigDB'
 local account_service_intf_types = require 'account.json_types.AccountService'
 local properties_intf_types = require 'account.json_types.Properties'
 local manager_accounts_intf_types = require 'account.json_types.ManagerAccounts'
@@ -42,6 +43,7 @@ local snmp_community_intf_types = require 'account.json_types.SnmpCommunity'
 local local_account_auth_n_intf_types = require 'account.json_types.LocalAccountAuthN'
 local password_policy_intf_types = require 'account.json_types.PasswordPolicy'
 local account_policy_intf_types = require 'account.json_types.AccountPolicy'
+local ipmi_channel_config_intf_types = require 'account.json_types.IpmiChannelConfig'
 
 local AccountService = {
     ['table_name'] = 't_account_service',
@@ -364,25 +366,24 @@ local AccountService = {
         ['bmc.kepler.AccountService'] = {
             ['ImportWeakPasswordDictionary'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'SecurityMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'Path'}},
                 ['rsp'] = {
                     {['baseType'] = 'U32', ['description'] = '仅远程上传涉及，任务id', ['param'] = 'TaskId'}
                 },
-                ['description'] = '导入弱口令字典'
+                ['description'] = '导入弱口令字典',
+                ['privilege'] = {'SecurityMgmt'}
             },
             ['ExportWeakPasswordDictionary'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'SecurityMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'Path'}},
                 ['rsp'] = {
                     {['baseType'] = 'U32', ['description'] = '仅远程上传涉及，任务id', ['param'] = 'TaskId'}
                 },
-                ['description'] = '导出弱口令字典'
+                ['description'] = '导出弱口令字典',
+                ['privilege'] = {'SecurityMgmt'}
             },
             ['GetRequestedPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -391,17 +392,18 @@ local AccountService = {
                     }
                 },
                 ['rsp'] = {{['baseType'] = 'String', ['description'] = '公钥字符串', ['param'] = 'PublicKey'}},
-                ['description'] = 'web接口登录获取公钥,仅web_backend调用'
+                ['description'] = 'web接口登录获取公钥,仅web_backend调用',
+                ['privilege'] = {'ReadOnly'}
             },
             ['RecoverAccount'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['maximum'] = 17, ['minimum'] = 2, ['param'] = 'AccountId'},
                     {['baseType'] = 'U8', ['maximum'] = 1, ['minimum'] = 0, ['param'] = 'Policy'}
                 },
                 ['rsp'] = {},
-                ['description'] = '根据用户传入id恢复还原点用户信息'
+                ['description'] = '根据用户传入id恢复还原点用户信息',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -551,7 +553,6 @@ local ManagerAccounts = {
         ['bmc.kepler.AccountService.ManagerAccounts'] = {
             ['New'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['maximum'] = 17, ['minimum'] = 0, ['param'] = 'AccountId'},
                     {['baseType'] = 'String', ['maxLength'] = 32, ['minLength'] = 1, ['param'] = 'UserName'},
@@ -563,10 +564,10 @@ local ManagerAccounts = {
                     }, {['baseType'] = 'Enum', ['$ref'] = '#/defs/FirstLoginPolicy', ['param'] = 'FirstLoginPolicy'}
                 },
                 ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
-                ['description'] = '新建账户;0表示不指定用户id,默认选择一个用户,不能指定id为1'
+                ['description'] = '新建账户;0表示不指定用户id,默认选择一个用户,不能指定id为1',
+                ['privilege'] = {'UserMgmt'}
             },
             ['NewOEMAccount'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['maximum'] = 115, ['minimum'] = 101, ['param'] = 'AccountId'},
                     {['baseType'] = 'String', ['maxLength'] = 32, ['minLength'] = 1, ['param'] = 'UserName'},
@@ -574,18 +575,18 @@ local ManagerAccounts = {
                     {['baseType'] = 'Dictionary', ['$ref'] = '#/defs/ExtraData', ['param'] = 'ExtraData'}
                 },
                 ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
-                ['description'] = '新建OEM用户'
+                ['description'] = '新建OEM用户',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetIdByUserName'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {{['baseType'] = 'String', ['maxLength'] = 32, ['minLength'] = 1, ['param'] = 'UserName'}},
                 ['rsp'] = {{['baseType'] = 'U8', ['param'] = 'AccountId'}},
-                ['description'] = '通过用户名获取用户id'
+                ['description'] = '通过用户名获取用户id',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['SetAccountWritable'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['maximum'] = 115, ['minimum'] = 2, ['param'] = 'AccountId'},
                     {
@@ -595,11 +596,11 @@ local ManagerAccounts = {
                     }
                 },
                 ['rsp'] = {},
-                ['description'] = '设置某用户某属性是否可修改,当前定制化需求仅需支持UserName/Password'
+                ['description'] = '设置某用户某属性是否可修改,当前定制化需求仅需支持UserName/Password',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetAccountWritable'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'U8', ['maximum'] = 115, ['minimum'] = 2, ['param'] = 'AccountId'}},
                 ['rsp'] = {
                     {
@@ -608,17 +609,18 @@ local ManagerAccounts = {
                         ['param'] = 'PropertiesWritable'
                     }
                 },
-                ['description'] = '获取某用户某属性是否可被修改'
+                ['description'] = '获取某用户某属性是否可被修改',
+                ['privilege'] = {'UserMgmt'}
             },
             ['SetAccountLockState'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['maximum'] = 115, ['minimum'] = 2, ['param'] = 'AccountId'},
                     {['baseType'] = 'Boolean', ['param'] = 'Lockstatus'}
                 },
                 ['rsp'] = {},
-                ['description'] = '设置用户锁定状态'
+                ['description'] = '设置用户锁定状态',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetUidGidByUserName'] = {
                 ['initiator'] = true,
@@ -880,14 +882,13 @@ local ManagerAccount = {
         ['bmc.kepler.AccountService.ManagerAccount'] = {
             ['Delete'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
                 ['rsp'] = {},
-                ['description'] = '删除账户'
+                ['description'] = '删除账户',
+                ['privilege'] = {'UserMgmt'}
             },
             ['ChangePwd'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8[]',
@@ -898,11 +899,11 @@ local ManagerAccount = {
                     }
                 },
                 ['rsp'] = {},
-                ['description'] = '修改账户密码'
+                ['description'] = '修改账户密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['ChangeSnmpPwd'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8[]',
@@ -913,11 +914,11 @@ local ManagerAccount = {
                     }
                 },
                 ['rsp'] = {},
-                ['description'] = '修改本地用户SNMP密码'
+                ['description'] = '修改本地用户SNMP密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['ImportSSHPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {['baseType'] = 'String', ['description'] = 'Content类型：URI/Text', ['param'] = 'Type'}, {
                         ['baseType'] = 'String',
@@ -932,30 +933,30 @@ local ManagerAccount = {
                         ['param'] = 'TaskId'
                     }
                 },
-                ['description'] = '导入SSH公钥'
+                ['description'] = '导入SSH公钥',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['DeleteSSHPublicKey'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {},
                 ['rsp'] = {},
-                ['description'] = '删除SSH公钥'
+                ['description'] = '删除SSH公钥',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['SetLastLogin'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {['baseType'] = 'String', ['description'] = '上次登录IP', ['param'] = 'Ip'},
                     {['baseType'] = 'String', ['description'] = '上次登录接口', ['param'] = 'Interface'}
                 },
                 ['rsp'] = {{['baseType'] = 'U8', ['description'] = '处理结果', ['param'] = 'Result'}},
-                ['description'] = '提供给第三方认证用于记录上次登录记录'
+                ['description'] = '提供给第三方认证用于记录上次登录记录',
+                ['privilege'] = {'ConfigureSelf'}
             }
         },
         ['bmc.kepler.AccountService.ManagerAccount.SnmpUser'] = {
             ['SetAuthenticationProtocol'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {
                         ['baseType'] = 'U8',
@@ -976,25 +977,26 @@ local ManagerAccount = {
                     }
                 },
                 ['rsp'] = {},
-                ['description'] = '设置snmp鉴权算法、鉴权密码和加密密码'
+                ['description'] = '设置snmp鉴权算法、鉴权密码和加密密码',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['SetEncryptionProtocol'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ConfigureSelf'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['description'] = 'SNMP加密算法', ['param'] = 'SNMPEncryptionProtocol'}
                 },
                 ['rsp'] = {},
-                ['description'] = '设置snmp加密算法'
+                ['description'] = '设置snmp加密算法',
+                ['privilege'] = {'ConfigureSelf'}
             },
             ['GetSnmpKeys'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
                 ['rsp'] = {
                     {['baseType'] = 'String', ['description'] = 'SNMP鉴权密码 Ku', ['param'] = 'AuthenticationKey'},
                     {['baseType'] = 'String', ['description'] = 'SNMP加密密码 Ku', ['param'] = 'EncryptionKey'}
                 },
-                ['description'] = '获取鉴权key和加密key'
+                ['description'] = '获取鉴权key和加密key',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2131,13 +2133,13 @@ local Role = {
         ['bmc.kepler.AccountService.Role'] = {
             ['SetRolePrivilege'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {
                     {['baseType'] = 'U8', ['param'] = 'PrivilegeType'},
                     {['baseType'] = 'Boolean', ['param'] = 'PrivilegeValue'}
                 },
                 ['rsp'] = {},
-                ['description'] = '设置角色权限'
+                ['description'] = '设置角色权限',
+                ['privilege'] = {'UserMgmt'}
             },
             ['Delete'] = {
                 ['initiator'] = true,
@@ -2263,31 +2265,31 @@ local SnmpCommunity = {
     ['mdb_method_configs'] = {
         ['bmc.kepler.Managers.SnmpService.SnmpCommunity'] = {
             ['SetRwCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'RwCommunity'}},
                 ['rsp'] = {},
-                ['description'] = '设置rw snmp团体名'
+                ['description'] = '设置rw snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['SetRoCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'String', ['param'] = 'RwCommunity'}},
                 ['rsp'] = {},
-                ['description'] = '设置ro snmp团体名'
+                ['description'] = '设置ro snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['GetSnmpCommunity'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {},
                 ['rsp'] = {
                     {['baseType'] = 'String', ['param'] = 'RwCommunity'},
                     {['baseType'] = 'String', ['param'] = 'RoCommunity'}
                 },
-                ['description'] = '获取snmp团体名'
+                ['description'] = '获取snmp团体名',
+                ['privilege'] = {'UserMgmt'}
             },
             ['SetSnmpCommunityLoginRule'] = {
-                ['privilege'] = {'UserMgmt'},
                 ['req'] = {{['baseType'] = 'String[]', ['param'] = 'LoginRuleIds'}},
                 ['rsp'] = {},
-                ['description'] = '设置snmp团体名登录规则'
+                ['description'] = '设置snmp团体名登录规则',
+                ['privilege'] = {'UserMgmt'}
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2388,24 +2390,24 @@ local LocalAccountAuthN = {
         ['bmc.kepler.AccountService.LocalAccountAuthN'] = {
             ['LocalAuthenticate'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
                     {['baseType'] = 'String', ['maxLength'] = 32, ['minLength'] = 1, ['param'] = 'UserName'},
                     {['baseType'] = 'U8[]', ['param'] = 'Password'},
                     {['baseType'] = 'Dictionary', ['$ref'] = '#/defs/Config', ['param'] = 'Config'}
                 },
                 ['rsp'] = {{['baseType'] = 'Dictionary', ['$ref'] = '#/defs/AccountData', ['param'] = 'AccountData'}},
-                ['description'] = '本地用户认证'
+                ['description'] = '本地用户认证',
+                ['privilege'] = {'ReadOnly'}
             },
             ['VncAuthenticate'] = {
                 ['initiator'] = true,
-                ['privilege'] = {'ReadOnly'},
                 ['req'] = {
                     {['baseType'] = 'String', ['description'] = '密文', ['param'] = 'CipherText'},
                     {['baseType'] = 'String', ['description'] = '挑战码', ['param'] = 'AuthChallenge'}
                 },
                 ['rsp'] = {{['baseType'] = 'Dictionary', ['$ref'] = '#/defs/AccountData', ['param'] = 'AccountData'}},
-                ['description'] = 'vnc用户认证'
+                ['description'] = 'vnc用户认证',
+                ['privilege'] = {'ReadOnly'}
             },
             ['GenRmcp20Code'] = {
                 ['initiator'] = true,
@@ -2854,6 +2856,225 @@ local AccountPolicyDB = {
     }
 }
 
+local IpmiChannelConfig = {
+    ['mdb_prop_configs'] = {
+        ['bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig'] = {
+            ['PrivilegeLimit'] = {
+                ['baseType'] = 'U8',
+                ['readOnly'] = true,
+                ['description'] = '通道权限',
+                ['privilege'] = {['read'] = {'ReadOnly'}},
+                ['validator'] = ipmi_channel_config_intf_types.PrivilegeLimit
+            },
+            ['IpmiMessagingEnabled'] = {
+                ['baseType'] = 'Boolean',
+                ['readOnly'] = true,
+                ['description'] = 'ipmi消息使能',
+                ['privilege'] = {['read'] = {'ReadOnly'}},
+                ['default'] = 'true',
+                ['validator'] = ipmi_channel_config_intf_types.IpmiMessagingEnabled
+            },
+            ['LinkAuthenticationEnabled'] = {
+                ['baseType'] = 'Boolean',
+                ['readOnly'] = true,
+                ['description'] = '链路身份认证使能',
+                ['privilege'] = {['read'] = {'ReadOnly'}},
+                ['default'] = 'true',
+                ['validator'] = ipmi_channel_config_intf_types.LinkAuthenticationEnabled
+            },
+            ['CallbackRestriction'] = {
+                ['baseType'] = 'U8',
+                ['readOnly'] = true,
+                ['description'] = '回拨权限',
+                ['privilege'] = {['read'] = {'ReadOnly'}},
+                ['validator'] = ipmi_channel_config_intf_types.CallbackRestriction
+            },
+            ['SessionLimit'] = {
+                ['baseType'] = 'U8',
+                ['readOnly'] = true,
+                ['description'] = '通道并发会话限制',
+                ['privilege'] = {['read'] = {'ReadOnly'}},
+                ['validator'] = ipmi_channel_config_intf_types.SessionLimit
+            }
+        },
+        ['bmc.kepler.Object.Properties'] = {
+            ['ClassName'] = {
+                ['baseType'] = 'String',
+                ['readOnly'] = true,
+                ['description'] = '对象类名',
+                ['validator'] = properties_intf_types.ClassName
+            },
+            ['ObjectName'] = {
+                ['baseType'] = 'String',
+                ['readOnly'] = true,
+                ['description'] = '对象名',
+                ['validator'] = properties_intf_types.ObjectName
+            },
+            ['ObjectIdentifier'] = {
+                ['baseType'] = 'Struct',
+                ['$ref'] = '#/defs/StructIdentifier',
+                ['readOnly'] = true,
+                ['description'] = '对象标志符',
+                ['validator'] = properties_intf_types.ObjectIdentifier
+            }
+        }
+    },
+    ['mdb_method_configs'] = {
+        ['bmc.kepler.Object.Properties'] = {
+            ['GetOptions'] = {
+                ['req'] = {
+                    {['baseType'] = 'String', ['description'] = '接口名', ['param'] = 'Interface'},
+                    {['baseType'] = 'String', ['description'] = '属性名', ['param'] = 'Property'}
+                },
+                ['rsp'] = {
+                    {
+                        ['baseType'] = 'Struct',
+                        ['$ref'] = '#/defs/Options',
+                        ['description'] = '属性能力选项，例如是否弃用、是否是易变属性等',
+                        ['param'] = 'Options'
+                    }
+                },
+                ['description'] = '按接口名和属性名查询属性的能力选项'
+            },
+            ['GetPropertiesByOptions'] = {
+                ['req'] = {
+                    {['baseType'] = 'String', ['description'] = '接口名', ['param'] = 'Interface'}, {
+                        ['baseType'] = 'Struct',
+                        ['$ref'] = '#/defs/Options',
+                        ['description'] = '属性能力选项，例如是否弃用、是否是易变属性等',
+                        ['param'] = 'Options'
+                    }
+                },
+                ['rsp'] = {{['baseType'] = 'String[]', ['description'] = '属性名列表', ['param'] = 'Properties'}},
+                ['description'] = '按接口名和能力选项查询符合条件的所有属性'
+            }
+        }
+    },
+    ['mdb_classes'] = mdb.get_class_obj('/bmc/kepler/AccountService/Accounts/:Id/Channels/:ChannelNumber'),
+    ['new_mdb_objects'] = mdb.new_objects_builder({
+        ['bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig'] = {
+            ['property_defaults'] = {
+                ['PrivilegeLimit'] = ipmi_channel_config_intf_types.PrivilegeLimit.default[1],
+                ['IpmiMessagingEnabled'] = 'true',
+                ['LinkAuthenticationEnabled'] = 'true',
+                ['CallbackRestriction'] = ipmi_channel_config_intf_types.CallbackRestriction.default[1],
+                ['SessionLimit'] = ipmi_channel_config_intf_types.SessionLimit.default[1]
+            },
+            ['privileges'] = {
+                ['path'] = privilege.ReadOnly,
+                ['props'] = {
+                    ['PrivilegeLimit'] = {['read'] = privilege.ReadOnly},
+                    ['IpmiMessagingEnabled'] = {['read'] = privilege.ReadOnly},
+                    ['LinkAuthenticationEnabled'] = {['read'] = privilege.ReadOnly},
+                    ['CallbackRestriction'] = {['read'] = privilege.ReadOnly},
+                    ['SessionLimit'] = {['read'] = privilege.ReadOnly}
+                }
+            },
+            ['interface_types'] = ipmi_channel_config_intf_types
+        },
+        ['bmc.kepler.Object.Properties'] = {
+            ['property_defaults'] = {
+                ['ClassName'] = properties_intf_types.ClassName.default[1],
+                ['ObjectName'] = properties_intf_types.ObjectName.default[1],
+                ['ObjectIdentifier'] = properties_intf_types.ObjectIdentifier.default[1]
+            },
+            ['privileges'] = {['path'] = privilege.ReadOnly},
+            ['interface_types'] = properties_intf_types
+        }
+    })
+}
+
+local IpmiChannelConfigDB = {
+    ['table_name'] = 't_ipmi_channel_config',
+    ['prop_configs'] = {
+        ['AccountId'] = {
+            ['baseType'] = 'U8',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '用户ID',
+            ['validator'] = ipmi_channel_config_db_class_types.AccountId
+        },
+        ['ChannelNumber'] = {
+            ['baseType'] = 'U8',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '通道编号',
+            ['validator'] = ipmi_channel_config_db_class_types.ChannelNumber
+        },
+        ['Use20BytesPasswd'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 1,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '',
+            ['validator'] = ipmi_channel_config_db_class_types.Use20BytesPasswd
+        },
+        ['IsCallin'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 0,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '',
+            ['validator'] = ipmi_channel_config_db_class_types.IsCallin
+        },
+        ['IsEnableAuth'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 1,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '链路身份认证使能',
+            ['validator'] = ipmi_channel_config_db_class_types.IsEnableAuth
+        },
+        ['IsEnableIpmiMsg'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 1,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = 'ipmi消息使能',
+            ['validator'] = ipmi_channel_config_db_class_types.IsEnableIpmiMsg
+        },
+        ['IsEnableByPasswd'] = {
+            ['baseType'] = 'Enum',
+            ['$ref'] = 'types.json#/defs/IpmiUserEnableByPassword',
+            ['default'] = 'Disable',
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '',
+            ['validator'] = ipmi_channel_config_db_class_types.IsEnableByPasswd
+        },
+        ['Privilege0'] = {
+            ['baseType'] = 'Enum',
+            ['$ref'] = 'types.json#/defs/IpmiPrivilege',
+            ['default'] = 'RESERVED',
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '',
+            ['validator'] = ipmi_channel_config_db_class_types.Privilege0
+        },
+        ['Privilege1'] = {
+            ['baseType'] = 'Enum',
+            ['$ref'] = 'types.json#/defs/IpmiPrivilege',
+            ['default'] = 'RESERVED',
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '通道编号,对应资源树PrivilegeLimit属性',
+            ['validator'] = ipmi_channel_config_db_class_types.Privilege1
+        },
+        ['SessionLimit'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 0,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '并发会话数限制',
+            ['validator'] = ipmi_channel_config_db_class_types.SessionLimit
+        }
+    },
+    ['default_props'] = {
+        ['AccountId'] = ipmi_channel_config_db_class_types.AccountId.default[1],
+        ['ChannelNumber'] = ipmi_channel_config_db_class_types.ChannelNumber.default[1],
+        ['Use20BytesPasswd'] = 1,
+        ['IsCallin'] = 0,
+        ['IsEnableAuth'] = 1,
+        ['IsEnableIpmiMsg'] = 1,
+        ['IsEnableByPasswd'] = types.IpmiUserEnableByPassword.Disable:value(),
+        ['Privilege0'] = types.IpmiPrivilege.RESERVED:value(),
+        ['Privilege1'] = types.IpmiPrivilege.RESERVED:value(),
+        ['SessionLimit'] = 0
+    }
+}
+
 local M = {}
 
 function M.init(bus)
@@ -2875,6 +3096,8 @@ function M.init(bus)
     class('PasswordPolicy', PasswordPolicy):set_bus(bus)
     class('AccountPolicy', AccountPolicy):set_bus(bus)
     class('AccountPolicyDB', AccountPolicyDB):set_bus(bus)
+    class('IpmiChannelConfig', IpmiChannelConfig):set_bus(bus)
+    class('IpmiChannelConfigDB', IpmiChannelConfigDB):set_bus(bus)
 end
 
 -- The callback needs to be registered during app initialization
@@ -3336,6 +3559,24 @@ end
 -- The callback needs to be registered during app initialization
 function M.ImplAccountPolicyPropertiesGetPropertiesByOptions(cb)
     class('AccountPolicy')['bmc.kepler.Object.Properties'].GetPropertiesByOptions = function(obj, ctx, ...)
+        local req = properties_intf_types.GetPropertiesByOptionsReq.new(...):validate(nil, nil, true)
+        local rsp = properties_intf_types.GetPropertiesByOptionsRsp.new(cb(obj, ctx, req:unpack())):validate()
+        return rsp:unpack(true)
+    end
+end
+
+-- The callback needs to be registered during app initialization
+function M.ImplIpmiChannelConfigPropertiesGetOptions(cb)
+    class('IpmiChannelConfig')['bmc.kepler.Object.Properties'].GetOptions = function(obj, ctx, ...)
+        local req = properties_intf_types.GetOptionsReq.new(...):validate(nil, nil, true)
+        local rsp = properties_intf_types.GetOptionsRsp.new(cb(obj, ctx, req:unpack())):validate()
+        return rsp:unpack(true)
+    end
+end
+
+-- The callback needs to be registered during app initialization
+function M.ImplIpmiChannelConfigPropertiesGetPropertiesByOptions(cb)
+    class('IpmiChannelConfig')['bmc.kepler.Object.Properties'].GetPropertiesByOptions = function(obj, ctx, ...)
         local req = properties_intf_types.GetPropertiesByOptionsReq.new(...):validate(nil, nil, true)
         local rsp = properties_intf_types.GetPropertiesByOptionsRsp.new(cb(obj, ctx, req:unpack())):validate()
         return rsp:unpack(true)
