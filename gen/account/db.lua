@@ -188,17 +188,17 @@ local def_types = require 'class.types.types'
 ---@field Visible FieldBase
 ---@field Deletable FieldBase
 
----@class IpmiChannelConfigDBTable: Table
+---@class IpmiChannelConfigTable: Table
+---@field PrivilegeLimit FieldBase
+---@field IpmiMessagingEnabled FieldBase
+---@field LinkAuthenticationEnabled FieldBase
+---@field CallbackRestriction FieldBase
+---@field SessionLimit FieldBase
+---@field ClassName FieldBase
+---@field ObjectName FieldBase
+---@field ObjectIdentifier FieldBase
 ---@field AccountId FieldBase
 ---@field ChannelNumber FieldBase
----@field Use20BytesPasswd FieldBase
----@field IsCallin FieldBase
----@field IsEnableAuth FieldBase
----@field IsEnableIpmiMsg FieldBase
----@field IsEnableByPasswd FieldBase
----@field Privilege0 FieldBase
----@field Privilege1 FieldBase
----@field SessionLimit FieldBase
 
 ---@class AccountDBDatabase
 ---@field db DataBase
@@ -218,7 +218,7 @@ local def_types = require 'class.types.types'
 ---@field AccountBackup AccountBackupTable
 ---@field PasswordPolicy PasswordPolicyTable
 ---@field AccountPolicyDB AccountPolicyDBTable
----@field IpmiChannelConfigDB IpmiChannelConfigDBTable
+---@field IpmiChannelConfig IpmiChannelConfigTable
 local AccountDBDatabase = {}
 AccountDBDatabase.__index = AccountDBDatabase
 
@@ -449,23 +449,19 @@ function AccountDBDatabase.new(path, datas)
         Visible = Col.BooleandField():cid(4):persistence_key('protect_power_off'):null():default(false),
         Deletable = Col.BooleandField():cid(5):persistence_key('protect_power_off'):null():default(false)
     }):create_if_not_exist(datas and datas['t_account_policy'])
-    obj.IpmiChannelConfigDB = db:Table('t_ipmi_channel_config', {
-        AccountId = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),
-        ChannelNumber = Col.IntegerField():cid(2):primary_key():persistence_key('protect_power_off'):max_length(8),
-        Use20BytesPasswd = Col.IntegerField():cid(3):persistence_key('protect_power_off'):null():max_length(8)
-            :default(1),
-        IsCallin = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8):default(0),
-        IsEnableAuth = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8):default(1),
-        IsEnableIpmiMsg = Col.IntegerField():cid(6):persistence_key(
-            'protect_power_off'):null():max_length(8):default(1),
-        IsEnableByPasswd = Col.EnumField(def_types.IpmiUserEnableByPassword):cid(7):persistence_key(
-            'protect_power_off'):null():default(def_types.IpmiUserEnableByPassword.Disable),
-        Privilege0 = Col.EnumField(def_types.IpmiPrivilege):cid(8):persistence_key('protect_power_off'):null():default(
-            def_types.IpmiPrivilege.RESERVED),
-        Privilege1 = Col.EnumField(def_types.IpmiPrivilege):cid(9):persistence_key('protect_power_off'):null():default(
-            def_types.IpmiPrivilege.RESERVED),
-        SessionLimit = Col.IntegerField():cid(10):persistence_key('protect_power_off'):null():max_length(8):default(0)
-    }):create_if_not_exist(datas and datas['t_ipmi_channel_config'])
+    obj.IpmiChannelConfig = db:Table('t_ipmi_channel_config', {
+        PrivilegeLimit = Col.IntegerField():cid(1):persistence_key('protect_power_off'):null():max_length(8),
+        IpmiMessagingEnabled = Col.BooleandField():cid(2):persistence_key('protect_power_off'):null():default(true),
+        LinkAuthenticationEnabled = Col.BooleandField():cid(3):persistence_key(
+            'protect_power_off'):null():default(true),
+        CallbackRestriction = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8),
+        SessionLimit = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8),
+        ClassName = Col.TextField():cid(6):null(),
+        ObjectName = Col.TextField():cid(7):null(),
+        ObjectIdentifier = Col.JsonField():cid(8):null(),
+        AccountId = Col.IntegerField():cid(9):primary_key():persistence_key('protect_power_off'):max_length(8),
+        ChannelNumber = Col.IntegerField():cid(10):primary_key():persistence_key('protect_power_off'):max_length(8)
+    }, 'protect_power_off'):create_if_not_exist(datas and datas['t_ipmi_channel_config'])
 
     obj.tables = db.tables
     return setmetatable(obj, AccountDBDatabase)
