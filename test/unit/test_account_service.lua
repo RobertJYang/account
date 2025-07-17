@@ -33,6 +33,32 @@ local function make_interface()
     return interface
 end
 
+local function make_channel_config(ctx, account_collection)
+    local account_info = {
+        ['id'] = 4,
+        ['name'] = "test3",
+        ['password'] = "Paswd@9001",
+        ['role_id'] = enum.RoleType.Operator:value(),
+        ['interface'] = make_interface(),
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
+    }
+    account_collection:new_account(ctx, account_info, false,false)
+    account_collection:set_account_password(ctx, 2, 4, "Paswd@9000")
+    local req = {}
+    local ctx = {}
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    req.ChannelNumber = 1
+    req.MessagingEnable = 1
+    req.AuthenticationEnable = 1
+    req.UserRestricted = 1
+    req.ChangeEnable = 1
+    req.UserId = 4
+    req.UserPrivilege = 4
+    req.SessionLimit = string.pack(">H", 0)
+    return req, ctx
+end
+
 -- 重复获取的公私钥对应当相同(7天有效期内)
 function TestAccount:test_repeatedly_require_requested_key_should_be_the_same()
     local key_tab_1 = self.test_global_account_config:get_web_requested_key_pair()
@@ -899,34 +925,57 @@ function TestAccount:test_check_host_user_magagement_success()
     self.test_global_account_config:set_host_user_management_enabled(true)
 end
 
--- set user access 成功设置角色模型
-function TestAccount:test_ipmi_set_user_access_success()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false,false)
-    self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
-    local req = {}
-    local ctx = {}
-    ctx.operation_log = { operation = nil, result = nil, params = {} }
-    req.ChannelNumber = 1
-    req.MessagingEnable = 1
-    req.AuthenticationEnable = 1
-    req.UserRestricted = 1
+-- set user access 成功设置用户通道权限
+function TestAccount:test_ipmi_set_user_access_when_config_not_exist_should_success()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
+    self.test_account_collection:delete_account(ctx, 4)
+end
+
+-- set user access 成功更改用户通道配置(ChangeEnable为1)
+function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
+    -- 更改用户配置
     req.ChangeEnable = 1
-    req.UserId = 4
-    req.UserPrivilege = 4
-    req.SessionLimit = ""
-    lu.assertEquals(self.test_account_collection.collection[req.UserId]:get_role_id(), 3)
-    self.test_account_collection:set_ipmi_user_access(req, ctx)
-    lu.assertEquals(self.test_account_collection.collection[req.UserId]:get_role_id(), 4)
-    lu.assertEquals(self.test_account_collection.collection[req.UserId].m_ipmi_user_info_data.Privilege1:value(), 4)
+
+    req.MessagingEnable = 0
+    req.AuthenticationEnable = 0
+    req.UserRestricted = 0
+    req.UserPrivilege = 2
+    req.SessionLimit = string.pack(">H", 1)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
+    self.test_account_collection:delete_account(ctx, 4)
+end
+
+-- set user access 成功更改用户通道配置(ChangeEnable为0)
+function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success2()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
+    -- 更改用户配置
+    req.ChangeEnable = 0
+
+    req.MessagingEnable = 0
+    req.AuthenticationEnable = 0
+    req.UserRestricted = 0
+    req.UserPrivilege = 2
+    req.SessionLimit = string.pack(">H", 1)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
     self.test_account_collection:delete_account(ctx, 4)
 end
 
@@ -976,30 +1025,9 @@ function TestAccount:test_ipmi_get_empty_user_access_success()
 end
 
 -- 设置权限异常值失败测试
-function TestAccount:test_ipmi_set_user_access_failed()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
-    self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
-    local req = {}
-    local ctx = {}
-    ctx.operation_log = { operation = nil, result = nil, params = {} }
-    req.ChannelNumber = 1
-    req.MessagingEnable = 1
-    req.AuthenticationEnable = 1
-    req.UserRestricted = 1
-    req.ChangeEnable = 1
-    req.UserId = 4
-    req.UserPrivilege = 11   -- 权限异常
-    req.SessionLimit = ""
-    
+function TestAccount:test_ipmi_set_user_access_when_privilege_invalid_should_fail()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    req.UserPrivilege = 0
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
     end)
@@ -1007,33 +1035,83 @@ function TestAccount:test_ipmi_set_user_access_failed()
     self.test_account_collection:delete_account(ctx, 4)
 end
 
--- 设置权限异常值失败测试
-function TestAccount:test_ipmi_set_user_access_failed2()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
-    self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
+-- 设置通道异常值失败测试
+function TestAccount:test_ipmi_set_user_access_when_channel_invalid_should_fail()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    req.ChannelNumber = 12  -- 通道异常
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+    self.test_account_collection:delete_account(ctx, 4)
+end
+
+-- 设置用户不存在失败测试
+function TestAccount:test_ipmi_set_user_access_when_account_not_exist_should_fail()
     local req = {}
     local ctx = {}
     ctx.operation_log = { operation = nil, result = nil, params = {} }
-    req.ChannelNumber = 1
+    req.ChannelNumber = 12  -- 通道异常
+    req.MessagingEnable = 1
+    req.AuthenticationEnable = 1
+    req.UserRestricted = 1
+    req.ChangeEnable = 1
+    req.UserId = 12
+    req.UserPrivilege = 4
+    req.SessionLimit = string.pack(">H", 0)
+
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+end
+
+-- 设置无效用户ID失败测试
+function TestAccount:test_ipmi_set_user_access_when_accountid_invalid_should_fail()
+    local req = {}
+    local ctx = {}
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    req.ChannelNumber = 12  -- 通道异常
+    req.MessagingEnable = 1
+    req.AuthenticationEnable = 1
+    req.UserRestricted = 1
+    req.ChangeEnable = 1
+    req.UserId = 18
+    req.UserPrivilege = 4
+    req.SessionLimit = string.pack(">H", 0)
+
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+end
+
+-- 设置无效会话限制失败测试
+function TestAccount:test_ipmi_set_user_access_when_sessionlimit_invalid_should_fail()
+    local req = {}
+    local ctx = {}
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    req.ChannelNumber = 12  -- 通道异常
     req.MessagingEnable = 1
     req.AuthenticationEnable = 1
     req.UserRestricted = 1
     req.ChangeEnable = 1
     req.UserId = 4
     req.UserPrivilege = 4
-    req.SessionLimit = ""
-    -- 通道异常
-    ctx.chan_num = 8
-    
+    req.SessionLimit = string.pack(">H", 17)
+
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+end
+
+-- 设置通道为当前通道且不满足通道校验限制失败测试
+-- 设置通道异常值失败测试
+function TestAccount:test_ipmi_set_user_access_when_present_channel_invalid_should_fail()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    req.ChannelNumber = 14  -- 通道异常
+    ctx.chan_num = 16
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
     end)

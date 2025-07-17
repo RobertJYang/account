@@ -351,16 +351,16 @@ end
 function utils.check_ipmi_account_id(user_id)
     -- 匿名用户
     if user_id == nil or type(user_id) ~= "number" then
-        error(err.invalid_data_field())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
     if user_id == 1 then
-        error(err.un_supported())
+        error(custom_msg.IPMICommandCannotExecute())
     end
     if user_id == 0 then
-        error(err.invalid_data_field())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
     if user_id > MAX_USER_NUM then
-        error(err.value_out_of_range())
+        error(custom_msg.IPMIOutOfRange())
     end
     return true
 end

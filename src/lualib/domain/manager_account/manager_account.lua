@@ -21,6 +21,7 @@ local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local kmc_client = require 'infrastructure.kmc_client'
 local history_password = require 'infrastructure.history_password'
+local ipmi_channel_config = require 'infrastructure.ipmi_channel_config'
 local global_account_cfg = require 'domain.global_account_config'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
 local privilege = require 'domain.privilege'
@@ -52,6 +53,7 @@ function ManagerAccount:ctor(db, account, password_validator)
     self.m_account_config = account_svc_cfg
     self.m_login_rule_collection = rc
     self.m_history_password = history_password.new(db, account.Id)
+    self.m_ipmi_channel_config = ipmi_channel_config.new(db, account.Id)
     self.m_account_update_signal = signal.new()
     self.m_snmp_update_signal = signal.new()
     self.current_privileges = nil
@@ -311,25 +313,22 @@ function ManagerAccount:set_ipmi_user_use_20bytes_passwd(passwordlen)
 end
 
 function ManagerAccount:set_ipmi_user_access(req, ctx)
-    local account_id = req.UserId
-    local user_restricted = req.UserRestricted
     local change_enable = req.ChangeEnable
-    local authentication_enable = req.AuthenticationEnable
-    local messaging_enable = req.MessagingEnable
-    local user_privilege = req.UserPrivilege
-    self.m_ipmi_user_info_data.AccountId = account_id
-    if change_enable == 1 then
-        self.m_ipmi_user_info_data.IsCallin = user_restricted
-        self.m_ipmi_user_info_data.IsEnableAuth = authentication_enable
-        self.m_ipmi_user_info_data.IsEnableIpmiMsg = messaging_enable
-        if messaging_enable == 1 then
-            self.m_ipmi_user_info_data.IsEnableByPasswd = enum.IpmiUserEnableByPassword.UserEnable
-        else
-            self.m_ipmi_user_info_data.IsEnableByPasswd = enum.IpmiUserEnableByPassword.PasswordEnable
-        end
+    local channel_number = req.ChannelNumber
+    local ipmi_channel_config_info = {}
+    ipmi_channel_config_info.AccountId = req.UserId
+    ipmi_channel_config_info.PrivilegeLimit = req.UserPrivilege
+    ipmi_channel_config_info.SessionLimit = req.SessionLimit
+
+    ipmi_channel_config_info.ChannelNumber = channel_number
+    if channel_number == enum.IpmiChannel.PRSENT_CHAN_NUM:value() then
+        ipmi_channel_config_info.ChannelNumber = ctx.chan_num
     end
-    self:set_ipmi_user_privilege(user_privilege)
-    self.m_ipmi_user_info_data:save()
+
+    ipmi_channel_config_info.CallbackRestriction = req.UserRestricted
+    ipmi_channel_config_info.LinkAuthenticationEnabled = (req.AuthenticationEnable == 1)
+    ipmi_channel_config_info.IpmiMessagingEnabled = (req.MessagingEnable == 1)
+    self.m_ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
 end
 
 function ManagerAccount:get_ipmi_user_access(req, ctx)

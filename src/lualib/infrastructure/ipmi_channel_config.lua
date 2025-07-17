@@ -1,0 +1,76 @@
+-- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- openUBMC is licensed under Mulan PSL v2.
+-- You can use this software according to the terms and conditions of the Mulan PSL v2.
+-- You may obtain a copy of Mulan PSL v2 at: http://license.coscl.org.cn/MulanPSL2
+-- THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+-- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+-- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+-- See the Mulan PSL v2 for more details.
+local class = require 'mc.class'
+
+local ipmi_channel_config = class()
+
+function ipmi_channel_config:ctor(db, account_id)
+    self.db = db
+    self.m_account_id = account_id
+end
+
+--- 获取指定用户指定通道的ipmi通道配置表
+function ipmi_channel_config:get(channel_number)
+    local ipmi_channel_config_list = self.db:select(self.db.IpmiChannelConfig)
+        :where(self.db.IpmiChannelConfig.AccountId:eq(self.m_account_id),
+            self.db.IpmiChannelConfig.ChannelNumber:eq(channel_number)):all()
+    return ipmi_channel_config_list or {}
+end
+
+--- 插入指定用户指定通道配置信息
+function ipmi_channel_config:insert(ipmi_channel_config_info, change_enable)
+    local ipmi_channel_config_db = self.db:select(self.db.IpmiChannelConfig)
+    -- 默认配置
+    local callback_restriction = 0
+    local authentication_enable = true
+    local messaging_enable = true
+    if change_enable == 1 then
+        callback_restriction = ipmi_channel_config_info.CallbackRestriction
+        authentication_enable = ipmi_channel_config_info.LinkAuthenticationEnabled
+        messaging_enable = ipmi_channel_config_info.IpmiMessagingEnabled
+    end
+    ipmi_channel_config_db.table({
+        AccountId = self.m_account_id,
+        ChannelNumber = ipmi_channel_config_info.ChannelNumber,
+        PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit,
+        SessionLimit = ipmi_channel_config_info.SessionLimit,
+        -- change_enable为0时,以下配置应保持默认
+        CallbackRestriction = callback_restriction,
+        LinkAuthenticationEnabled = authentication_enable,
+        IpmiMessagingEnabled = messaging_enable 
+    })
+end
+
+--- 更新指定用户指定通道配置
+function ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
+    local ipmi_channel_config_list = self:get(ipmi_channel_config_info.ChannelNumber)
+    if ipmi_channel_config_list ~= {} and #ipmi_channel_config_list ~= 0 then
+        for _, row in ipairs(ipmi_channel_config_list) do
+            row.PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit
+            row.SessionLimit = ipmi_channel_config_info.SessionLimit
+            -- changeable = 0 时以下字段保持原有配置
+            if change_enable == 1 then
+                row.CallbackRestriction = ipmi_channel_config_info.CallbackRestriction
+                row.LinkAuthenticationEnabled = ipmi_channel_config_info.LinkAuthenticationEnabled
+                row.IpmiMessagingEnabled = ipmi_channel_config_info.IpmiMessagingEnabled
+            end
+            row:save()
+        end
+        return
+    end
+    -- 通道配置不存在则新增
+    self:insert(ipmi_channel_config_info, change_enable)
+end
+
+--- 删除指定用户通道配置
+function ipmi_channel_config:delete()
+    self.db:delete(self.db.IpmiChannelConfig):where(self.db.IpmiChannelConfig.AccountId:eq(self.m_account_id)):all()
+end
+
+return ipmi_channel_config

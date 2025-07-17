@@ -51,6 +51,8 @@ local PATH_CERT_SERVICE = '/bmc/kepler/CertificateService'
 local PATH_ACCOUT_CERT = '/bmc/kepler/AccountService/MultiFactorAuth/ClientCertificate/Certificates/%d'
 local DEFAULT_MIN_USER_NUM = 2
 local DEFAULT_MAX_USER_NUM = 17
+local RESERVED_CHANNEL_1 = 12
+local RESERVED_CHANNEL_2 = 13
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
@@ -498,6 +500,8 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
 
         -- 清除历史密码
         account.m_history_password:delete()
+        -- 清除通道配置
+        account.m_ipmi_channel_config:delete()
         -- 将用户从db与mbd移除
         account.m_account_data:delete()
         account.m_snmp_user_info_data:delete()
@@ -910,44 +914,43 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     local privilege = req.UserPrivilege
     local channel_number = req.ChannelNumber
     local ctx_channel = ctx.chan_num
+    local length = #req.SessionLimit
+    local session_limit = string.unpack(">H", req.SessionLimit)
     local account_id = req.UserId
     if privilege == 0 or
-        ((privilege >= enum.IpmiPrivilege.OEM:value()) and
+        ((privilege > enum.IpmiPrivilege.OEM:value()) and
             (privilege ~= enum.IpmiPrivilege.NO_ACCESS:value())) then
         log:error("privilege is error")
         ctx.operation_log.params.privilege = "illegal level"
         ctx.operation_log.result = 'no_user'
-        error(err.value_out_of_range())
+        error(custom_msg.IPMIOutOfRange())
     end
     ctx.operation_log.params.privilege = role_privilege_map.privilege_to_string_map[privilege]
 
     utils.check_ipmi_account_id(account_id)
     if not self.collection[account_id] then
         ctx.operation_log.result = 'no_user'
-        error(err.invalid_account_id())
+        error(custom_msg.IPMIOutOfRange())
     end
     ctx.operation_log.params.name = self:get_user_name(account_id)
     ctx.operation_log.params.id = account_id
 
-    if privilege == enum.IpmiPrivilege.CALLBACK:value() then
-        log:error("privilege is error")
-        error(err.un_supported())
+    -- Ch-Dh reserved channel
+    if channel_number == RESERVED_CHANNEL_1 or channel_number == RESERVED_CHANNEL_2 then
+        log:error("channel number is reserved")
+        error(custom_msg.IPMICommandCannotExecute())
     end
-
-    if channel_number == enum.IpmiChannel.IPMB_CHAN_NUM:value() or
-        ctx_channel == enum.IpmiChannel.IPMB_ETH_CHAN_NUM:value() then
-        log:error("channel of ipmi is not allowed")
-        error(err.un_supported())
+    -- PRESENT_CHANNEL需校验上下文的通道号
+    if channel_number == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
+        (ctx_channel == RESERVED_CHANNEL_1 or
+            ctx_channel == RESERVED_CHANNEL_2 or
+            ctx_channel > enum.IpmiChannel.SYS_CHAN_NUM:value())  then
+        log:error("channel number is invalid")
+        error(custom_msg.IPMICommandCannotExecute())
     end
-
-    if #req.SessionLimit ~= 0 and #req.SessionLimit ~= 1 then
-        log:error("SessionLimit is length %s error", #req.SessionLimit)
-        error(custom_msg.IPMIRequestLengthInvalid())
-    end
-
-    if not req.SessionLimit and req.SessionLimit ~= "" then
-        log:error("SessionLimit is not needed. if not null, should be 0x00")
-        error(err.invalid_data_field())
+    if length ~= 0 and session_limit > 15 then
+        log:error("sessionlimit is out of range")
+        error(custom_msg.IPMIOutOfRange())
     end
 end
 
@@ -971,38 +974,13 @@ function AccountCollection:ipmi_set_user_access_restricted_scene_check(req, ctx)
     ctx.operation_log.params.privilege = role_privilege_map.privilege_to_string_map[privilege]
     -- 判断是否禁用带内用户管理
     self:check_ipmi_host_user_mgnt_enabled(ctx)
-    -- 判断要降权限的用户是否为仅有的使能的管理员或逃生用户
-    if privilege ~= enum.IpmiPrivilege.ADMIN:value() and self:check_is_last_enabled_admin(account_id) then
-        log:error('Set user access failed, account (user%d) is last enabled admin.', account_id)
-        error(err.un_supported())
-    end
-    if self:check_is_emergency_user(account_id) then
-        log:error('Set user access failed, account (user%d) is emergency login user.', account_id)
-        error(custom_msg.EmergencyLoginUser('Privilege'))
-    end
 end
 
 function AccountCollection:set_ipmi_user_access(req, ctx)
     self:ipmi_set_user_access_input_check(req, ctx)
     self:ipmi_set_user_access_restricted_scene_check(req, ctx)
     local account_id = req.UserId
-    local change_enable = req.ChangeEnable
-    local messaging_enable = req.MessagingEnable
-    local user_name = self:get_user_name(account_id)
-    if change_enable == 1 then
-        local msg_enable = false;
-        if messaging_enable == 1 then
-            msg_enable = true
-        end
-        self:set_enabled(account_id, msg_enable)
-        self.m_account_changed:emit(account_id, "Enabled", msg_enable)
-        self.m_account_permanent_changed:emit(account_id, "Enabled")
-    end
     self.collection[account_id]:set_ipmi_user_access(req, ctx)
-    local privilege = self.collection[account_id]:get_ipmi_user_privilege()
-    local role_id = role_privilege_map.privilege_to_role_map[privilege]
-    self:set_role_id(ctx, account_id, role_id, privilege)
-    self.m_account_security_changed:emit(account_id, user_name)
 end
 
 function AccountCollection:get_enabled_user()
