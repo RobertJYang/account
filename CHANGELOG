@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.3] - 2025-07-17
+支持Set User Access命令按照标准实现
+
 ## [1.90.2] - 2025-07-15
 支持ipmi通道权限配置更改自动生成代码上库
 
