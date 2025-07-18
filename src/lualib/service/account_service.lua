@@ -264,30 +264,25 @@ end
 
 function AccountService:get_ipmi_user_access(req, ctx)
     local user_id = req.UserId
-    local chan_num = req.ChannelNumber
-    -- 1是IPMI的保留用户
+    local chan_num = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
+        ctx.chan_num or req.ChannelNumber)
+    -- 用户ID有效性校验, 1是IPMI的保留用户
     if user_id < 1 or user_id > self.m_account_config:get_max_user_num() then
         log:error("User id is out of range")
-        error(err.invalid_data_field())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
-    -- 通道校验，只允许指定IPMB_CHAN_NUM通道获取信息
-    if chan_num == enum.IpmiChannel.PRSENT_CHAN_NUM:value()  then
-        if  not ctx.session then
-            chan_num = enum.IpmiChannel.IPMB_CHAN_NUM:value()
-        else
-            chan_num = ctx.chan_num
-        end
-    end
-    if chan_num == enum.IpmiChannel.IPMB_CHAN_NUM:value() then
-        log:error("Behavior without auth is not allowed")
-        error(err.un_supported())
-    elseif chan_num > enum.IpmiChannel.LAN1_CHAN_NUM:value() then
-        log:error("Channel ipmi use is not allowed")
-        error(err.invalid_data_field())
+    -- 通道校验
+    if chan_num ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() and
+        chan_num ~= enum.IpmiChannel.IPMB_SM_CHAN_NUM:value() and
+        chan_num ~= enum.IpmiChannel.IPMB_ETH_CHAN_NUM:value() and
+        chan_num ~= enum.IpmiChannel.EDMA_CHAN_NUM:value() and
+        chan_num ~= enum.IpmiChannel.SYS_CHAN_NUM:value() then
+        log:error("channel number is invalid")
+        error(custom_msg.IPMICommandCannotExecute())
     end
 
     self.m_account_collection:check_ipmi_host_user_mgnt_enabled(ctx)
-    local rsp = self.m_account_collection:get_ipmi_user_access(req, ctx)
+    local rsp = self.m_account_collection:get_ipmi_user_access(user_id, chan_num)
     return err_cfg.USER_OPER_SUCCESS, rsp
 end
 
