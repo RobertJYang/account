@@ -51,8 +51,6 @@ local PATH_CERT_SERVICE = '/bmc/kepler/CertificateService'
 local PATH_ACCOUT_CERT = '/bmc/kepler/AccountService/MultiFactorAuth/ClientCertificate/Certificates/%d'
 local DEFAULT_MIN_USER_NUM = 2
 local DEFAULT_MAX_USER_NUM = 17
-local RESERVED_CHANNEL_1 = 12
-local RESERVED_CHANNEL_2 = 13
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
@@ -912,8 +910,8 @@ end
 
 function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     local privilege = req.UserPrivilege
-    local channel_number = req.ChannelNumber
-    local ctx_channel = ctx.chan_num
+    local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
+        ctx.chan_num or req.ChannelNumber)
     local length = #req.SessionLimit
     local session_limit = string.unpack(">H", req.SessionLimit)
     local account_id = req.UserId
@@ -935,16 +933,12 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     ctx.operation_log.params.name = self:get_user_name(account_id)
     ctx.operation_log.params.id = account_id
 
-    -- Ch-Dh reserved channel
-    if channel_number == RESERVED_CHANNEL_1 or channel_number == RESERVED_CHANNEL_2 then
-        log:error("channel number is reserved")
-        error(custom_msg.IPMICommandCannotExecute())
-    end
-    -- PRESENT_CHANNEL需校验上下文的通道号
-    if channel_number == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
-        (ctx_channel == RESERVED_CHANNEL_1 or
-            ctx_channel == RESERVED_CHANNEL_2 or
-            ctx_channel > enum.IpmiChannel.SYS_CHAN_NUM:value())  then
+    -- 通道校验
+    if channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() and
+        channel_number ~= enum.IpmiChannel.IPMB_SM_CHAN_NUM:value() and
+        channel_number ~= enum.IpmiChannel.IPMB_ETH_CHAN_NUM:value() and
+        channel_number ~= enum.IpmiChannel.EDMA_CHAN_NUM:value() and
+        channel_number ~= enum.IpmiChannel.SYS_CHAN_NUM:value() then
         log:error("channel number is invalid")
         error(custom_msg.IPMICommandCannotExecute())
     end
@@ -993,15 +987,13 @@ function AccountCollection:get_enabled_user()
     return enabled
 end
 
-function AccountCollection:get_ipmi_user_access(req, ctx)
-    local account_id = req.UserId
+function AccountCollection:get_ipmi_user_access(user_id, chan_num)
     local rsp = nil
-    if self.collection[account_id] == nil then
+    if self.collection[user_id] == nil then
         rsp = self:get_ipmi_empty_user_access()
     else
-        rsp = self.collection[account_id]:get_ipmi_user_access(req, ctx)
+        rsp = self.collection[user_id]:get_ipmi_user_access(chan_num)
     end
-    rsp.EnabledUser = self:get_enabled_user()
     return rsp
 end
 
@@ -1317,7 +1309,8 @@ function AccountCollection:get_ipmi_empty_user_access()
     local rsp = ipmi_cmds.GetUserAccess.rsp.new()
     rsp.MaxUserNumber = self.m_global_account_config:get_max_user_num()
     rsp.Reserved = 0
-    rsp.EnableStatus = 2
+    rsp.EnableStatus = 0
+    rsp.EnabledUser = 1
     rsp.UserNumber = 1
     rsp.Reserved2 = 0
     rsp.ChaAccessMode = 0

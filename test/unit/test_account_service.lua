@@ -979,49 +979,95 @@ function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success2
     self.test_account_collection:delete_account(ctx, 4)
 end
 
--- 获取正常用户权限测试
+-- 获取正常用户通道配置测试
 function TestAccount:test_ipmi_get_user_access_success()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
-    self.test_account_collection:set_account_password(self.ctx, 2, 4, "Paswd@9000")
+    local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    self.test_account_collection:set_ipmi_user_access(set_req, ctx)
     local req = {}
     local ctx = {}
     ctx.operation_log = { operation = nil, result = nil, params = {} }
     req.UserId = 4
-    local ret = self.test_account_collection:get_ipmi_user_access(req, ctx)
+    req.ChannelNumber = 1
+
+    local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
+    lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
     lu.assertEquals(ret.MaxUserNumber, 17)
-    lu.assertEquals(ret.EnableStatus, 1)
+    lu.assertEquals(ret.EnableStatus, 0)
     lu.assertEquals(ret.UserNumber, 1)
     lu.assertEquals(ret.IpmiMessaging, 1)
+    lu.assertEquals(ret.ChaAccessMode, 1)
     lu.assertEquals(ret.LinkAuthentication, 1)
-    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.OPERATOR:value())
+    lu.assertEquals(ret.PrivilegeLimit, 4)
     self.test_account_collection:delete_account(ctx, 4)
 end
 
--- 获取权限空用户测试
+-- 获取空用户通道配置测试
 function TestAccount:test_ipmi_get_empty_user_access_success()
     local req = {}
     local ctx = {}
     req.UserId = 4
+    req.ChannelNumber = 1
     ctx.operation_log = { operation = nil, result = nil, params = {} }
     pcall(function()
         self.test_account_collection:delete_account(ctx, 4)
     end)
-    local ret = self.test_account_collection:get_ipmi_user_access(req, ctx)
+    local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
+    lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
     lu.assertEquals(ret.MaxUserNumber, 17)
-    lu.assertEquals(ret.EnableStatus, 2)
+    lu.assertEquals(ret.EnableStatus, 0)
+    lu.assertEquals(ret.EnabledUser, 1)
     lu.assertEquals(ret.UserNumber, 1)
     lu.assertEquals(ret.IpmiMessaging, 1)
     lu.assertEquals(ret.LinkAuthentication, 1)
+    lu.assertEquals(ret.ChaAccessMode, 0)
     lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.NO_ACCESS:value())
+end
+
+-- 用户存在未配置通道权限，获取通道配置成功测试
+function TestAccount:test_ipmi_get_channel_not_config_should_success()
+    local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    self.test_account_collection:set_ipmi_user_access(set_req, ctx)
+    local req = {}
+    local ctx = {}
+    req.UserId = 4
+    req.ChannelNumber = 8
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
+    lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
+    lu.assertEquals(ret.MaxUserNumber, 17)
+    lu.assertEquals(ret.EnableStatus, 0)
+    lu.assertEquals(ret.EnabledUser, 1)
+    lu.assertEquals(ret.UserNumber, 1)
+    lu.assertEquals(ret.IpmiMessaging, 1)
+    lu.assertEquals(ret.LinkAuthentication, 1)
+    lu.assertEquals(ret.ChaAccessMode, 0)
+    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.NO_ACCESS:value())
+end
+
+-- 用户ID非法，获取通道配置失败测试
+function TestAccount:test_ipmi_get_invalid_user_id_config_should_fail()
+    local req = {}
+    local ctx = {}
+    req.UserId = 18
+    req.ChannelNumber = 1
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    local ret = pcall(function()
+        self.test_account_service:get_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+end
+
+-- 通道号非法，获取通道配置失败测试
+function TestAccount:test_ipmi_get_invalid_channel_config_should_fail()
+    local req = {}
+    local ctx = {}
+    req.UserId = 4
+    req.ChannelNumber = 12
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    local ret = pcall(function()
+        self.test_account_service:get_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
 end
 
 -- 设置权限异常值失败测试

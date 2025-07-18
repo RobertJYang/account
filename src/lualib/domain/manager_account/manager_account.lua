@@ -314,16 +314,13 @@ end
 
 function ManagerAccount:set_ipmi_user_access(req, ctx)
     local change_enable = req.ChangeEnable
-    local channel_number = req.ChannelNumber
     local ipmi_channel_config_info = {}
     ipmi_channel_config_info.AccountId = req.UserId
     ipmi_channel_config_info.PrivilegeLimit = req.UserPrivilege
     ipmi_channel_config_info.SessionLimit = req.SessionLimit
 
-    ipmi_channel_config_info.ChannelNumber = channel_number
-    if channel_number == enum.IpmiChannel.PRSENT_CHAN_NUM:value() then
-        ipmi_channel_config_info.ChannelNumber = ctx.chan_num
-    end
+    ipmi_channel_config_info.ChannelNumber = req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
+        ctx.chan_num or req.ChannelNumber
 
     ipmi_channel_config_info.CallbackRestriction = req.UserRestricted
     ipmi_channel_config_info.LinkAuthenticationEnabled = (req.AuthenticationEnable == 1)
@@ -331,19 +328,35 @@ function ManagerAccount:set_ipmi_user_access(req, ctx)
     self.m_ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
 end
 
-function ManagerAccount:get_ipmi_user_access(req, ctx)
-    -- 获取权限信息
+function ManagerAccount:get_ipmi_user_access(chan_num)
     local rsp = ipmi_cmds.GetUserAccess.rsp.new()
     rsp.MaxUserNumber = self.m_account_config:get_max_user_num()
     rsp.Reserved = 0
-    rsp.EnableStatus = (self.m_account_data.Enabled == true) and 1 or 2
+
+    -- 该通道上使能的用户数量EnabledUser
+    rsp.EnabledUser = self.m_ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
+    rsp.EnableStatus = 0
+    if self.m_ipmi_user_info_data.IsEnableByPasswd == enum.IpmiUserEnableByPassword.PasswordEnable then
+        rsp.EnableStatus = 1
+    end
+
     rsp.UserNumber = 1
     rsp.Reserved2 = 0
-    rsp.ChaAccessMode = self.m_ipmi_user_info_data.IsCallin
-    rsp.LinkAuthentication = self.m_ipmi_user_info_data.IsEnableAuth
-    rsp.IpmiMessaging = self.m_ipmi_user_info_data.IsEnableIpmiMsg
+
     rsp.Reserved3 = 0
-    rsp.PrivilegeLimit = self:get_ipmi_user_privilege()
+    -- 未配置的通道返回默认配置
+    rsp.ChaAccessMode = 0
+    rsp.LinkAuthentication = 1
+    rsp.IpmiMessaging = 1
+    rsp.PrivilegeLimit = enum.IpmiPrivilege.NO_ACCESS:value()
+    -- 数据库读取配置信息
+    local ipmi_channel_config_info = self.m_ipmi_channel_config:get(chan_num)
+    if ipmi_channel_config_info ~= {} and #ipmi_channel_config_info ~= 0 then
+        rsp.ChaAccessMode = ipmi_channel_config_info[1].CallbackRestriction
+        rsp.LinkAuthentication = ipmi_channel_config_info[1].LinkAuthenticationEnabled == true and 1 or 0
+        rsp.IpmiMessaging = ipmi_channel_config_info[1].IpmiMessagingEnabled == true and 1 or 0
+        rsp.PrivilegeLimit = ipmi_channel_config_info[1].PrivilegeLimit
+    end
     return rsp
 end
 
