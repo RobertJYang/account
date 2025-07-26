@@ -31,6 +31,7 @@ local global_account_config = require 'domain.global_account_config'
 local password_validator_collection = require 'domain.password_validator_collection'
 local account_policy_collection = require 'domain.account_policy_collection'
 local manager_account = require 'domain.manager_account.manager_account'
+local ipmi_channel_config = require 'domain.ipmi_channel_config'
 local account_collection = require 'domain.account_collection'
 local account_permanent_backup = require 'domain.account_permanent_backup'
 local file_synchronization = require 'domain.file_synchronization'
@@ -131,9 +132,10 @@ function TestAccount:setupClass()
     self.test_account_policy_collection = account_policy_collection.new(self.db, self.test_global_account_config)
     self.test_login_rule_collection = login_rule_collection.new(nil, self.db)
     self.test_role_collection = role_collection.new(self.db)
+    self.test_ipmi_channel_config = ipmi_channel_config.new(self.db)
     self.test_account_collection = account_collection.new(nil, self.db, self.test_global_account_config,
         self.test_role_collection, nil, self.test_password_validator_collection,
-        self.test_account_policy_collection, {})
+        self.test_account_policy_collection, self.test_ipmi_channel_config, {})
     self.test_account_permanent_backup = account_permanent_backup.new(self.db, self.test_account_collection)
     self.test_file_synchronization = file_synchronization.new(self.db, self.test_account_collection, {})
     self.test_file_synchronization:regist_file_sync_signals()

@@ -1010,6 +1010,14 @@
                     "PoweroffPer"
                 ],
                 "description": ""
+            },
+            "IsSynced": {
+                "baseType": "Boolean",
+                "default": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "description": ""
             }
         }
     },

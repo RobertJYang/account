@@ -7,18 +7,28 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local class = require 'mc.class'
+local signal = require 'mc.signal'
 
 local ipmi_channel_config = class()
 
-function ipmi_channel_config:ctor(db, account_id)
+function ipmi_channel_config:ctor(db)
     self.db = db
-    self.m_account_id = account_id
+end
+
+function ipmi_channel_config:signals_init()
+    self.m_channel_config_added = signal.new()
+    self.m_channel_config_changed = signal.new()
+    self.m_channel_config_removed = signal.new()
+end
+
+function ipmi_channel_config:init()
+    self:signals_init()
 end
 
 --- 获取指定用户指定通道的ipmi通道配置表
-function ipmi_channel_config:get(channel_number)
+function ipmi_channel_config:get(account_id, channel_number)
     local ipmi_channel_config_list = self.db:select(self.db.IpmiChannelConfig)
-        :where(self.db.IpmiChannelConfig.AccountId:eq(self.m_account_id),
+        :where(self.db.IpmiChannelConfig.AccountId:eq(account_id),
             self.db.IpmiChannelConfig.ChannelNumber:eq(channel_number)):all()
     return ipmi_channel_config_list or {}
 end
@@ -27,30 +37,30 @@ end
 function ipmi_channel_config:insert(ipmi_channel_config_info, change_enable)
     local ipmi_channel_config_db = self.db:select(self.db.IpmiChannelConfig)
     -- 默认配置
-    local callback_restriction = 0
-    local authentication_enable = true
-    local messaging_enable = true
-    if change_enable == 1 then
-        callback_restriction = ipmi_channel_config_info.CallbackRestriction
-        authentication_enable = ipmi_channel_config_info.LinkAuthenticationEnabled
-        messaging_enable = ipmi_channel_config_info.IpmiMessagingEnabled
+    if change_enable ~= 1 then
+        ipmi_channel_config_info.CallbackRestriction = 0
+        ipmi_channel_config_info.LinkAuthenticationEnabled = true
+        ipmi_channel_config_info.IpmiMessagingEnabled = true
     end
     local row_data = ipmi_channel_config_db.table({
-        AccountId = self.m_account_id,
+        AccountId = ipmi_channel_config_info.AccountId,
         ChannelNumber = ipmi_channel_config_info.ChannelNumber,
         PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit,
         SessionLimit = ipmi_channel_config_info.SessionLimit,
         -- change_enable为0时,以下配置应保持默认
-        CallbackRestriction = callback_restriction,
-        LinkAuthenticationEnabled = authentication_enable,
-        IpmiMessagingEnabled = messaging_enable 
+        CallbackRestriction = ipmi_channel_config_info.CallbackRestriction,
+        LinkAuthenticationEnabled = ipmi_channel_config_info.LinkAuthenticationEnabled,
+        IpmiMessagingEnabled = ipmi_channel_config_info.IpmiMessagingEnabled
     })
     row_data:save()
+    self.m_channel_config_added:emit(ipmi_channel_config_info)
 end
 
 --- 更新指定用户指定通道配置
 function ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
-    local ipmi_channel_config_list = self:get(ipmi_channel_config_info.ChannelNumber)
+    local account_id = ipmi_channel_config_info.AccountId
+    local channel_number = ipmi_channel_config_info.ChannelNumber
+    local ipmi_channel_config_list = self:get(account_id, channel_number)
     if ipmi_channel_config_list ~= {} and #ipmi_channel_config_list ~= 0 then
         for _, row in ipairs(ipmi_channel_config_list) do
             row.PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit
@@ -62,6 +72,16 @@ function ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
                 row.IpmiMessagingEnabled = ipmi_channel_config_info.IpmiMessagingEnabled
             end
             row:save()
+            self.m_channel_config_changed:emit(account_id, channel_number,
+                "PrivilegeLimit", row.PrivilegeLimit)
+            self.m_channel_config_changed:emit(account_id, channel_number,
+                "SessionLimit", row.SessionLimit)
+            self.m_channel_config_changed:emit(account_id, channel_number,
+                "CallbackRestriction", row.CallbackRestriction)
+            self.m_channel_config_changed:emit(account_id, channel_number,
+                "LinkAuthenticationEnabled", row.LinkAuthenticationEnabled)
+            self.m_channel_config_changed:emit(account_id, channel_number,
+                "IpmiMessagingEnabled", row.IpmiMessagingEnabled)
         end
         return
     end
@@ -70,8 +90,9 @@ function ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
 end
 
 --- 删除指定用户通道配置
-function ipmi_channel_config:delete()
-    self.db:delete(self.db.IpmiChannelConfig):where(self.db.IpmiChannelConfig.AccountId:eq(self.m_account_id)):all()
+function ipmi_channel_config:delete(account_id)
+    self.db:delete(self.db.IpmiChannelConfig):where(self.db.IpmiChannelConfig.AccountId:eq(account_id)):all()
+    self.m_channel_config_removed:emit(account_id)
 end
 
 --- 获取指定通道使能用户数量
@@ -81,7 +102,7 @@ function ipmi_channel_config:get_enabled_user_number_on_channel(channel_number)
     local enable_num = 0
     if ipmi_channel_config_list and #ipmi_channel_config_list ~= 0 then
         for _, row in ipairs(ipmi_channel_config_list) do
-            if row.IpmiMessagingEnabled == 1 then
+            if row.IpmiMessagingEnabled == true then
                 enable_num = enable_num + 1
             end
         end

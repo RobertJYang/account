@@ -118,6 +118,7 @@ local def_types = require 'class.types.types'
 ---@field IsEnableByPasswd FieldBase
 ---@field Privilege0 FieldBase
 ---@field Privilege1 FieldBase
+---@field IsSynced FieldBase
 
 ---@class HistoryPasswordTable: Table
 ---@field AccountId FieldBase
@@ -379,7 +380,8 @@ function AccountDBDatabase.new(path, datas)
         Privilege0 = Col.EnumField(def_types.IpmiPrivilege):cid(7):persistence_key('protect_power_off'):null():default(
             def_types.IpmiPrivilege.RESERVED),
         Privilege1 = Col.EnumField(def_types.IpmiPrivilege):cid(8):persistence_key('protect_power_off'):null():default(
-            def_types.IpmiPrivilege.RESERVED)
+            def_types.IpmiPrivilege.RESERVED),
+        IsSynced = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null():default(false)
     }):create_if_not_exist(datas and datas['t_ipmi_user_info'])
     obj.HistoryPassword = db:Table('t_history_password', {
         AccountId = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),
