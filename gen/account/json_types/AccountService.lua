@@ -13,6 +13,58 @@ local mdb = require 'mc.mdb'
 
 local AccountService = {}
 
+---@class AccountService.SNMPv3TrapAccountChangePolicy
+---@field SNMPv3TrapAccountChangePolicy integer
+local TSNMPv3TrapAccountChangePolicy = {}
+TSNMPv3TrapAccountChangePolicy.__index = TSNMPv3TrapAccountChangePolicy
+TSNMPv3TrapAccountChangePolicy.group = {}
+
+local function TSNMPv3TrapAccountChangePolicy_from_obj(obj)
+    return setmetatable(obj, TSNMPv3TrapAccountChangePolicy)
+end
+
+function TSNMPv3TrapAccountChangePolicy.new(SNMPv3TrapAccountChangePolicy)
+    return TSNMPv3TrapAccountChangePolicy_from_obj({SNMPv3TrapAccountChangePolicy = SNMPv3TrapAccountChangePolicy or 0})
+end
+---@param obj AccountService.SNMPv3TrapAccountChangePolicy
+function TSNMPv3TrapAccountChangePolicy:init_from_obj(obj)
+    self.SNMPv3TrapAccountChangePolicy = obj.SNMPv3TrapAccountChangePolicy or 0
+end
+
+function TSNMPv3TrapAccountChangePolicy:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TSNMPv3TrapAccountChangePolicy.group)
+end
+
+TSNMPv3TrapAccountChangePolicy.from_obj = TSNMPv3TrapAccountChangePolicy_from_obj
+
+TSNMPv3TrapAccountChangePolicy.proto_property = {'SNMPv3TrapAccountChangePolicy'}
+
+TSNMPv3TrapAccountChangePolicy.default = {0}
+
+TSNMPv3TrapAccountChangePolicy.struct = {{name = 'SNMPv3TrapAccountChangePolicy', is_array = false, struct = nil}}
+
+function TSNMPv3TrapAccountChangePolicy:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'SNMPv3TrapAccountChangePolicy', self.SNMPv3TrapAccountChangePolicy, 'uint8', false,
+        errs, need_convert)
+
+    if self.SNMPv3TrapAccountChangePolicy ~= nil then
+        validate.ranges(prefix .. 'SNMPv3TrapAccountChangePolicy', self.SNMPv3TrapAccountChangePolicy, 0, 1, errs,
+            need_convert)
+    end
+
+    TSNMPv3TrapAccountChangePolicy:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TSNMPv3TrapAccountChangePolicy.proto_property, errs, need_convert)
+    return self
+end
+
+function TSNMPv3TrapAccountChangePolicy:unpack(_)
+    return self.SNMPv3TrapAccountChangePolicy
+end
+
+AccountService.SNMPv3TrapAccountChangePolicy = TSNMPv3TrapAccountChangePolicy
+
 ---@class AccountService.UserNamePasswordPrefixCompareLength
 ---@field UserNamePasswordPrefixCompareLength integer
 local TUserNamePasswordPrefixCompareLength = {}
@@ -400,7 +452,7 @@ TInactiveDaysThreshold.struct = {{name = 'InactiveDaysThreshold', is_array = fal
 function TInactiveDaysThreshold:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'InactiveDaysThreshold', self.InactiveDaysThreshold, 'uint32', false, errs,
+    validate.Optional(prefix .. 'InactiveDaysThreshold', self.InactiveDaysThreshold, 'uint32', false, errs, 
         need_convert)
 
     if self.InactiveDaysThreshold ~= nil then
@@ -1505,7 +1557,8 @@ AccountService.interface = mdb.register_interface('bmc.kepler.AccountService', {
     OSAdministratorPrivilegeEnabled = {'b', {}, false, true, false},
     SNMPv3TrapAccountLimitPolicy = {'y', {'EMIT_CHANGE'}, false, 2, false},
     UserNamePasswordPrefixCompareEnabled = {'b', {'EMIT_CHANGE'}, false, false, false},
-    UserNamePasswordPrefixCompareLength = {'y', {'EMIT_CHANGE'}, false, 4, false}
+    UserNamePasswordPrefixCompareLength = {'y', {'EMIT_CHANGE'}, false, 4, false},
+    SNMPv3TrapAccountChangePolicy = {'y', {'EMIT_CHANGE'}, false, 0, false}
 }, {
     ImportWeakPasswordDictionary = {'a{ss}s', 'u', TImportWeakPasswordDictionaryReq, TImportWeakPasswordDictionaryRsp},
     ExportWeakPasswordDictionary = {'a{ss}s', 'u', TExportWeakPasswordDictionaryReq, TExportWeakPasswordDictionaryRsp},

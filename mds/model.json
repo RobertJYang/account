@@ -195,6 +195,16 @@
                         "usage": [
                             "PoweroffPer"
                         ]
+                    },
+                    "SNMPv3TrapAccountChangePolicy": {
+                        "default": 0,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
                     }
                 },
                 "methods": {

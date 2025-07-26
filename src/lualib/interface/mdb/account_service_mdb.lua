@@ -41,6 +41,9 @@ function account_service_mdb:regist_account_signals()
     self.m_change_unregist_handle = self.m_account_service.m_config_changed:on(function(...)
         self:config_mdb_update(...)
     end)
+    self.m_config_change_unregist_handle = self.m_account_config.m_account_service_config_changed:on(function(...)
+        self:config_mdb_update(...)
+    end)
 end
 
 function account_service_mdb:init()
@@ -142,7 +145,11 @@ account_service_mdb.watch_property_hook = {
     UserNamePasswordPrefixCompareLength = operation_logger.proxy(function(self, ctx, value)
         ctx.operation_log.params = { length = value }
         self.m_account_config:set_user_name_password_compared_length(value)
-    end,'UserNamePasswordPrefixCompareLength')
+    end,'UserNamePasswordPrefixCompareLength'),
+    SNMPv3TrapAccountChangePolicy = operation_logger.proxy(function(self, ctx, value)
+        self.m_account_config:set_snmp_v3_trap_account_change_policy(ctx, value)
+        self.m_account_service.m_account_collection:update_deletable()
+    end, 'SNMPv3TrapAccountChangePolicy'),
 }
 
 function account_service_mdb:watch_service_property(service)

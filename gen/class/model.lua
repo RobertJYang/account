@@ -338,6 +338,19 @@ local AccountService = {
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'SecurityMgmt'}},
                 ['validator'] = account_service_intf_types.UserNamePasswordPrefixCompareLength
+            },
+            ['SNMPv3TrapAccountChangePolicy'] = {
+                ['baseType'] = 'U8',
+                ['readOnly'] = false,
+                ['default'] = 0,
+                ['minimum'] = 0,
+                ['maximum'] = 1,
+                ['options'] = {['emitsChangedSignal'] = 'true'},
+                ['description'] = 'snmpv3trap用户的修改策略.0代表保持原有修改策略,原有修改策略' ..
+                    '由SNMPv3TrapAccountLimitPolicy控制,1代表snmpv3trap用户修改策略为可重命名,可被删除',
+                ['usage'] = {'PoweroffPer'},
+                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'SecurityMgmt'}},
+                ['validator'] = account_service_intf_types.SNMPv3TrapAccountChangePolicy
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -461,7 +474,8 @@ local AccountService = {
                 ['OSAdministratorPrivilegeEnabled'] = true,
                 ['SNMPv3TrapAccountLimitPolicy'] = 2,
                 ['UserNamePasswordPrefixCompareEnabled'] = false,
-                ['UserNamePasswordPrefixCompareLength'] = 4
+                ['UserNamePasswordPrefixCompareLength'] = 4,
+                ['SNMPv3TrapAccountChangePolicy'] = 0
             },
             ['privileges'] = {
                 ['path'] = privilege.ReadOnly,
@@ -499,6 +513,10 @@ local AccountService = {
                         ['write'] = privilege.SecurityMgmt
                     },
                     ['UserNamePasswordPrefixCompareLength'] = {
+                        ['read'] = privilege.ReadOnly,
+                        ['write'] = privilege.SecurityMgmt
+                    },
+                    ['SNMPv3TrapAccountChangePolicy'] = {
                         ['read'] = privilege.ReadOnly,
                         ['write'] = privilege.SecurityMgmt
                     }
@@ -2884,6 +2902,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '通道权限',
+                ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.PrivilegeLimit
@@ -2892,6 +2911,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'Boolean',
                 ['readOnly'] = true,
                 ['description'] = 'ipmi消息使能',
+                ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['default'] = 'true',
@@ -2901,6 +2921,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'Boolean',
                 ['readOnly'] = true,
                 ['description'] = '链路身份认证使能',
+                ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['default'] = 'true',
@@ -2910,6 +2931,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '回拨权限',
+                ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.CallbackRestriction
@@ -2918,6 +2940,7 @@ local IpmiChannelConfig = {
                 ['baseType'] = 'U8',
                 ['readOnly'] = true,
                 ['description'] = '通道并发会话限制',
+                ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}},
                 ['validator'] = ipmi_channel_config_intf_types.SessionLimit

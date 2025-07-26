@@ -22,6 +22,7 @@ local utils = require 'infrastructure.utils'
 local file_proxy = require 'infrastructure.file_proxy'
 local flash_sync = require 'infrastructure.flash_synchronizer'
 local core = require 'account_core'
+local signal = require 'mc.signal'
 
 local MAX_USER_NUM = 17
 local MIN_USER_NUM = 2
@@ -37,6 +38,7 @@ function global_account_config:ctor(db, file_transfer)
     self.m_file_transfer = file_transfer
     self.m_weak_password_dictionary = {}
     self.m_weak_password_dictionary_config_status = enum.WeakPwdDictEnum.WEAK_PWDDICT_COMPELETE
+    self.m_account_service_config_changed = signal.new()
 end
 
 function global_account_config:init()
@@ -304,6 +306,7 @@ end
 function global_account_config:set_snmp_v3_trap_account(account_id)
     self.m_db_account_service.SNMPv3TrapAccountId = account_id
     self.m_db_account_service:save()
+    self.m_account_service_config_changed:emit('SNMPv3TrapAccountId', account_id)
 end
 
 function global_account_config:get_snmp_v3_trap_account_id()
@@ -327,6 +330,25 @@ end
 
 function global_account_config:get_snmp_v3_trap_account_limit_policy()
     return self.m_db_account_service.SNMPv3TrapAccountLimitPolicy
+end
+
+function global_account_config:get_snmp_v3_trap_account_change_policy()
+    return self.m_db_account_service.SNMPv3TrapAccountChangePolicy
+end
+
+function global_account_config:set_snmp_v3_trap_account_change_policy(ctx, policy_value)
+    if policy_value == 0 then
+        ctx.operation_log.result = 'NotChangeable'
+    elseif policy_value == 1 then
+        ctx.operation_log.result = 'AllowedChangeable'
+    else
+        log:error("Invalid SNMPv3TrapAccountChangePolicy value(%s)", policy_value)
+        error(base_msg.PropertyValueNotInList('%SNMPv3TrapAccountChangePolicy:' .. 'Unknown',
+            '%SNMPv3TrapAccountChangePolicy'))
+    end
+    self.m_db_account_service.SNMPv3TrapAccountChangePolicy = policy_value
+    self.m_db_account_service:save()
+    self.m_account_service_config_changed:emit('SNMPv3TrapAccountChangePolicy', policy_value)
 end
 
 function global_account_config:get_inactive_time_threshold()

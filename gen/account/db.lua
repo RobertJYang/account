@@ -41,6 +41,7 @@ local def_types = require 'class.types.types'
 ---@field SNMPv3TrapAccountLimitPolicy FieldBase
 ---@field UserNamePasswordPrefixCompareEnabled FieldBase
 ---@field UserNamePasswordPrefixCompareLength FieldBase
+---@field SNMPv3TrapAccountChangePolicy FieldBase
 ---@field ClassName FieldBase
 ---@field ObjectName FieldBase
 ---@field ObjectIdentifier FieldBase
@@ -266,21 +267,23 @@ function AccountDBDatabase.new(path, datas)
             :default(false),
         UserNamePasswordPrefixCompareLength = Col.IntegerField():cid(22):persistence_key('protect_power_off'):null()
             :max_length(8):default(4),
-        ClassName = Col.TextField():cid(23):null(),
-        ObjectName = Col.TextField():cid(24):null(),
-        ObjectIdentifier = Col.JsonField():cid(25):null(),
-        PasswordExpirationDays = Col.IntegerField():cid(26):persistence_key('protect_power_off'):null():max_length(32)
+        SNMPv3TrapAccountChangePolicy = Col.IntegerField():cid(23):persistence_key('protect_power_off'):null()
+            :max_length(8):default(0),
+        ClassName = Col.TextField():cid(24):null(),
+        ObjectName = Col.TextField():cid(25):null(),
+        ObjectIdentifier = Col.JsonField():cid(26):null(),
+        PasswordExpirationDays = Col.IntegerField():cid(27):persistence_key('protect_power_off'):null():max_length(32)
             :default(4294967295),
-        AccountLockoutDuration = Col.IntegerField():cid(27):null():max_length(32):default(300),
-        AccountLockoutThreshold = Col.IntegerField():cid(28):null():max_length(32):default(5),
-        UserMgmtEnable = Col.BooleandField():cid(29):persistence_key('protect_power_off'):null():default(true),
-        TimeSource = Col.EnumField(def_types.TimeSource):cid(30):persistence_key('protect_power_off'):null():default(
+        AccountLockoutDuration = Col.IntegerField():cid(28):null():max_length(32):default(300),
+        AccountLockoutThreshold = Col.IntegerField():cid(29):null():max_length(32):default(5),
+        UserMgmtEnable = Col.BooleandField():cid(30):persistence_key('protect_power_off'):null():default(true),
+        TimeSource = Col.EnumField(def_types.TimeSource):cid(31):persistence_key('protect_power_off'):null():default(
             def_types.TimeSource.TS_NOT_NTP),
-        PasswordComplexityIsLock = Col.BooleandField():cid(31):persistence_key('protect_power_off'):null()
+        PasswordComplexityIsLock = Col.BooleandField():cid(32):persistence_key('protect_power_off'):null()
             :default(false),
-        PreviousPasswordsDisallowed = Col.IntegerField():cid(32):persistence_key(
+        PreviousPasswordsDisallowed = Col.IntegerField():cid(33):persistence_key(
             'protect_power_off'):null():max_length(8):default(5),
-        Id = Col.IntegerField():cid(33):primary_key():persistence_key('protect_power_off'):max_length(8)
+        Id = Col.IntegerField():cid(34):primary_key():persistence_key('protect_power_off'):max_length(8)
     }, 'protect_power_off'):create_if_not_exist(datas and datas['t_account_service'])
     obj.ManagerAccountDB = db:Table('t_manager_account', {
         AccountExpiration = Col.TextField():cid(1):persistence_key('protect_power_off'):null():critical(),

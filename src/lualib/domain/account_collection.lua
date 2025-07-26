@@ -456,6 +456,25 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     self:update_within_min_password_days_status()
 end
 
+function AccountCollection:change_snmp_v3_trap_account(delete_id)
+    local change_id = self.m_global_account_config:get_max_user_num() + 1
+    local account_id
+    for _, account in pairs(self.collection) do
+        account_id = account.m_account_data.Id
+        if ((account:check_is_enabled_admin() and account:get_password_valid_time() ~= 0) or
+            self:check_is_emergency_user(account_id)) and
+            account_id ~= delete_id and
+            account_id <= change_id then
+                change_id = account_id
+        end
+    end
+    if not self.collection[change_id] then
+        log:error('No valid account to be changed to snmp v3 trap account.')
+            error(custom_msg.AccountForbidRemoved())
+    end
+    self.m_global_account_config:set_snmp_v3_trap_account(change_id)
+end
+
 --- 删除用户
 ---@param ctx table 上下文信息
 ---@param account_id number 用户ID
@@ -481,10 +500,14 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
             error(custom_msg.CannotDeleteLastAdministrator())
         end
         if account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() and
+            self.m_global_account_config:get_snmp_v3_trap_account_change_policy() == 0 and
             self.m_global_account_config:get_snmp_v3_trap_account_limit_policy() ~=
                 enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value() then
-            log:error('Delete account failed, account (user%d) is snmp v3 trap account.', account_id)
-            error(custom_msg.AccountForbidRemoved())
+                log:error('Delete account failed, account (user%d) is snmp v3 trap account.', account_id)
+                error(custom_msg.AccountForbidRemoved())
+        elseif account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() and
+            self.m_global_account_config:get_snmp_v3_trap_account_change_policy() == 1 then
+                self:change_snmp_v3_trap_account(account_id)
         end
 
         --判断该类型用户是否可被删除account_policy中的Deletable属性
@@ -710,13 +733,16 @@ function AccountCollection:set_user_name(ctx, account_id, user_name)
         if self:is_other_user_has_the_same_name(account_id, user_name) then
             error(base_msg.ResourceAlreadyExists())
         end
-        -- 装备定制化需要设置管理员用户名，跳过trap的限制
-        if not core.is_manufacture_mode() and
-            account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() and
-            self.m_global_account_config:get_snmp_v3_trap_account_limit_policy() ==
-                enum.SNMPv3TrapAccountLimitPolicy.NotModifiable:value() then
-            log:error('Change account name failed, account (user%d) is snmp v3 trap account.', account_id)
-            error(custom_msg.SNMPV3TrapUserNameCannotBeChanged())
+        -- 判断SNMPTrapAccountChangePolicy是否为0，为0则保持原有策略
+        if self.m_global_account_config:get_snmp_v3_trap_account_change_policy() == 0 then
+            -- 装备定制化需要设置管理员用户名，跳过trap的限制
+            if not core.is_manufacture_mode() and
+                account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() and
+                self.m_global_account_config:get_snmp_v3_trap_account_limit_policy() ==
+                    enum.SNMPv3TrapAccountLimitPolicy.NotModifiable:value() then
+                log:error('Change account name failed, account (user%d) is snmp v3 trap account.', account_id)
+                error(custom_msg.SNMPV3TrapUserNameCannotBeChanged())
+            end
         end
         -- 修改用户
         self:change_user_name(account_id, user_name)
