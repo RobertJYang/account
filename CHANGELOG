@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.5] - 2025-07-24
+支持动态调整trapv3用户绑定策略
+
 ## [1.90.4] - 2025-07-17
 支持Get User Access命令按照标准实现
 

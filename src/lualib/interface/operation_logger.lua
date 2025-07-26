@@ -248,6 +248,13 @@ local operation_log_map = {
             'and user can not rename or delete v3 trap account',
         fail = 'Set SNMP v3 trap account limit policy failed'
     },
+    SNMPv3TrapAccountChangePolicy = {
+        AllowedChangeable = 'Set SNMP v3 trap account change policy successfully, ' ..
+            'and user can rename or delete v3 trap account',
+        NotChangeable = 'Set SNMP v3 trap account change policy successfully, ' ..
+            'and v3 trap account change policy controlled by SNMPv3TrapAccountLimitPolicy',
+        fail = 'Set SNMP v3 trap account change policy failed'
+    },
     InactiveDaysThreshold = {
         success = 'Set user inactive threshold to ({threshold}) days successfully',
         fail = 'Set inactive user timelimit time failed',

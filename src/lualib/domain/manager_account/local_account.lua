@@ -123,6 +123,7 @@ end
 function local_account:update_deletable(have_only_enabled_admin)
     if self:get_id() == self.m_account_config:get_emergency_account() or
         (self:get_id() == self.m_account_config:get_snmp_v3_trap_account_id() and
+            self.m_account_config:get_snmp_v3_trap_account_change_policy() == 0 and
             self.m_account_config:get_snmp_v3_trap_account_limit_policy() ~=
                 enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value()) or
                     (have_only_enabled_admin and self:check_is_enabled_admin()) then

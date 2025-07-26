@@ -43,7 +43,7 @@ local function make_channel_config(ctx, account_collection)
         ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
         ['account_type'] = enum.AccountType.Local:value()
     }
-    account_collection:new_account(ctx, account_info, false,false)
+    account_collection:new_account(ctx, account_info, false, false)
     account_collection:set_account_password(ctx, 2, 4, "Paswd@9000")
     local req = {}
     local ctx = {}
@@ -1222,6 +1222,24 @@ function TestAccount:test_set_invalid_snmp_v3_trap_account_limit_policy_should_f
     end)
 end
 
+--- 设置snmpv3trap用户的变更策略非法值，应该设置失败
+function TestAccount:test_set_invalid_snmp_v3_trap_account_change_policy_should_fail()
+    local origin = self.test_global_account_config:get_snmp_v3_trap_account_change_policy()
+    lu.assertEquals(origin, 0)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 2)
+    end)
+end
+
+--- 设置snmpv3trap用户的变更策略合法值，应该设置成功
+function TestAccount:test_set_invalid_snmp_v3_trap_account_change_policy_should_success() 
+    self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 1)
+    local origin = self.test_global_account_config:get_snmp_v3_trap_account_change_policy()
+    lu.assertEquals(origin, 1)
+    -- 恢复环境
+    self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 0)
+end
+
 --- 默认情况下密码用户名策略关闭，新建与设置密码与用户名前n字节相同，应该成功
 function TestAccount:test_set_same_with_name_password_when_default_should_success()
     local default_user_name_password_compard_status =
@@ -1470,4 +1488,32 @@ function TestAccount:test_change_pwd_need_modify_shoule_change_pwd_prompt_and_pr
     self.test_global_account_config:set_initial_password_need_modify(modify_status)
     self.test_global_account_config:set_initial_password_prompt_enable(prompt_status)
     self.test_global_account_config:set_initial_account_privilege_restrict_enabled(priv_restrict_status)
+end
+
+-- 测试删除trapv3用户后会自动更改trapv3用户
+function TestAccount:test_change_snmp_v3_account_when_is_emergency_account_should_success()
+    -- 前置条件准备，存在两个管理员用户2、3，其中2号为设置为逃生用户，3号为trapv3用户
+    local account_info = {
+        ['id'] = 3,
+        ['name'] = "test3",
+        ['password'] = "Paswd@9001",
+        ['role_id'] = enum.RoleType.Administrator:value(),
+        ['interface'] = make_interface(),
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
+    }
+    self.test_account_collection:new_account(self.ctx, account_info, false)
+    local emergency_id = self.test_global_account_config:get_emergency_account()
+    local trap_id = self.test_global_account_config:get_snmp_v3_trap_account_id()
+    self.test_global_account_config:set_emergency_account(2)
+    self.test_global_account_config:set_snmp_v3_trap_account(3)
+    self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 1)
+    -- 删除trapv3用户
+    self.test_account_collection:delete_account(self.ctx, 3)
+    local account_id = self.test_global_account_config:get_snmp_v3_trap_account_id()
+    lu.assertEquals(account_id, 2)
+    -- 恢复环境
+    self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 0)
+    self.test_global_account_config:set_snmp_v3_trap_account(trap_id)
+    self.test_global_account_config:set_emergency_account(emergency_id)
 end
