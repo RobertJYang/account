@@ -264,7 +264,7 @@ end
 
 function AccountService:get_ipmi_user_access(req, ctx)
     local user_id = req.UserId
-    local chan_num = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
+    local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
         ctx.chan_num or req.ChannelNumber)
     -- 用户ID有效性校验, 1是IPMI的保留用户
     if user_id < 1 or user_id > self.m_account_config:get_max_user_num() then
@@ -272,17 +272,20 @@ function AccountService:get_ipmi_user_access(req, ctx)
         error(custom_msg.IPMIInvalidFieldRequest())
     end
     -- 通道校验
-    if chan_num ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() and
-        chan_num ~= enum.IpmiChannel.IPMB_SM_CHAN_NUM:value() and
-        chan_num ~= enum.IpmiChannel.IPMB_ETH_CHAN_NUM:value() and
-        chan_num ~= enum.IpmiChannel.EDMA_CHAN_NUM:value() and
-        chan_num ~= enum.IpmiChannel.SYS_CHAN_NUM:value() then
+    local flag = 0
+    for _, chan_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+        if channel_number == chan_num then
+            flag = 1
+            break
+        end
+    end
+    if flag == 0 then
         log:error("channel number is invalid")
         error(custom_msg.IPMICommandCannotExecute())
     end
 
     self.m_account_collection:check_ipmi_host_user_mgnt_enabled(ctx)
-    local rsp = self.m_account_collection:get_ipmi_user_access(user_id, chan_num)
+    local rsp = self.m_account_collection:get_ipmi_user_access(user_id, channel_number)
     return err_cfg.USER_OPER_SUCCESS, rsp
 end
 

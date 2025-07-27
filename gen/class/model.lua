@@ -1670,6 +1670,13 @@ local IpmiUserInfo = {
             ['usage'] = {'PoweroffPer'},
             ['description'] = '',
             ['validator'] = ipmi_user_info_class_types.Privilege1
+        },
+        ['IsSynced'] = {
+            ['baseType'] = 'Boolean',
+            ['default'] = false,
+            ['usage'] = {'PoweroffPer'},
+            ['description'] = '',
+            ['validator'] = ipmi_user_info_class_types.IsSynced
         }
     },
     ['default_props'] = {
@@ -1680,7 +1687,8 @@ local IpmiUserInfo = {
         ['IsEnableIpmiMsg'] = 1,
         ['IsEnableByPasswd'] = types.IpmiUserEnableByPassword.Disable:value(),
         ['Privilege0'] = types.IpmiPrivilege.RESERVED:value(),
-        ['Privilege1'] = types.IpmiPrivilege.RESERVED:value()
+        ['Privilege1'] = types.IpmiPrivilege.RESERVED:value(),
+        ['IsSynced'] = false
     }
 }
 

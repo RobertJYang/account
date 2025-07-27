@@ -21,7 +21,6 @@ local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local kmc_client = require 'infrastructure.kmc_client'
 local history_password = require 'infrastructure.history_password'
-local ipmi_channel_config = require 'infrastructure.ipmi_channel_config'
 local global_account_cfg = require 'domain.global_account_config'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
 local privilege = require 'domain.privilege'
@@ -33,7 +32,7 @@ local SaltCharset = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstu
 local DAY_SECOND_COUNT = 24 * 60 * 60
 
 local ManagerAccount = class()
-function ManagerAccount:ctor(db, account, password_validator)
+function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_config)
     local kmc_client = kmc_client.get_instance()
     local account_svc_cfg = global_account_cfg.get_instance()
     local rc = login_rule_collection.get_instance()
@@ -53,12 +52,12 @@ function ManagerAccount:ctor(db, account, password_validator)
     self.m_account_config = account_svc_cfg
     self.m_login_rule_collection = rc
     self.m_history_password = history_password.new(db, account.Id)
-    self.m_ipmi_channel_config = ipmi_channel_config.new(db, account.Id)
     self.m_account_update_signal = signal.new()
     self.m_snmp_update_signal = signal.new()
     self.current_privileges = nil
     self.login_record_flush_flag = false
     self.password_validator_obj = password_validator
+    self.m_ipmi_channel_config = ipmi_channel_config
 end
 
 -- 获取用户当前锁定状态
@@ -317,7 +316,7 @@ function ManagerAccount:set_ipmi_user_access(req, ctx)
     local ipmi_channel_config_info = {}
     ipmi_channel_config_info.AccountId = req.UserId
     ipmi_channel_config_info.PrivilegeLimit = req.UserPrivilege
-    ipmi_channel_config_info.SessionLimit = req.SessionLimit
+    ipmi_channel_config_info.SessionLimit = string.unpack('>B', req.SessionLimit)
 
     ipmi_channel_config_info.ChannelNumber = req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
         ctx.chan_num or req.ChannelNumber
@@ -328,7 +327,7 @@ function ManagerAccount:set_ipmi_user_access(req, ctx)
     self.m_ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
 end
 
-function ManagerAccount:get_ipmi_user_access(chan_num)
+function ManagerAccount:get_ipmi_user_access(user_id, chan_num)
     local rsp = ipmi_cmds.GetUserAccess.rsp.new()
     rsp.MaxUserNumber = self.m_account_config:get_max_user_num()
     rsp.Reserved = 0
@@ -350,7 +349,7 @@ function ManagerAccount:get_ipmi_user_access(chan_num)
     rsp.IpmiMessaging = 1
     rsp.PrivilegeLimit = enum.IpmiPrivilege.NO_ACCESS:value()
     -- 数据库读取配置信息
-    local ipmi_channel_config_info = self.m_ipmi_channel_config:get(chan_num)
+    local ipmi_channel_config_info = self.m_ipmi_channel_config:get(user_id, chan_num)
     if ipmi_channel_config_info ~= {} and #ipmi_channel_config_info ~= 0 then
         rsp.ChaAccessMode = ipmi_channel_config_info[1].CallbackRestriction
         rsp.LinkAuthentication = ipmi_channel_config_info[1].LinkAuthenticationEnabled == true and 1 or 0

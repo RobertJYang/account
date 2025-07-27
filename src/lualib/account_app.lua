@@ -31,6 +31,7 @@ local login_rule_collection = require 'domain.login_rule.login_rule_collection'
 local role_collection = require 'domain.role'
 local global_account_config = require 'domain.global_account_config'
 local account_recover = require 'service.account_recover'
+local ipmi_channel_config = require 'domain.ipmi_channel_config'
 local account_collection = require 'domain.account_collection'
 local account_permanent_backup = require 'domain.account_permanent_backup'
 local file_synchronization = require 'domain.file_synchronization'
@@ -46,6 +47,7 @@ local account_service_mdb = require 'interface.mdb.account_service_mdb'
 local snmp_community_mdb = require 'interface.mdb.snmp_community_mdb'
 local password_validator_mdb = require 'interface.mdb.password_validator_mdb'
 local account_policy_mdb = require 'interface.mdb.account_policy_mdb'
+local ipmi_channel_config_mdb = require 'interface.mdb.ipmi_channel_config_mdb'
 local account_service_ipmi = require 'interface.ipmi.account_service_ipmi'
 local password_validator_ipmi = require 'interface.ipmi.password_validator_ipmi'
 local account_service_snmp = require 'interface.snmp.account_service_snmp'
@@ -138,6 +140,9 @@ function app:init()
         return true
     end)
 
+    -- 执行数据同步
+    self:sync_and_update_ipmi_channel_config()
+
     self.service_ready = self:service_init()
 
     -- 信号注册后需要将初始化中预加载的数据上树一次
@@ -195,9 +200,10 @@ function app:service_init()
     self.account_policy_collection = account_policy_collection.new(self.db, self.global_account_config)
     log:notice("account config init end, account manager init start")
     -- 用户管理
+    self.ipmi_channel_config = ipmi_channel_config.new(self.db)
     self.account_collection = account_collection.new(self.persist, self.db, self.global_account_config,
         self.role_collection, self.host_privilege_limit, self.password_validator_collection,
-        self.account_policy_collection, linux_file_path)
+        self.account_policy_collection, self.ipmi_channel_config, linux_file_path)
     self.account_permanent_backup = account_permanent_backup.new(self.db, self.account_collection)
     log:notice("account manager init end, linux file manager init start")
     -- 文件管理
@@ -218,6 +224,8 @@ function app:service_init()
     self.snmp_community_mdb = snmp_community_mdb.new(self.account_service)
     self.password_validator_mdb = password_validator_mdb.new(self.password_validator_collection)
     self.account_policy_mdb = account_policy_mdb.new(self.account_policy_collection)
+    self.ipmi_channel_config_mdb = ipmi_channel_config_mdb.new(self.db, self.ipmi_channel_config)
+    self.ipmi_channel_config_mdb:regist_channel_config_signals()
     self.account_service_ipmi = account_service_ipmi.new()
     self.password_validator_ipmi = password_validator_ipmi.new(self.password_validator_collection)
     self.account_service_snmp = account_service_snmp.new(self.account_service)
@@ -634,6 +642,55 @@ function app:collection_garbage_init()
             collectgarbage('collect')
         end
     end)
+end
+
+-- 实现从IpmiUserInfo到IpmiChannelConfig的数据同步
+function app:sync_and_update_ipmi_channel_config()
+    log:notice("Start syncing data from IpmiUserInfo to IpmiChannelConfig (Update Logic)...")
+
+    if not self.db or not self.db.IpmiUserInfo or not self.db.IpmiChannelConfig then
+        log:warn("Database tables IpmiUserInfo or IpmiChannelConfig not found. Skipping sync.")
+        return
+    end
+
+    local old_tbl = self.db.IpmiUserInfo
+    local new_tbl = self.db.IpmiChannelConfig
+
+    local query = self.db:select(old_tbl):where(old_tbl.IsSynced:eq(false))
+
+    query:fold(function(old_record)
+        log:info("Syncing for AccountId: %d", old_record.AccountId)
+
+        local data_to_update = {
+            CallbackRestriction = old_record.IsCallin,
+            LinkAuthenticationEnabled = (old_record.IsEnableAuth == 1),
+            IpmiMessagingEnabled = (old_record.IsEnableIpmiMsg == 1),
+            PrivilegeLimit = old_record.Privilege1:value()
+        }
+
+        local ok, err = pcall(function()
+            local result = self.db:update(new_tbl)
+                :value(data_to_update)
+                :where(new_tbl.AccountId:eq(old_record.AccountId),
+                       new_tbl.ChannelNumber:eq(1)
+                )
+                :exec()
+
+            log:notice("--- Debugging result of :exec() for AccountId: %d ---", old_record.AccountId)
+            log:info("Type of result: %s", type(result))
+
+            self.db:update(old_tbl)
+                :value({ IsSynced = true })
+                :where(old_tbl.AccountId:eq(old_record.AccountId))
+                :exec()
+        end)
+
+        if not ok then
+            log:error("Failed to sync for AccountId: %d. Error: %s", old_record.AccountId, tostring(err))
+        end
+    end)
+
+    log:notice("Data sync (Update Logic) from IpmiUserInfo to IpmiChannelConfig finished.")
 end
 
 return app

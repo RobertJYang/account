@@ -54,7 +54,7 @@ local DEFAULT_MAX_USER_NUM = 17
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
-    password_validator_collection, account_policy_collection, linux_file_path)
+    password_validator_collection, account_policy_collection, ipmi_channel_config, linux_file_path)
     self.persist = persist
     self.db = db
     self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
@@ -72,6 +72,7 @@ function AccountCollection:ctor(persist, db, global_account_config, role_collect
     self.m_host_privilege_limit = host_privilege_limit
     self.password_validator_collection = password_validator_collection
     self.account_policy_collection = account_policy_collection
+    self.ipmi_channel_config = ipmi_channel_config
 end
 
 AccountCollection.operation_type_check = {
@@ -113,7 +114,8 @@ function AccountCollection:init_account_collection(db)
             return acc
         end
         local suc, ret = pcall(account_type_map[account.AccountType:value()].new,
-            db, account, self.password_validator_collection:get_validator(account.AccountType:value()))
+            db, account, self.password_validator_collection:get_validator(account.AccountType:value()),
+            self.ipmi_channel_config)
         if suc == true then
             acc[account.Id] = ret
             if self.persist then
@@ -153,6 +155,7 @@ function AccountCollection:init()
     self:init_account_collection(self.db)
     -- 防止数据库不存在ipmi用户与snmp用户信息，将这两部分数据进行初始化
     self:init_ipmi_user_info()
+    self:init_default_ipmi_channels()
     self:init_snmp_user_info()
 
     self.m_change_unregist_handle = self.m_ipmi_crypt_password_update:on(function(...)
@@ -183,6 +186,44 @@ function AccountCollection:init_ipmi_user_info()
             collection:init_ipmi_user_info(ipmi_in_db)
         end
         collection:set_ipmi_user_privilege(role_privilege_map.role_to_privilege_map[collection:get_role_id()])
+    end
+end
+
+function AccountCollection:init_default_ipmi_channels()
+    log:notice("Checking and inserting default IPMI channel configurations for all accounts.")
+    for account_id, collection in pairs(self.collection) do
+        if account_id < self.m_global_account_config:get_min_user_num() or
+            account_id > self.m_global_account_config:get_max_user_num() then
+            goto continue
+        end
+        local role_id = collection.m_account_data.RoleId
+        local ok, err = pcall(function()
+            local existing_channels_map = {}
+            self.db:select(self.db.IpmiChannelConfig)
+                :where(self.db.IpmiChannelConfig.AccountId:eq(account_id))
+                :fold(function(record)
+                    existing_channels_map[record.ChannelNumber] = true
+                end)
+            for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+                if not existing_channels_map[channel_num] then
+                    local new_channel_data = {
+                        AccountId = account_id,
+                        ChannelNumber = channel_num,
+                        CallbackRestriction = 0,
+                        LinkAuthenticationEnabled = true,
+                        IpmiMessagingEnabled = true,
+                        PrivilegeLimit = role_privilege_map.role_to_privilege_map[role_id],
+                        SessionLimit = 0
+                    }
+                    self.db:insert(self.db.IpmiChannelConfig):value(new_channel_data):exec()
+                end
+            end
+        end)
+        if not ok then
+            log:error("An error occurred while checking/inserting channel configs for AccountId %d: %s",
+                account_id, tostring(err))
+        end
+        ::continue::
     end
 end
 
@@ -393,7 +434,7 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     local account_in_db = self.m_table_account({ Id = account_info.id, UserName = account_info.name,
         RoleId = account_info.role_id })
     local account_in_server = account_class.new(self.db, account_in_db,
-        self.password_validator_collection:get_validator(enum.AccountType.Local:value()))
+        self.password_validator_collection:get_validator(enum.AccountType.Local:value()), self.ipmi_channel_config)
     if not is_ipmi_or_snmp and is_password_validator then
         local ok, ret = pcall(function()
             -- 第三个参数为是否初始化优化，第四个参数为是否自己修改自己密码
@@ -443,6 +484,8 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
         self.m_global_account_config:get_history_password_count())
     self.collection[account_info.id]:update_privileges()
 
+    self:new_account_channel_config_to_db_and_mdb(account_info.id, account_info.role_id)
+
     -- 用户名或者密码为空的情形不允许设置到Linux系统-- ipmi增加用户时不带密码
     if not utils.str_is_empty(account_info.name) and not utils.str_is_empty(account_data.Password) then
         -- 将用户设置到linux系统
@@ -454,6 +497,24 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     self:update_deletable()
     -- 密码最短使用时间不为0时，新建用户受此限制
     self:update_within_min_password_days_status()
+end
+
+function AccountCollection:new_account_channel_config_to_db_and_mdb(account_id, role_id)
+    if account_id < self.m_global_account_config:get_min_user_num() or
+        account_id > self.m_global_account_config:get_max_user_num() then
+        return
+    end
+    local ipmi_channel_config_db = {}
+    for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+        ipmi_channel_config_db.AccountId = account_id
+        ipmi_channel_config_db.ChannelNumber = channel_num
+        ipmi_channel_config_db.PrivilegeLimit = role_privilege_map.role_to_privilege_map[role_id]
+        ipmi_channel_config_db.SessionLimit = 0
+        ipmi_channel_config_db.CallbackRestriction = 0
+        ipmi_channel_config_db.IpmiMessagingEnabled = true
+        ipmi_channel_config_db.LinkAuthenticationEnabled = true
+        self.ipmi_channel_config:insert(ipmi_channel_config_db, 0)
+    end
 end
 
 function AccountCollection:change_snmp_v3_trap_account(delete_id)
@@ -522,7 +583,7 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
         -- 清除历史密码
         account.m_history_password:delete()
         -- 清除通道配置
-        account.m_ipmi_channel_config:delete()
+        self.ipmi_channel_config:delete(account_id)
         -- 将用户从db与mbd移除
         account.m_account_data:delete()
         account.m_snmp_user_info_data:delete()
@@ -938,8 +999,6 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     local privilege = req.UserPrivilege
     local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
         ctx.chan_num or req.ChannelNumber)
-    local length = #req.SessionLimit
-    local session_limit = string.unpack(">H", req.SessionLimit)
     local account_id = req.UserId
     if privilege == 0 or
         ((privilege > enum.IpmiPrivilege.OEM:value()) and
@@ -960,15 +1019,22 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     ctx.operation_log.params.id = account_id
 
     -- 通道校验
-    if channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() and
-        channel_number ~= enum.IpmiChannel.IPMB_SM_CHAN_NUM:value() and
-        channel_number ~= enum.IpmiChannel.IPMB_ETH_CHAN_NUM:value() and
-        channel_number ~= enum.IpmiChannel.EDMA_CHAN_NUM:value() and
-        channel_number ~= enum.IpmiChannel.SYS_CHAN_NUM:value() then
+    local flag = 0
+    for _, chan_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+        if channel_number == chan_num then
+            flag = 1
+            break
+        end
+    end
+    if flag == 0 then
         log:error("channel number is invalid")
         error(custom_msg.IPMICommandCannotExecute())
     end
-    if length ~= 0 and session_limit > 15 then
+
+    if not req.SessionLimit or req.SessionLimit == "" then
+        req.SessionLimit = string.pack(">B", 0)
+    end
+    if #req.SessionLimit ~= 0 and string.unpack(">B", req.SessionLimit) > 15 then
         log:error("sessionlimit is out of range")
         error(custom_msg.IPMIOutOfRange())
     end
@@ -1018,7 +1084,7 @@ function AccountCollection:get_ipmi_user_access(user_id, chan_num)
     if self.collection[user_id] == nil then
         rsp = self:get_ipmi_empty_user_access()
     else
-        rsp = self.collection[user_id]:get_ipmi_user_access(chan_num)
+        rsp = self.collection[user_id]:get_ipmi_user_access(user_id, chan_num)
     end
     return rsp
 end

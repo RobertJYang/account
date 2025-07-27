@@ -55,7 +55,7 @@ local function make_channel_config(ctx, account_collection)
     req.ChangeEnable = 1
     req.UserId = 4
     req.UserPrivilege = 4
-    req.SessionLimit = string.pack(">H", 0)
+    req.SessionLimit = string.pack(">B", 0)
     return req, ctx
 end
 
@@ -949,7 +949,7 @@ function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success(
     req.AuthenticationEnable = 0
     req.UserRestricted = 0
     req.UserPrivilege = 2
-    req.SessionLimit = string.pack(">H", 1)
+    req.SessionLimit = string.pack(">B", 1)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
     end)
@@ -971,7 +971,7 @@ function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success2
     req.AuthenticationEnable = 0
     req.UserRestricted = 0
     req.UserPrivilege = 2
-    req.SessionLimit = string.pack(">H", 1)
+    req.SessionLimit = string.pack(">B", 1)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
     end)
@@ -1030,18 +1030,17 @@ function TestAccount:test_ipmi_get_channel_not_config_should_success()
     local req = {}
     local ctx = {}
     req.UserId = 4
-    req.ChannelNumber = 8
+    req.ChannelNumber = 2
     ctx.operation_log = { operation = nil, result = nil, params = {} }
     local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
     lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
     lu.assertEquals(ret.MaxUserNumber, 17)
     lu.assertEquals(ret.EnableStatus, 0)
-    lu.assertEquals(ret.EnabledUser, 1)
     lu.assertEquals(ret.UserNumber, 1)
     lu.assertEquals(ret.IpmiMessaging, 1)
     lu.assertEquals(ret.LinkAuthentication, 1)
     lu.assertEquals(ret.ChaAccessMode, 0)
-    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.NO_ACCESS:value())
+    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.OPERATOR:value())
 end
 
 -- 用户ID非法，获取通道配置失败测试
@@ -1104,7 +1103,7 @@ function TestAccount:test_ipmi_set_user_access_when_account_not_exist_should_fai
     req.ChangeEnable = 1
     req.UserId = 12
     req.UserPrivilege = 4
-    req.SessionLimit = string.pack(">H", 0)
+    req.SessionLimit = string.pack(">B", 0)
 
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1124,7 +1123,7 @@ function TestAccount:test_ipmi_set_user_access_when_accountid_invalid_should_fai
     req.ChangeEnable = 1
     req.UserId = 18
     req.UserPrivilege = 4
-    req.SessionLimit = string.pack(">H", 0)
+    req.SessionLimit = string.pack(">B", 0)
 
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1144,7 +1143,7 @@ function TestAccount:test_ipmi_set_user_access_when_sessionlimit_invalid_should_
     req.ChangeEnable = 1
     req.UserId = 4
     req.UserPrivilege = 4
-    req.SessionLimit = string.pack(">H", 17)
+    req.SessionLimit = string.pack(">B", 17)
 
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)

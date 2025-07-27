@@ -7,6 +7,8 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 
+local enum = require 'class.types.types'
+
 local RESERVED_ROOT_USER_NAME = '<root>'
 local ACTUAL_ROOT_USER_NAME   = 'root'
 local TELNET_USER             = '<su>'
@@ -156,6 +158,12 @@ local SHA512_SALT_PATTERN = "(%$.-%$.-%$)(.*)"
 
 -- 当前支持的所有登录接口num:223
 local DEFAULT_INTERFACES = 223
+
+-- ipmi当前按支持的带外通道
+local DEFAULT_CHANNELS_MAP = {
+    enum.IpmiChannel.LAN1_CHAN_NUM:value(),
+    enum.IpmiChannel.LAN2_CHAN_NUM:value()
+}
 
 return {
   PASSWD_FILE = PASSWD_FILE,
@@ -358,5 +366,7 @@ return {
 
   FILE_MAX_SIZE = FILE_MAX_SIZE,
   FILE_MAX_NUM = FILE_MAX_NUM,
-  DEFAULT_INTERFACES = DEFAULT_INTERFACES
+  DEFAULT_INTERFACES = DEFAULT_INTERFACES,
+
+  DEFAULT_CHANNELS_MAP = DEFAULT_CHANNELS_MAP
 }
