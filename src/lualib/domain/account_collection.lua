@@ -518,7 +518,7 @@ function AccountCollection:new_account_channel_config_to_db_and_mdb(account_id, 
 end
 
 function AccountCollection:change_snmp_v3_trap_account(delete_id)
-    local change_id = self.m_global_account_config:get_max_user_num() + 1
+    local change_id = config.MAX_INVALID_USER_ID
     local account_id
     for _, account in pairs(self.collection) do
         account_id = account.m_account_data.Id
