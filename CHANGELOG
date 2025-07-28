@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.7] - 2025-07-28
+修改更换trapv3用户校验
+
 ## [1.90.6] - 2025-07-26
 支持ipmi通道配置上树
 
