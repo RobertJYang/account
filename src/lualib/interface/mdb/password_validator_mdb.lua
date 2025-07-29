@@ -16,7 +16,7 @@ local enum = require 'class.types.types'
 local operation_logger = require 'interface.operation_logger'
 
 local c_object = require 'mc.orm.object'
-local password_validator_obj = c_object('PasswordPolicy')
+local password_validator_obj = c_object('PasswordPolicyDB')
 
 -- ORM会尝试调用create_mdb_object将模型类上库
 -- 手动实现用户的各模型类create_mdb_object, 避免刷日志
@@ -35,7 +35,7 @@ end
 
 function PasswordValidatorMdb:init()
     for _, policy in pairs(self.m_policy_collection.collection) do
-        self:new_policy_to_mdb_tree(policy:get_obj())
+        self:new_policy_to_mdb_tree(policy)
     end
 
     self.m_policy_collection.m_config_changed:on(function(...)
@@ -50,7 +50,10 @@ PasswordValidatorMdb.watch_property_hook = {
     end, 'PasswordPolicy'),
     Pattern = operation_logger.proxy(function(self, ctx, account_type, value)
         self.m_policy_collection:set_pattern(ctx, account_type, value)
-    end, 'PasswordPattern')
+    end, 'PasswordPattern'),
+    MaxPasswordLength = operation_logger.proxy(function(self, ctx, account_type, value)
+        self.m_policy_collection:set_password_max_length(ctx, account_type, value)
+    end, 'MaxPasswordLength')
 }
 
 function PasswordValidatorMdb:watch_policy_property(policy, account_type)
@@ -71,11 +74,14 @@ function PasswordValidatorMdb:watch_policy_property(policy, account_type)
     end)
 end
 
-function PasswordValidatorMdb:new_policy_to_mdb_tree(policy_info)
+function PasswordValidatorMdb:new_policy_to_mdb_tree(policy_entity)
+    local policy_info = policy_entity:get_obj()
     local account_type_name = tostring(enum.AccountType.new(policy_info.AccountType))
     local cur_policy = service:CreatePasswordPolicy(account_type_name, function(policy)
-        policy.Policy  = policy_info.Policy
-        policy.Pattern = policy_info.Pattern
+        policy.AccountType       = policy_entity.m_account_type
+        policy.Policy            = policy_info.Policy
+        policy.Pattern           = policy_info.Pattern
+        policy.MaxPasswordLength = policy_info.MaxPasswordLength
         self:watch_policy_property(policy, policy_info.AccountType)
     end)
     self.m_mdb_policys[policy_info.AccountType] = cur_policy

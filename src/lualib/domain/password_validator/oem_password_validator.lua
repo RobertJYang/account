@@ -14,15 +14,15 @@ local config = require 'common_config'
 local password_validator = require 'domain.password_validator.password_validator'
 local core = require 'account_core'
 
-local LocalPasswordValidator = class(password_validator)
+local OemPasswordValidator = class(password_validator)
 
-function LocalPasswordValidator:init()
-    LocalPasswordValidator.super.init(self)
+function OemPasswordValidator:init()
+    OemPasswordValidator.super.init(self)
     self.m_password_max_length = 20
-    self.m_account_type = 'Local'
+    self.m_account_type = 'Oem'
 end
 
-function LocalPasswordValidator:basic_validate(info)
+function OemPasswordValidator:basic_validate(info)
     local password_max_length = self:get_password_max_length()
     if #info.password > password_max_length then
         log:error("The password is too long")
@@ -57,4 +57,4 @@ function LocalPasswordValidator:basic_validate(info)
     end
 end
 
-return singleton(LocalPasswordValidator)
+return singleton(OemPasswordValidator)

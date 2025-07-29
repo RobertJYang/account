@@ -15,6 +15,7 @@ local enum = require 'class.types.types'
 local local_password_validator = require 'domain.password_validator.local_password_validator'
 local snmp_community_password_validator = require 'domain.password_validator.snmp_community_password_validator'
 local vnc_password_validator = require 'domain.password_validator.vnc_password_validator'
+local oem_password_validator = require 'domain.password_validator.oem_password_validator'
 
 local PasswordValidatorCollection = class()
 
@@ -30,6 +31,10 @@ local account_type_map = {
     [enum.AccountType.SnmpCommunity:value()] = {
         name = 'SnmpCommunity',
         obj  = snmp_community_password_validator
+    },
+    [enum.AccountType.OEM:value()] = {
+        name = 'OEM',
+        obj  = oem_password_validator
     }
 }
 
@@ -37,7 +42,7 @@ function PasswordValidatorCollection:ctor(db, global_account_config)
     self.db = db
     self.m_account_config = global_account_config
 
-    local policy_collection = db:select(db.PasswordPolicy):fold(function(policy, acc)
+    local policy_collection = db:select(db.PasswordPolicyDB):fold(function(policy, acc)
         if not account_type_map[policy.AccountType] then
             log:error("invalid policy data, account_type(%d)", policy.AccountType)
             policy:delete()
@@ -87,6 +92,29 @@ function PasswordValidatorCollection:get_pattern(account_type)
         error(base_msg.InternalError())
     end
     return self.collection[account_type]:get_pattern()
+end
+
+function PasswordValidatorCollection:set_password_max_length(ctx, account_type, value)
+    if not self.collection[account_type] then
+        error(base_msg.InternalError())
+    end
+
+    ctx.operation_log.params = {account_type = account_type_map[account_type].name, length = value}
+
+    if account_type ~= enum.AccountType.OEM:value() then
+        log:error("only oem can change max password length")
+        error(base_msg.ActionNotSupported('Change Max Password Length'))
+    end
+
+    self.collection[account_type]:set_password_max_length(value)
+end
+
+function PasswordValidatorCollection:get_password_max_length(account_type)
+    if not self.collection[account_type] then
+        error(base_msg.InternalError())
+    end
+
+    return self.collection[account_type]:get_password_max_length()
 end
 
 return singleton(PasswordValidatorCollection)

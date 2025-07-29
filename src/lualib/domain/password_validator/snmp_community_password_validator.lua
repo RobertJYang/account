@@ -15,6 +15,12 @@ local core = require 'account_core'
 
 local SnmpCommunityPasswordValidator = class(password_validator)
 
+function SnmpCommunityPasswordValidator:init()
+    SnmpCommunityPasswordValidator.super.init(self)
+    self.m_password_max_length = 32
+    self.m_account_type = 'SnmpCommunity'
+end
+
 -- 设置新团体名时要求和旧团体名相比至少有两位字符是不同的
 local function compare_snmp(new_password, current_password)
     local count  = 0
@@ -39,8 +45,9 @@ function SnmpCommunityPasswordValidator:basic_validate(info)
     local password = info.password
 
     local long_community_enable = self.m_account_config:get_long_community_enabled()
-    local max_community_length = 32
+    local max_community_length = self:get_password_max_length()
     local min_community_length = 16
+    local error_param = info.is_ro_community and 'ReadOnlyCommunity' or 'ReadWriteCommunity'
 
     local password_complexity_check_enable = self.m_account_config:get_password_complexity_enable()
 
@@ -48,10 +55,13 @@ function SnmpCommunityPasswordValidator:basic_validate(info)
     if not long_community_enable then
         min_community_length = password_complexity_check_enable and 8 or 1
     end
-    if #password < min_community_length or #password > max_community_length then
-        -- 根据用户id选择错误机制填入参数,id为20时为只读团体名，为21时为读写团体名
-        local error_param = info.is_ro_community and 'ReadOnlyCommunity' or 'ReadWriteCommunity'
+    if #password < min_community_length then
         error(custom_msg.InvalidCommunityNameLength(error_param))
+    end
+
+    if #password > max_community_length then
+        log:error("The password is too long")
+        error(custom_msg.StringValueTooLong(error_param, max_community_length))
     end
 
     if password_complexity_check_enable then

@@ -24,14 +24,22 @@ function TestAccount:test_validator_init()
     local validator = self.test_password_validator_collection:get_validator(enum.AccountType.Local:value())
     lu.assertEquals(validator:get_policy(), enum.PasswordRulePolicy.Default:value())
     lu.assertEquals(validator:get_pattern(), "")
+    lu.assertEquals(validator:get_password_max_length(), 20)
 
     validator = self.test_password_validator_collection:get_validator(enum.AccountType.SnmpCommunity:value())
     lu.assertEquals(validator:get_policy(), enum.PasswordRulePolicy.Default:value())
     lu.assertEquals(validator:get_pattern(), "")
+    lu.assertEquals(validator:get_password_max_length(), 32)
 
     validator = self.test_password_validator_collection:get_validator(enum.AccountType.VNC:value())
     lu.assertEquals(validator:get_policy(), enum.PasswordRulePolicy.Default:value())
     lu.assertEquals(validator:get_pattern(), "")
+    lu.assertEquals(validator:get_password_max_length(), 8)
+
+    validator = self.test_password_validator_collection:get_validator(enum.AccountType.OEM:value())
+    lu.assertEquals(validator:get_policy(), enum.PasswordRulePolicy.Default:value())
+    lu.assertEquals(validator:get_pattern(), "")
+    lu.assertEquals(validator:get_password_max_length(), 20)
 
     validator = self.test_password_validator_collection:get_validator(enum.AccountType.LDAP:value())
     lu.assertIsNil(validator)
@@ -147,4 +155,36 @@ function TestAccount:test_local_account_password_validate()
         enum.PasswordRulePolicy.Default:value())
     self.test_password_validator_collection:set_pattern(self.ctx, enum.AccountType.Local:value(), "")
     self.test_account_collection:delete_account(self.ctx, account_id)
+end
+
+function TestAccount:test_set_password_max_length_only_oem_success()
+    -- 1、获取默认值，用于恢复环境
+    local default_length =
+        self.test_password_validator_collection:get_password_max_length(enum.AccountType.OEM:value())
+
+    -- 2、OEM设置最大密码长度为50，设置成功
+    local ok, err = pcall(function()
+        self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.OEM:value(), 50)
+    end)
+    assert(ok)
+    lu.assertIsNil(err)
+
+    -- 3、检查设置值
+    lu.assertEquals(self.test_password_validator_collection:get_password_max_length(enum.AccountType.OEM:value()), 50)
+
+    -- 4、设置其他账户类型最大密码长度为50，设置失败
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.Local:value(), 50)
+    end)
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_password_validator_collection:set_password_max_length(self.ctx,
+            enum.AccountType.SnmpCommunity:value(), 50)
+    end)
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.VNC:value(), 50)
+    end)
+
+    -- end 恢复环境
+    self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.OEM:value(),
+        default_length)
 end

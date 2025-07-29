@@ -11,6 +11,8 @@ local log = require 'mc.logging'
 local vos_utils = require 'utils.vos'
 local utils_crypt = require 'utils.crypt'
 local base_msg = require 'messages.base'
+local custom_msg = require 'messages.custom'
+local error_config = require 'error_config'
 local enum = require 'class.types.types'
 local config = require 'common_config'
 local utils = require 'infrastructure.utils'
@@ -37,7 +39,8 @@ function OEMAccount:init_account(account_info)
     -- 如果新增用户密码为已加密的密文，则设置密码及IPMI密码为该密文，否则进行加密
     if account_info.is_pwd_encrypted then
         encrypted_password_validator(account_info.password)
-        self.m_account_data.Password = account_info.password
+        self.m_account_data.Password     = account_info.password
+        self.m_account_data.KDFPassword  = account_info.password
         self.m_account_data.IpmiPassword = ''
     else
         self.m_account_data.Password, self.m_account_data.KDFPassword =
@@ -118,6 +121,50 @@ function OEMAccount:get_property_writable(property)
     return self.m_account_data[property] ~= false
 end
 
+function OEMAccount:password_validator(ctx, user_name, password, is_initial, is_config_self)
+    -- 创建OEM用户直接跳过密码校验
+    if is_initial then
+        return
+    end
+    self:property_writable_check('Password')
+    -- 校验密码复杂度
+    local info = {
+        ["password"] = password,
+        ["username"] = user_name
+    }
+    local ok, err = pcall(function()
+        self.password_validator_obj:validate(info)
+    end)
+    if not ok then
+        log:error('The password does not meet the password complexity')
+        ctx.operation_log.params.ret = error_config.USER_PASS_COMPLEXITY_FAIL
+        error(err)
+    end
+    -- 校验密码长度
+    if #password < config.MIN_PASSWORD_DEFAULT_LEN then
+        log:error('password length is out of range')
+        ctx.operation_log.params.ret = error_config.USER_USERPASS_TOO_LONG
+        error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN,
+            self.password_validator_obj:get_password_max_length()))
+    end
+    -- 检查密码内是否含有汉字
+    if not utils.check_if_password_character_is_valid(password) then
+        log:error('password contains chinese')
+        ctx.operation_log.params.ret = error_config.USER_INVALID_DATA_FIELD
+        error(custom_msg.InvalidPassword())
+    end
+    -- 校验用户密码是否属于弱口令
+    if self.m_account_config:get_weak_pwd_dictionary_enable() then
+        self.m_account_config:check_password_in_weak_passwd_dictionary(ctx, password)
+    end
+    -- 和历史密码比较, 创建用户不应和历史比较
+    if not is_initial and not self.m_history_password:check(password) then
+        ctx.operation_log.params.ret = error_config.USER_CANNT_SET_SAME_PASSWORD
+        log:error('check history password failed')
+        error(custom_msg.InvalidPasswordSameWithHistory())
+    end
+end
+
 function OEMAccount:set_account_password(password, is_config_self)
     if not is_config_self then
         log:error('Only custom account itself can change password')
@@ -125,7 +172,12 @@ function OEMAccount:set_account_password(password, is_config_self)
     end
     self.m_account_data.Password, self.m_account_data.KDFPassword =
         self:crypt_password_by_random_salt(password)
-    self.m_account_data.IpmiPassword = self.kmc_client:encrypt_password(password)
+    
+    local ipmi_pwd = password
+    if #password > 20 then
+        ipmi_pwd = string.sub(password, 1 ,20)
+    end
+    self.m_account_data.IpmiPassword = self.kmc_client:encrypt_password(ipmi_pwd)
     self.m_account_data:save()
     -- 添加至历史密码
     self.m_history_password:insert(self.m_account_data.Password, self.m_account_data.KDFPassword,

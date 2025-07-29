@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.90.11] - 2025-07-31
+支持密码策略可配置超长密码
+
 ## [1.90.10] - 2025-07-30
 支持多通道场景下用户权限与通道权限分离
 支持恢复出厂设置保留用户信息需保留通道配置

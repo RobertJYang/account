@@ -8,13 +8,26 @@
 -- See the Mulan PSL v2 for more details.
 local singleton = require 'mc.singleton'
 local class = require 'mc.class'
+local log = require 'mc.logging'
 local custom_msg = require 'messages.custom'
 local password_validator = require 'domain.password_validator.password_validator'
 local core = require 'account_core'
 
 local VncPasswordValidator = class(password_validator)
 
+function VncPasswordValidator:init()
+    VncPasswordValidator.super.init(self)
+    self.m_password_max_length = 8
+    self.m_account_type = 'VNC'
+end
+
 function VncPasswordValidator:basic_validate(info)
+    local password_max_length = self:get_password_max_length()
+    if #info.password > password_max_length then
+        log:error("The password is too long")
+        error(custom_msg.StringValueTooLong('Password', password_max_length))
+    end
+    
     if not self.m_account_config:get_password_complexity_enable() then
         return
     end
