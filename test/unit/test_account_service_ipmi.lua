@@ -291,6 +291,19 @@ function TestAccount:test_ipmi_get_account_interface()
     assert(rsp.Interface == 0xff)
 end
 
+-- 获取用户名超过userID测试，
+function TestAccount:test_ipmi_get_account_name_by_id_failed()
+    local req = {}
+    local ctx = {}
+    ctx.ChanType = enum.IpmiChannelType.IPMI_HOST:value()
+    req.UserId = 0xFF
+    req.ManufactureId = 0x0007db
+    local ret = pcall(function()
+        self.test_account_service_ipmi:get_user_name(req, ctx)
+    end)
+    assert(ret == false)
+end
+
 -- 获取用户名密码对比信息
 function TestAccount:test_ipmi_get_user_name_password_compare_info()
     local req = {}

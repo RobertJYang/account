@@ -99,7 +99,7 @@ function account_service_ipmi:get_user_name(req, ctx)
     local account_id = req.UserId
     if account_id < self.m_account_config:get_min_user_num() or 
         account_id > self.m_account_config:get_max_user_num() then
-        log:error("account id is illegal")
+        log:error("account id(%s) is illegal", account_id)
         error(err.invalid_data_field())
     end
 

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.8] - 2025-07-29
+ipmi获取用户名日志优化
+
 ## [1.90.7] - 2025-07-28
 修改更换trapv3用户校验
 
