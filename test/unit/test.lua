@@ -247,6 +247,7 @@ require 'test_account_recover'
 require 'test_account_permanent_backup'
 require 'test_password_validator'
 require 'test_account_policy'
+require 'test_ipmi_channel_mappings'
 -- OEM测试文件，裁剪时请注意
 require 'test_oem_account'
 

@@ -1025,12 +1025,12 @@ end
 
 -- 用户存在未配置通道权限，获取通道配置成功测试
 function TestAccount:test_ipmi_get_channel_not_config_should_success()
-    local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
-    self.test_account_collection:set_ipmi_user_access(set_req, ctx)
+    -- local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    -- self.test_account_collection:set_ipmi_user_access(set_req, ctx)
     local req = {}
     local ctx = {}
     req.UserId = 4
-    req.ChannelNumber = 2
+    req.ChannelNumber = 1
     ctx.operation_log = { operation = nil, result = nil, params = {} }
     local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
     lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
@@ -1040,7 +1040,7 @@ function TestAccount:test_ipmi_get_channel_not_config_should_success()
     lu.assertEquals(ret.IpmiMessaging, 1)
     lu.assertEquals(ret.LinkAuthentication, 1)
     lu.assertEquals(ret.ChaAccessMode, 0)
-    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.OPERATOR:value())
+    lu.assertEquals(ret.PrivilegeLimit, enum.IpmiPrivilege.NO_ACCESS:value())
 end
 
 -- 用户ID非法，获取通道配置失败测试

@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+## [1.90.9] - 2025-07-29
+支持通道号校验适配ChannelNumberMapping
+支持兼容单通道场景绑定用户权限与通道权限
+
 ## [1.90.8] - 2025-07-29
 ipmi获取用户名日志优化
 

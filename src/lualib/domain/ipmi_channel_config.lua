@@ -112,4 +112,10 @@ function ipmi_channel_config:get_enabled_user_number_on_channel(channel_number)
     return enable_num
 end
 
+--- 获取所有通道配置
+function ipmi_channel_config:get_all_channel_config()
+    local ipmi_channel_config_list = self.db:select(self.db.IpmiChannelConfig):all()
+    return ipmi_channel_config_list or {}
+end
+
 return ipmi_channel_config

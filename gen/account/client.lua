@@ -30,6 +30,7 @@ local CA = require 'account.json_types.CA'
 local Certificate = require 'account.json_types.Certificate'
 local CertificateService = require 'account.json_types.CertificateService'
 local File = require 'account.json_types.File'
+local ChannelNumberMappings = require 'account.json_types.ChannelNumberMappings'
 
 ---@class account_client: BasicClient
 local account_client = class(app_base.Client)
@@ -140,6 +141,15 @@ end
 
 function account_client:ForeachFileObjects(cb)
     return foreach_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.Managers.Security.File', cb, true)
+end
+
+function account_client:GetChannelNumberMappingsObjects()
+    return get_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.IpmiService.ChannelNumberMappings', true)
+end
+
+function account_client:ForeachChannelNumberMappingsObjects(cb)
+    return foreach_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.IpmiService.ChannelNumberMappings', cb,
+        true)
 end
 
 function account_client:OnCipherSuitPropertiesChanged(cb)
@@ -335,6 +345,21 @@ end
 function account_client:OnFileInterfacesRemoved(cb)
     self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), '/bmc', cb,
         'bmc.kepler.Managers.Security.File')
+end
+
+function account_client:OnChannelNumberMappingsPropertiesChanged(cb)
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_properties_changed(self:get_bus(), '/bmc', cb,
+        'bmc.kepler.IpmiService.ChannelNumberMappings', {'ExternalChannelNumber'})
+end
+
+function account_client:OnChannelNumberMappingsInterfacesAdded(cb)
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_added(self:get_bus(), '/bmc', cb,
+        'bmc.kepler.IpmiService.ChannelNumberMappings')
+end
+
+function account_client:OnChannelNumberMappingsInterfacesRemoved(cb)
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), '/bmc', cb,
+        'bmc.kepler.IpmiService.ChannelNumberMappings')
 end
 
 function account_client:SubscribeIpv4ChangedSignal(cb)

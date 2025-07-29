@@ -271,7 +271,17 @@ function AccountService:get_ipmi_user_access(req, ctx)
         log:error("User id is out of range")
         error(custom_msg.IPMIInvalidFieldRequest())
     end
-    -- 通道校验
+    -- 通道校验,单通道场景下仅支持LAN1
+    if self.m_account_collection.ipmi_channel_mappings.multi_channel_status == 0 and
+        channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() then
+        log:error("channel number(%s) is invalid", channel_number)
+        error(custom_msg.IPMICommandCannotExecute())
+    end
+    channel_number = self.m_account_collection.ipmi_channel_mappings:channel_number_translation(channel_number)
+    if not channel_number then
+        log:error("channel number(%s) is invalid", channel_number)
+        error(custom_msg.IPMICommandCannotExecute())
+    end
     local flag = 0
     for _, chan_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
         if channel_number == chan_num then
@@ -280,7 +290,7 @@ function AccountService:get_ipmi_user_access(req, ctx)
         end
     end
     if flag == 0 then
-        log:error("channel number is invalid")
+        log:error("channel number(%s) is invalid", channel_number)
         error(custom_msg.IPMICommandCannotExecute())
     end
 
