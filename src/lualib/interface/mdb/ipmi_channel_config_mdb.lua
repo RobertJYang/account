@@ -24,8 +24,7 @@ end
 
 local ipmi_channel_config_mdb = class()
 
-function ipmi_channel_config_mdb:ctor(db, ipmi_channel_config)
-    self.m_db_ipmi_channel_config = db:select(db.IpmiChannelConfig):all()
+function ipmi_channel_config_mdb:ctor(ipmi_channel_config)
     self.m_ipmi_channel_config = ipmi_channel_config
     self.m_channel_config = {}
     self.m_mdb_cls = cls_mng("IpmiChannelConfig")
@@ -44,27 +43,13 @@ function ipmi_channel_config_mdb:regist_channel_config_signals()
 end
 
 function ipmi_channel_config_mdb:init()
-    self:new_default_channel_config_to_mdb()
-end
-
-
--- 实现从IpmiChannelConfig表加载数据并上树
-function ipmi_channel_config_mdb:new_default_channel_config_to_mdb()
-    for _, record in ipairs(self.m_db_ipmi_channel_config) do
-        local account_id = record.AccountId
-        local channel_num = record.ChannelNumber
-        local channel_config = service:CreateIpmiChannelConfig(tostring(account_id),
-            tostring(channel_num), function(obj)
-            obj.PrivilegeLimit = record.PrivilegeLimit
-            obj.IpmiMessagingEnabled = record.IpmiMessagingEnabled
-            obj.LinkAuthenticationEnabled = record.LinkAuthenticationEnabled
-            obj.CallbackRestriction = record.CallbackRestriction
-            obj.SessionLimit = record.SessionLimit
-        end)
-        if not self.m_channel_config[account_id] then
-            self.m_channel_config[account_id] = {}
-        end
-        self.m_channel_config[account_id][channel_num] = channel_config
+    -- 实现从IpmiChannelConfig表加载数据并上树
+    local ipmi_channel_config_list = self.m_ipmi_channel_config:get_all_channel_config()
+    if not ipmi_channel_config_list or ipmi_channel_config_list == {} then
+        return
+    end
+    for _, ipmi_channel_config in ipairs(ipmi_channel_config_list) do
+        self:new_channel_config_to_mdb_tree(ipmi_channel_config)
     end
 end
 

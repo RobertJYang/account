@@ -123,6 +123,10 @@ function MockClient:ForeachCipherSuitObjects(cb)
     return cb(obj)
 end
 
+function MockClient:GetChannelNumberMappingsObjects()
+    return {}
+end
+
 local client = clz.new()
 client.pcall = PMockClient.new()
 

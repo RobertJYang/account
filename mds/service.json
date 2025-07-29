@@ -1,6 +1,6 @@
 {
     "name": "account",
-    "version": "1.90.8",
+    "version": "1.90.9",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",
@@ -127,6 +127,13 @@
         {
             "path": "*",
             "interface": "bmc.kepler.Managers.Security.File"
+        },
+        {
+            "path": "*",
+            "interface": "bmc.kepler.IpmiService.ChannelNumberMappings",
+            "properties": {
+                "ExternalChannelNumber": ["subscribe"]
+            }
         }
     ]
 }

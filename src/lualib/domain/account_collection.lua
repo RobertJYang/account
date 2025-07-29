@@ -29,6 +29,7 @@ local linux_account = require 'infrastructure.account_linux'
 local account_backup_db = require 'infrastructure.account_backup_db'
 local utils = require 'infrastructure.utils'
 local file_proxy = require 'infrastructure.file_proxy'
+local ipmi_channel_mappings = require 'domain.ipmi_channel_mappings'
 local local_account = require 'domain.manager_account.local_account'
 local ipmi_account = require 'domain.manager_account.ipmi_account'
 local vnc_account = require 'domain.manager_account.vnc_account'
@@ -73,6 +74,7 @@ function AccountCollection:ctor(persist, db, global_account_config, role_collect
     self.password_validator_collection = password_validator_collection
     self.account_policy_collection = account_policy_collection
     self.ipmi_channel_config = ipmi_channel_config
+    self.ipmi_channel_mappings = ipmi_channel_mappings.get_instance()
 end
 
 AccountCollection.operation_type_check = {
@@ -156,6 +158,8 @@ function AccountCollection:init()
     -- 防止数据库不存在ipmi用户与snmp用户信息，将这两部分数据进行初始化
     self:init_ipmi_user_info()
     self:init_default_ipmi_channels()
+    -- 执行数据同步
+    self:sync_and_update_ipmi_channel_config()
     self:init_snmp_user_info()
 
     self.m_change_unregist_handle = self.m_ipmi_crypt_password_update:on(function(...)
@@ -726,6 +730,15 @@ function AccountCollection:set_role_id(ctx, account_id, role_id, ipmi_privilege)
     local privilege = ipmi_privilege or role_privilege_map.role_to_privilege_map[role_id]
     self.collection[account_id]:set_role_id(role_id)
     self.collection[account_id]:set_ipmi_user_privilege(privilege)
+    -- 单通道场景下将通道权限与用户权限绑定
+    local ipmi_channel_config_list
+    if self.ipmi_channel_mappings.multi_channel_status == 0 and
+        account_id >= self.m_global_account_config:get_min_user_num() and
+        account_id <= self.m_global_account_config:get_max_user_num() then
+        ipmi_channel_config_list = self.ipmi_channel_config:get(account_id, 1)
+        ipmi_channel_config_list[1].PrivilegeLimit = privilege
+        self.ipmi_channel_config.m_channel_config_changed:emit(account_id, 1, "PrivilegeLimit", privilege)
+    end    
     self.m_account_changed:emit(account_id, "RoleId", role_id)
     self.m_account_permanent_changed:emit(account_id, "RoleId")
     self.m_account_security_changed:emit(account_id, userName)
@@ -1019,6 +1032,11 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     ctx.operation_log.params.id = account_id
 
     -- 通道校验
+    channel_number = self.ipmi_channel_mappings:channel_number_translation(channel_number)
+    if not channel_number then
+        log:error("channel number(%s) is invalid", channel_number)
+        error(custom_msg.IPMICommandCannotExecute())
+    end
     local flag = 0
     for _, chan_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
         if channel_number == chan_num then
@@ -1027,10 +1045,15 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
         end
     end
     if flag == 0 then
-        log:error("channel number is invalid")
+        log:error("channel number(%s) is invalid", channel_number)
         error(custom_msg.IPMICommandCannotExecute())
     end
-
+    -- 单通道场景下仅支持LAN1
+    if self.ipmi_channel_mappings.multi_channel_status == 0 and
+        channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() then
+        log:error("channel number(%s) is invalid", channel_number)
+        error(custom_msg.IPMICommandCannotExecute())
+    end
     if not req.SessionLimit or req.SessionLimit == "" then
         req.SessionLimit = string.pack(">B", 0)
     end
@@ -1067,6 +1090,12 @@ function AccountCollection:set_ipmi_user_access(req, ctx)
     self:ipmi_set_user_access_restricted_scene_check(req, ctx)
     local account_id = req.UserId
     self.collection[account_id]:set_ipmi_user_access(req, ctx)
+    -- 单通道场景下需要设置用户角色
+    if self.ipmi_channel_mappings.multi_channel_status == 0 then
+        local role_id = role_privilege_map.privilege_to_role_map[req.UserPrivilege]
+        self:set_role_id(ctx, account_id, role_id, req.UserPrivilege)
+        self.m_account_changed:emit(account_id, "RoleId", role_id)
+    end    
 end
 
 function AccountCollection:get_enabled_user()
@@ -1577,6 +1606,54 @@ function AccountCollection:backup_account_info()
             log:notice("[Recover] backup account %s data", account_info:get_user_name())
         end
     end
+end
+
+-- 实现从IpmiUserInfo到IpmiChannelConfig的数据同步
+function AccountCollection:sync_and_update_ipmi_channel_config()
+    if not self.db or not self.db.IpmiUserInfo or not self.db.IpmiChannelConfig then
+        log:warn("Database tables IpmiUserInfo or IpmiChannelConfig not found. Skipping sync.")
+        return
+    end
+
+    local old_tbl = self.db.IpmiUserInfo
+    local new_tbl = self.db.IpmiChannelConfig
+
+    local query = self.db:select(old_tbl):where(old_tbl.IsSynced:eq(false))
+
+    if not query or query == {} then
+        return
+    end
+
+    query:fold(function(old_record)
+        log:info("Syncing for AccountId: %s", old_record.AccountId)
+
+        local data_to_update = {
+            CallbackRestriction = old_record.IsCallin,
+            LinkAuthenticationEnabled = (old_record.IsEnableAuth == 1),
+            IpmiMessagingEnabled = (old_record.IsEnableIpmiMsg == 1),
+            PrivilegeLimit = old_record.Privilege1:value()
+        }
+
+        local ok, err = pcall(function()
+            self.db:update(new_tbl)
+                :value(data_to_update)
+                :where(new_tbl.AccountId:eq(old_record.AccountId),
+                       new_tbl.ChannelNumber:eq(1)
+                )
+                :exec()
+
+            self.db:update(old_tbl)
+                :value({ IsSynced = true })
+                :where(old_tbl.AccountId:eq(old_record.AccountId))
+                :exec()
+        end)
+
+        if not ok then
+            log:error("Failed to sync for AccountId: %s. Error: %s", old_record.AccountId, tostring(err))
+        end
+    end)
+
+    log:notice("Data sync (Update Logic) from IpmiUserInfo to IpmiChannelConfig finished.")
 end
 
 return singleton(AccountCollection)
