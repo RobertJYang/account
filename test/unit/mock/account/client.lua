@@ -124,7 +124,9 @@ function MockClient:ForeachCipherSuitObjects(cb)
 end
 
 function MockClient:GetChannelNumberMappingsObjects()
-    return {}
+    return {
+        ['mdb_path'] = {ExternalChannelNumber=1, InternalChannelNumber=1}
+    }
 end
 
 local client = clz.new()
