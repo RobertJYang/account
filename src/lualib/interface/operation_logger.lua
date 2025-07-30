@@ -157,10 +157,10 @@ local operation_log_map = {
         user_mgnt_disabled = "Delete user{id} failed"
     },
     IpmiSetUserAccess = {
-        success = 'Modify user({name}|user{id}) privilege to ({privilege}) successfully',
-        fail = 'Modify user({name}|user{id}) privilege to ({privilege}) failed',
-        no_user = 'Modify user privilege to ({privilege}) failed',
-        user_mgnt_disabled = "Modify user{id} privilege to ({privilege}) failed"
+        success = 'Modify user({name}|user{id}) channel({channel_number}) privilege to ({privilege}) successfully',
+        fail = 'Modify user({name}|user{id}) channel({channel_number}) privilege to ({privilege}) failed',
+        no_user = 'Modify user channel({channel_number}) privilege to ({privilege}) failed',
+        user_mgnt_disabled = "Modify user{id} channel({channel_number}) privilege to ({privilege}) failed"
     },
     IpmiSetTwoFactorAuthState = {
         success = '{state} two-factor authentication and {state_ocsp} certificate revocation check successfully',

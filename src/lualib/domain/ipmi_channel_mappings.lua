@@ -27,23 +27,20 @@ end
 
 function channel_number_mappings:init_ch_num_maps()
     local map_objs = client:GetChannelNumberMappingsObjects()
-    if not map_objs then
+    if not map_objs or next(map_objs) == nil then
         log:notice('Failed to get channel number mappings objects')
         return
     end
     for path, obj in pairs(map_objs) do
-        self.ch_num_maps[obj.ExternerlChannelNumber] = obj.InternalChannelNumber
-        self.path_to_ch_num[path] = obj.ExternerlChannelNumber
+        self.ch_num_maps[obj.ExternalChannelNumber] = obj.InternalChannelNumber
+        self.path_to_ch_num[path] = obj.ExternalChannelNumber
     end
+    self.multi_channel_status = 1
 end
 
 function channel_number_mappings:channel_number_translation(ch_num)
     if not ch_num then
         return nil
-    end
-    local channel_support
-    if not self.ch_num_maps or self.ch_num_maps == {} then
-        channel_support = false
     end
     for external_channel_num, internal_channle_num in pairs(self.ch_num_maps) do
         if external_channel_num == ch_num then
@@ -80,7 +77,9 @@ end
 function channel_number_mappings:on_channel_number_mappings_interfaces_removed(sender, path)
     self.ch_num_maps[self.path_to_ch_num[path]] = nil
     self.path_to_ch_num[path] = nil
-    self.multi_channel_status = 0
+    if not self.path_to_ch_num or next(self.path_to_ch_num) == nil then
+        self.multi_channel_status = 0
+    end   
 end
 
 return singleton(channel_number_mappings)

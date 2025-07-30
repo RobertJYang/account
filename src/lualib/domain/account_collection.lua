@@ -1013,6 +1013,7 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
         ctx.chan_num or req.ChannelNumber)
     local account_id = req.UserId
+    ctx.operation_log.params.channel_number = channel_number
     if privilege == 0 or
         ((privilege > enum.IpmiPrivilege.OEM:value()) and
             (privilege ~= enum.IpmiPrivilege.NO_ACCESS:value())) then

@@ -143,7 +143,8 @@ function ConfigHandle:on_get_preserved_config(ctx, preserve_list)
                 't_snmp_user_info',
                 't_ipmi_user_info',
                 't_account_service',
-                't_account_backup'
+                't_account_backup',
+                't_ipmi_channel_config'
             },
             DomainId = {
                 self.m_kmc_client.m_domain_id
