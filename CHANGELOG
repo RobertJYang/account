@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.90.12] - 2025-07-31
+认证接口放开密码限制
+
 ## [1.90.11] - 2025-07-31
 支持密码策略可配置超长密码
 

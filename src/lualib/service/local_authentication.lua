@@ -104,8 +104,7 @@ function local_authentication:authenticate(ctx, user_name, password, ext_config)
         error(custom_msg.AuthorizationFailed())
     end
     if ext_config["IsAuthPassword"] then
-        if #password < config.MIN_PASSWORD_DEFAULT_LEN or
-            #password > self.m_account_config:get_password_max_length() then
+        if #password < config.MIN_PASSWORD_DEFAULT_LEN or #password > config.MAX_PASSWORD_DEFAULT_LEN then
             log:error('password length is out of range')
             error(custom_msg.AuthorizationFailed())
         end

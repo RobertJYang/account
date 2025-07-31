@@ -141,7 +141,7 @@ function OEMAccount:password_validator(ctx, user_name, password, is_initial, is_
         error(err)
     end
     -- 校验密码长度
-    if #password < config.MIN_PASSWORD_DEFAULT_LEN then
+    if #password < config.MIN_PASSWORD_DEFAULT_LEN or #password > config.MAX_PASSWORD_DEFAULT_LEN then
         log:error('password length is out of range')
         ctx.operation_log.params.ret = error_config.USER_USERPASS_TOO_LONG
         error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN,
