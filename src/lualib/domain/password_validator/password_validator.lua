@@ -60,6 +60,21 @@ function PasswordValidator:get_pattern()
     return self.data.Pattern
 end
 
+function PasswordValidator:set_password_max_length(value)
+    if value < self.m_password_max_length or value > 512 then
+        log:error("invalid password max length(%s) for %s, acceptable values [%s, 512]",
+            value, self.data.AccountTypeName, self.m_password_max_length)
+        error(custom_msg.PropertyValueOutOfRange(value, 'MaxPasswordLength'))
+    end
+
+    self.data.MaxPasswordLength = value
+    self.data:save()
+end
+
+function PasswordValidator:get_password_max_length()
+    return self.data.MaxPasswordLength
+end
+
 function PasswordValidator:validate(info)
     -- Policy为U8的数据类型,最多支持右移7位
     for i = 0, 7 do

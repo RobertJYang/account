@@ -790,7 +790,7 @@ function TestAccount:test_set_snmp_invalid_length_password_should_fail()
         self.test_account_service:set_user_snmp_pwd(self.ctx, 3, invalid_length_password)
     end)
     invalid_length_password = 'Paswd@123456789123456'
-    lu.assertErrorMsgContains(custom_msg.InvalidPasswordLengthMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.StringValueTooLongMessage.Name, function()
         self.test_account_service:set_user_snmp_pwd(self.ctx, 3, invalid_length_password)
     end)
 

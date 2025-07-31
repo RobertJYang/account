@@ -13,6 +13,7 @@ local utils = require 'infrastructure.utils'
 local enum = require 'class.types.types'
 local mc_utils = require 'mc.utils'
 local base_msg = require 'messages.base'
+local custom_msg = require 'messages.custom'
 
 local OEM_ACCOUNT_ID<const> = 101   -- oem用户id:101
 
@@ -57,9 +58,9 @@ function TestAccount:test_add_oem_administrator_account_should_success()
     self.test_account_collection:delete_account(tmp_ctx, 3)
 
     -- 恢复环境
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
     test_account = self.test_account_collection.collection[OEM_ACCOUNT_ID]
     lu.assertIsNil(test_account)
 end
@@ -93,9 +94,9 @@ function TestAccount:test_add_oem_account_interface_and_role_not_writable_should
     end)
 
     -- 恢复环境
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
 end
 
@@ -126,9 +127,9 @@ function TestAccount:test_verify_not_pwd_encrypted_oem_account_should_match_succ
     end)
 
     -- 恢复环境
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
 end
 
@@ -160,8 +161,91 @@ function TestAccount:test_verify_pwd_encrypted_oem_account_should_match_success_
     end)
 
     -- 恢复环境
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, true)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
     self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
-    self.test_account_policy_collection:set_deletable(self.ctx, 8, false)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
     lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
+end
+
+function TestAccount:test_set_long_password_successful()
+    -- 1、新建OEM用户
+    local interface = make_interface()
+    local account_info = {
+        ['id'] = OEM_ACCOUNT_ID,
+        ['name'] = "OEMAccount",
+        ['password'] = "$1$ftdliuca$LRcjcgfkA88Urj6974q/V0",
+        ['role_id'] = enum.RoleType.Administrator:value(),
+        ['interface'] = interface,
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['oem'] = true,
+        ['is_pwd_encrypted'] = true,
+        ['account_type'] = enum.AccountType.OEM:value()
+    }
+    self.test_account_collection:new_account(self.ctx, account_info, false)
+
+    -- 2、校验新建的用户成功
+    lu.assertNotIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
+    -- 信息匹配则成功
+    local account = self.test_account_collection.collection[account_info.id]
+    local ok = pcall(account.verify_account, account, account_info)
+    assert(ok)
+
+    -- 3、尝试设置长密码(>20)，失败 strlen(Paswd@123456789012345678901234567890) = 36
+    local long_passwd = "Paswd@123456789012345678901234567890"
+    lu.assertErrorMsgContains(custom_msg.StringValueTooLongMessage.Name, function()
+        self.test_account_collection:set_account_password(self.ctx, OEM_ACCOUNT_ID, OEM_ACCOUNT_ID, long_passwd)
+    end)
+
+    -- 4、设置OEM用户长密码为40
+    self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.OEM:value(), 40)
+
+    -- 5、尝试设置长密码，成功
+    ok = pcall(function()
+        self.test_account_collection:set_account_password(self.ctx, OEM_ACCOUNT_ID, OEM_ACCOUNT_ID, long_passwd)
+    end)
+    assert(ok)
+
+    -- end 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
+    self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
+    lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
+    self.test_password_validator_collection:set_password_max_length(self.ctx, enum.AccountType.OEM:value(), 20)
+end
+
+function TestAccount:test_oem_password_validator()
+    -- 1、新建OEM用户
+    local interface = make_interface()
+    local account_info = {
+        ['id'] = OEM_ACCOUNT_ID,
+        ['name'] = "OEMAccount",
+        ['password'] = "$1$ftdliuca$LRcjcgfkA88Urj6974q/V0",
+        ['role_id'] = enum.RoleType.Administrator:value(),
+        ['interface'] = interface,
+        ['first_login_policy'] = enum.FirstLoginPolicy.PromptPasswordReset,
+        ['oem'] = true,
+        ['is_pwd_encrypted'] = true,
+        ['account_type'] = enum.AccountType.OEM:value()
+    }
+    self.test_account_collection:new_account(self.ctx, account_info, false)
+
+    -- 2、校验新建的用户成功
+    lu.assertNotIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
+    -- 信息匹配则成功
+    local account = self.test_account_collection.collection[account_info.id]
+    local ok = pcall(account.verify_account, account, account_info)
+    assert(ok)
+
+    -- 3、设置不符合密码复杂度的密码，失败
+    self.test_global_account_config:set_password_complexity_enable(false)
+    lu.assertErrorMsgContains(custom_msg.InvalidPasswordLengthMessage.Name, function()
+        self.test_account_collection:set_account_password(self.ctx, OEM_ACCOUNT_ID, OEM_ACCOUNT_ID, '')
+    end)
+
+    -- end 恢复环境
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), true)
+    self.test_account_collection:delete_account(self.ctx, OEM_ACCOUNT_ID)
+    self.test_account_policy_collection:set_deletable(self.ctx, enum.AccountType.OEM:value(), false)
+    lu.assertIsNil(self.test_account_collection.collection[OEM_ACCOUNT_ID])
+    self.test_global_account_config:set_password_complexity_enable(true)
 end

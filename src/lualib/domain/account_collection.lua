@@ -434,11 +434,12 @@ end
 function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_class, is_ipmi_or_snmp,
     is_password_validator)
     log:info("start to add new account to db and mdb")
+    local account_type = account_info.oem and enum.AccountType.OEM:value() or enum.AccountType.Local:value()
     -- 将新用户加入db与mdb
     local account_in_db = self.m_table_account({ Id = account_info.id, UserName = account_info.name,
         RoleId = account_info.role_id })
     local account_in_server = account_class.new(self.db, account_in_db,
-        self.password_validator_collection:get_validator(enum.AccountType.Local:value()), self.ipmi_channel_config)
+        self.password_validator_collection:get_validator(account_type), self.ipmi_channel_config)
     if not is_ipmi_or_snmp and is_password_validator then
         local ok, ret = pcall(function()
             -- 第三个参数为是否初始化优化，第四个参数为是否自己修改自己密码
@@ -1070,7 +1071,7 @@ function AccountCollection:check_ipmi_host_user_mgnt_enabled(ctx)
         log:debug("Check host user management success")
         return
     end
-    log:error("Check host user management failed, channel_num: %d", ctx.chan_num)
+    log:error("Check host user management failed, channel_num: %s", ctx.chan_num)
     if ctx.operation_log then
         ctx.operation_log.result = 'user_mgnt_disabled'
     end

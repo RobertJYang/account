@@ -197,11 +197,11 @@ function local_account:password_validator(ctx, user_name, password, is_initial, 
         error(err)
     end
     -- 校验密码长度
-    local max_password_length = self.m_account_config:get_password_max_length()
-    if #password < config.MIN_PASSWORD_DEFAULT_LEN or #password > max_password_length then
+    if #password < config.MIN_PASSWORD_DEFAULT_LEN then
         log:error('password length is out of range')
         ctx.operation_log.params.ret = error_config.USER_USERPASS_TOO_LONG
-        error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN, max_password_length))
+        error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN,
+            self.password_validator_obj:get_password_max_length()))
     end
     -- 检查密码内是否含有汉字
     if not utils.check_if_password_character_is_valid(password) then

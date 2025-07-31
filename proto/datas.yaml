@@ -167,14 +167,25 @@ t_ipmi_user_info:
 
 t_password_policy:
   - AccountType: 0
+    AccountTypeName: Local
     Policy: 1
     Pattern: ''
+    MaxPasswordLength: 20
   - AccountType: 3
+    AccountTypeName: VNC
     Policy: 1
     Pattern: ''
+    MaxPasswordLength: 8
   - AccountType: 7
+    AccountTypeName: SnmpCommunity
     Policy: 1
     Pattern: ''
+    MaxPasswordLength: 32
+  - AccountType: 8
+    AccountTypeName: Oem
+    Policy: 1
+    Pattern: ''
+    MaxPasswordLength: 20
 
 t_account_policy:
 - AccountType: 0

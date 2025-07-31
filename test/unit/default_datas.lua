@@ -288,8 +288,10 @@ M.t_ldap_controller = {
 M.t_kerberos = {{Id = 1, Enabled = false, Address = [=[]=], Port = 88, Realm = [=[]=]}}
 M.t_snmp_community = {{Id = 1, LongCommunityEnabled = true, RwCommunityEnabled = true}}
 M.t_password_policy = {
-    {AccountType = 0, Policy = 1, Pattern = [=[]=]}, {AccountType = 3, Policy = 1, Pattern = [=[]=]},
-    {AccountType = 7, Policy = 1, Pattern = [=[]=]}
+    {AccountType = 0, AccountTypeName = [=[Local]=], Policy = 1, Pattern = [=[]=], MaxPasswordLength = 20},
+    {AccountType = 3, AccountTypeName = [=[VNC]=], Policy = 1, Pattern = [=[]=], MaxPasswordLength = 8},
+    {AccountType = 7, AccountTypeName = [=[SnmpCommunity]=], Policy = 1, Pattern = [=[]=], MaxPasswordLength = 32},
+    {AccountType = 8, AccountTypeName = [=[Oem]=], Policy = 1, Pattern = [=[]=], MaxPasswordLength = 20}
 }
 M.t_account_policy = {
     {

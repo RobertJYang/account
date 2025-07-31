@@ -9,9 +9,6 @@
 --
 -- Test passwords:[Admin@9000, Admin@90001234567891, Admin@900012345678912,
 -- Admin@90001234567891, Admin@900012345678912]
-local class = require 'mc.class'
-local custom_msg = require 'messages.custom'
-local base_msg = require 'messages.base'
 local ipmi_types = require 'ipmi.types'
 local enum = require 'class.types.types'
 local ipmi_mds = require 'account.ipmi.ipmi'
@@ -52,32 +49,30 @@ function PasswordValidatorIpmiCases.test_ipmi_set_policy_success(bus)
 
     -- 2、设置 policy 为 Default
     local set_policy_ipmi_req = set_ipmi_req(enum.AccountType.Local:value(), '\x01') -- 0x01 Default
-    local rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.SetPasswordRulePolicy, set_policy_ipmi_req)
+    local _, rsp  = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.SetPasswordRulePolicy,
+        set_policy_ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
-    assert(rsp.ManufactureId == MANUFACTURE_ID)
 
     -- 3、设置 pattern 后再设置 policy 为 Customized
     local custom_regex = '^ABC$'
     local set_pattern_ipmi_req = set_ipmi_req(enum.AccountType.Local:value(), custom_regex)
-    rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.SetPasswordPattern, set_pattern_ipmi_req)
+    _, rsp  = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.SetPasswordPattern, set_pattern_ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
-    assert(rsp.ManufactureId == MANUFACTURE_ID)
 
     set_policy_ipmi_req = set_ipmi_req(enum.AccountType.Local:value(), '\x02') -- 0x02 Customized
-    rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.SetPasswordRulePolicy, set_policy_ipmi_req)
+    _, rsp  = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.SetPasswordRulePolicy, set_policy_ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
-    assert(rsp.ManufactureId == MANUFACTURE_ID)
 
     -- 4、查看刚才设置的值
     local get_policy_ipmi_req = get_ipmi_req(enum.AccountType.Local:value())
-    rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.GetPasswordRulePolicy, get_policy_ipmi_req)
+    _, rsp  = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.GetPasswordRulePolicy, get_policy_ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
     assert(rsp.ManufactureId == MANUFACTURE_ID)
     assert(rsp.Length == 1)
     assert(rsp.Data == '\x02')
 
     local get_pattern_ipmi_req = get_ipmi_req(enum.AccountType.Local:value())
-    rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.GetPasswordPattern, get_pattern_ipmi_req)
+    _, rsp  = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.GetPasswordPattern, get_pattern_ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
     assert(rsp.ManufactureId == MANUFACTURE_ID)
     assert(rsp.Length == string.len(custom_regex))

@@ -9,11 +9,7 @@
 --
 -- Test passwords:[Admin@9000, Admin@90001234567891, Admin@900012345678912,
 -- Admin@90001234567891, Admin@900012345678912]
-local class = require 'mc.class'
-local custom_msg = require 'messages.custom'
-local base_msg = require 'messages.base'
 local ipmi_types = require 'ipmi.types'
-local enum = require 'class.types.types'
 local ipmi_mds = require 'account.ipmi.ipmi'
 local test_case_utils = require 'testcase_utils'
 local json = require 'cjson'
@@ -40,7 +36,7 @@ function AccountServiceIpmiCaes.test_ipmi_delete_account(bus)
         UserName      = string.rep('\0', 16)    -- 空名字删除
     }
 
-    local rsp = test_case_utils.ipmi_test_tool_by_ipmitool(ipmi_mds.SetUserName, ipmi_req)
+    local _, rsp = test_case_utils.ipmi_test_tool_by_dbus_pcall(bus, ipmi_mds.SetUserName, ipmi_req)
     assert(rsp.CompletionCode == ipmi_types.Cc.Success)
 end
 

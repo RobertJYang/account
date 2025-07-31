@@ -113,7 +113,7 @@ function TestAccount:test_max_community_string_length()
             RO_COMMUNITY_ID, ".Huawei12345678#$%.Huawei12345678")
     end)
     lu.assertEquals(ok, false)
-    lu.assertEquals(err.name, custom_msg.InvalidCommunityNameLengthMessage.Name)
+    lu.assertEquals(err.name, custom_msg.StringValueTooLongMessage.Name)
 end
 
 function TestAccount:test_community_in_weak_password_dict()

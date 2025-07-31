@@ -535,6 +535,11 @@ local operation_log_map = {
         fail = 'Set {account_type} password pattern failed',
         invalid_account_type = 'Set password policy failed'
     },
+    MaxPasswordLength = {
+        success = 'Set {account_type} max password length to {length} successfully',
+        fail = 'Set {account_type} max password length failed',
+        invalid_account_type = 'Set max password length failed'
+    },
     -----------------------    end   -------------------------
     ---------------  role_privilege_mdb end  -------------------
     SetExtendedCustomRoleEnabled = {

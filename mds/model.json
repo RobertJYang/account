@@ -230,7 +230,8 @@
                 "usage": [
                     "PoweroffPer"
                 ]
-            },"AccountLockoutDuration": {
+            },
+            "AccountLockoutDuration": {
                 "baseType": "S32",
                 "default": 300,
                 "description": "账号登录失败后锁定时长,单位为秒"
@@ -1420,8 +1421,6 @@
         }
     },
     "PasswordPolicy": {
-        "tableName": "t_password_policy",
-        "tableType": "PoweroffPer",
         "privilege": ["ReadOnly"],
         "path": "/bmc/kepler/AccountService/PasswordPolicys/:AccountType",
         "interfaces": {
@@ -1432,30 +1431,62 @@
                             "read": ["ReadOnly"],
                             "write": ["SecurityMgmt"]
                         },
-                        "default": 1,
-                        "usage": [
-                            "PoweroffPer"
-                        ]
+                        "default": 1
                     },
                     "Pattern": {
                         "privilege": {
                             "read": ["ReadOnly"],
                             "write": ["SecurityMgmt"]
                         },
-                        "default": "",
-                        "usage": [
-                            "PoweroffPer"
-                        ]
+                        "default": ""
+                    },
+                    "AccountType": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
+                    },
+                    "MaxPasswordLength": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        }
                     }
                 }
             }
-        },
+        }
+    },
+    "PasswordPolicyDB": {
+        "tableName": "t_password_policy",
         "properties": {
             "AccountType": {
                 "baseType": "U8",
                 "primaryKey": true,
                 "usage": [
                     "PoweroffPer"
+                ]
+            },
+            "AccountTypeName": {
+                "baseType": "String"
+            },
+            "Policy": {
+                "baseType": "U8",
+                "default": 1,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "Pattern": {
+                "baseType": "String",
+                "default": "",
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "MaxPasswordLength": {
+                "baseType": "U32",
+                "usage": [
+                    "TemporaryPer"
                 ]
             }
         }
