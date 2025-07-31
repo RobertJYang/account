@@ -197,7 +197,7 @@ function local_account:password_validator(ctx, user_name, password, is_initial, 
         error(err)
     end
     -- 校验密码长度
-    if #password < config.MIN_PASSWORD_DEFAULT_LEN then
+    if #password < config.MIN_PASSWORD_DEFAULT_LEN or #password > config.MAX_PASSWORD_DEFAULT_LEN then
         log:error('password length is out of range')
         ctx.operation_log.params.ret = error_config.USER_USERPASS_TOO_LONG
         error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN,
@@ -267,11 +267,10 @@ function local_account:check_conditions_set_snmp_passwd(ctx, password)
         error(err)
     end
 
-    if #password < config.MIN_PASSWORD_DEFAULT_LEN or
-        #password > self.m_account_config:get_password_max_length() then
+    if #password < config.MIN_PASSWORD_DEFAULT_LEN or #password > config.MAX_PASSWORD_DEFAULT_LEN then
         log:error('Length of snmp password is out of range')
         error(custom_msg.InvalidPasswordLength(config.MIN_PASSWORD_DEFAULT_LEN,
-                self.m_account_config:get_password_max_length()))
+            self.password_validator_obj:get_password_max_length()))
     end
     -- 校验用户密码是否属于弱口令
     if self.m_account_config:get_weak_pwd_dictionary_enable() then
