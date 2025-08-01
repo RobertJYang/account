@@ -357,6 +357,12 @@ local function parse_content_with_type(user_name, type, content)
 end
 
 function account_mdb:import_ssh_public_key(ctx, account_id, type, content)
+    -- 导入文件路径校验, 失败不记录日志
+    local ok, err = pcall(utils.is_import_permitted, type, content, 'pub', 'content', file_proxy.proxy_ispermitted)
+    if not ok then
+        ctx.operation_log.operation = 'SkipLog'
+        return err
+    end
     -- 针对文本内容先转移到本地
     local path = parse_content_with_type(ctx.UserName, type, content)
 

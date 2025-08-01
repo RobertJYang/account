@@ -15,6 +15,7 @@ local crypt = require 'utils.crypt'
 local queue = require 'skynet.queue'
 local snmp = require 'lsnmp.core'
 local custom_msg = require 'messages.custom'
+local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
 local err = require 'account.errors'
 local config = require 'common_config'
@@ -26,6 +27,13 @@ local utils = class()
 utils.queue = queue()
 
 local MAX_USER_NUM = 17
+
+local pattern_collection = {
+    ['pub'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.pub$",
+    ['cert'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.(crt|cer|cert|pem|p12|pfx|crl|der)$",
+    ['tab'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.tab$",
+    ['weakpwddic'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,251})$"
+}
 
 function utils:ctor()
     self.last_time_map = {}
@@ -267,6 +275,41 @@ function utils.check_import_path(path, header)
     end
 
     return true
+end
+
+-- 校验文件导入路径的合法性
+function utils.is_import_permitted(type, content, file_type, property_name, result)
+    if type ~= 'URI' then
+        return true
+    end
+
+    local error_collection = {
+        ['pub'] = custom_msg.PublicKeyImportFailed(),
+        ['cert'] = custom_msg.CertImportFailed(),
+        ['tab'] = custom_msg.InvalidPath("******", property_name),
+        ['weakpwddic'] = custom_msg.WeakPWDDictImportFailed()
+    }
+
+    if not utils_core.g_regex_match(pattern_collection[file_type], content) then
+        error(base_msg.PropertyValueFormatError("******", property_name))
+    end
+
+    if content:sub(1,1) ~= '/' then
+        return true
+    end
+
+    if not utils_core.is_file(content) then
+        error(error_collection[file_type])
+    end
+
+    if file_utils.check_real_path_s(content, "/tmp") ~= 0 then
+        error(error_collection[file_type])
+    end
+
+    if result(content, 'rw') then
+        return true
+    end
+    error(custom_msg.NoPrivilegeToOperateSpecifiedFile())
 end
 
 -- 16进制数字符串按字节转为字符串

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.14] - 2025-08-02
+导入ssh公钥增加路径校验
+
 ## [1.90.13] - 2025-08-02
 修复操作日志未记录通道配置的问题
 

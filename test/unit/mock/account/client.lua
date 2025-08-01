@@ -8,6 +8,9 @@
 -- See the Mulan PSL v2 for more details.
 local Singleton = require 'mc.singleton'
 local class = require 'mc.class'
+local utils_core = require 'utils.core'
+local file_utils = require 'utils.file'
+local mc_utils = require 'mc.utils'
 
 local EMPYT_HASH<const> = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 
@@ -16,6 +19,43 @@ local EMPYT_HASH<const> = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 local MockClient = class()
 
 function MockClient:init()
+end
+
+local FileObjects={}
+function FileObjects:Create(self, dst_path, open_mode, file_mode, uid, gid)
+    local file = file_utils.open_s(dst_path, open_mode)
+    file:close()
+    utils_core.chmod(dst_path, file_mode)
+    utils_core.chown(dst_path, uid, gid)
+    return true
+end
+
+function FileObjects:Delete(self, dst_path)
+    mc_utils.remove_file(dst_path)
+    return true
+end
+
+function FileObjects:Move(self, src_path, dst_path, uid, gid)
+    file_utils.move_file_s(src_path, dst_path)
+    return true
+end
+
+function FileObjects:Chmod(self, dst_path, file_mode)
+    utils_core.chmod(dst_path, file_mode)
+    return true
+end
+
+function FileObjects:Chown(self, dst_path, uid, gid)
+    utils_core.chown(dst_path, uid, gid)
+    return true
+end
+
+function FileObjects:IsPermitted(ctx, dst_path, permission)
+    return true    
+end
+
+function MockClient:GetFileObjects()
+    return {FileObjects}
 end
 
 function MockClient:GetSecureBootObjects()
