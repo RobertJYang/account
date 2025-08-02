@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.90.13] - 2025-08-02
+修复操作日志未记录通道配置的问题
 
 ## [1.90.12] - 2025-07-31
 认证接口放开密码限制

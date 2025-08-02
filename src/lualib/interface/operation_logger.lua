@@ -159,6 +159,9 @@ local operation_log_map = {
     IpmiSetUserAccess = {
         success = 'Modify user({name}|user{id}) channel({channel_number}) privilege to ({privilege}) successfully',
         fail = 'Modify user({name}|user{id}) channel({channel_number}) privilege to ({privilege}) failed',
+        changeable = 'Modify user({name}|user{id}) channel({channel_number}) privilege({privilege}), '..
+            'session_limit({session_limit}), msg_enable({msg_enable}), link_auth({link_auth}), '..
+            'callback({callback}) successfully',
         no_user = 'Modify user channel({channel_number}) privilege to ({privilege}) failed',
         user_mgnt_disabled = "Modify user{id} channel({channel_number}) privilege to ({privilege}) failed"
     },
