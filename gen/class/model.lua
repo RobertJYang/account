@@ -282,12 +282,24 @@ local AccountService = {
                 ['readOnly'] = false,
                 ['default'] = 5,
                 ['minimum'] = 0,
-                ['maximum'] = 5,
+                ['maximum'] = 100,
                 ['options'] = {['emitsChangedSignal'] = 'true'},
                 ['description'] = '检查历史密码数',
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'SecurityMgmt'}},
                 ['validator'] = account_service_intf_types.HistoryPasswordCount
+            },
+            ['MaxHistoryPasswordCount'] = {
+                ['baseType'] = 'U8',
+                ['readOnly'] = false,
+                ['default'] = 5,
+                ['minimum'] = 5,
+                ['maximum'] = 100,
+                ['options'] = {['emitsChangedSignal'] = 'false'},
+                ['description'] = '最大检查历史密码数',
+                ['usage'] = {'TemporaryPer'},
+                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'SecurityMgmt'}},
+                ['validator'] = account_service_intf_types.MaxHistoryPasswordCount
             },
             ['HostUserManagementEnabled'] = {
                 ['baseType'] = 'Boolean',
@@ -470,6 +482,7 @@ local AccountService = {
                 ['InactiveDaysThreshold'] = 0,
                 ['WeakPasswordDictionaryEnabled'] = true,
                 ['HistoryPasswordCount'] = 5,
+                ['MaxHistoryPasswordCount'] = 5,
                 ['HostUserManagementEnabled'] = true,
                 ['OSAdministratorPrivilegeEnabled'] = true,
                 ['SNMPv3TrapAccountLimitPolicy'] = 2,
@@ -503,6 +516,7 @@ local AccountService = {
                         ['write'] = privilege.SecurityMgmt
                     },
                     ['HistoryPasswordCount'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
+                    ['MaxHistoryPasswordCount'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
                     ['HostUserManagementEnabled'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt},
                     ['OSAdministratorPrivilegeEnabled'] = {
                         ['read'] = privilege.ReadOnly,

@@ -1,4 +1,9 @@
 All notable changes to this project will be documented in this file.
+
+## [1.90.15] - 2025-08-02
+新增属性:MaxAccountLockoutThreshold、MaxAccountLockoutDuration、MaxHistoryPasswordCount
+用来配置登录失败锁定次数和时间、历史密码的最大范围
+
 ## [1.90.14] - 2025-08-02
 导入ssh公钥增加路径校验
 

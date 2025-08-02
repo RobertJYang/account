@@ -268,6 +268,10 @@ local operation_log_map = {
         fail = 'Set number of history password for comparision failed',
         disable = 'Disable history password comparision successfully'
     },
+    MaxHistoryPasswordCount = {
+        success = 'Set number of max history password for comparision to ({count}) successfully',
+        fail = 'Set number of max history password for comparision failed'
+    },
     MinPasswordLength = {
         success = 'Set minimum password length to ({length}) successfully',
         fail = 'Set minimum password length to ({length}) failed',

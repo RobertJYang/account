@@ -36,6 +36,7 @@ local def_types = require 'class.types.types'
 ---@field InactiveDaysThreshold FieldBase
 ---@field WeakPasswordDictionaryEnabled FieldBase
 ---@field HistoryPasswordCount FieldBase
+---@field MaxHistoryPasswordCount FieldBase
 ---@field HostUserManagementEnabled FieldBase
 ---@field OSAdministratorPrivilegeEnabled FieldBase
 ---@field SNMPv3TrapAccountLimitPolicy FieldBase
@@ -236,14 +237,13 @@ function AccountDBDatabase.new(path, datas)
         MinPasswordLength = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(32)
             :default(8),
         ServiceEnabled = Col.BooleandField():cid(6):null():default(true),
-        PasswordComplexityEnable = Col.BooleandField():cid(7):persistence_key(
-            'protect_power_off'):null():default(true),
+        PasswordComplexityEnable = Col.BooleandField():cid(7):persistence_key('protect_power_off'):null():default(true),
         InitialPasswordPromptEnable = Col.BooleandField():cid(8):persistence_key('protect_power_off'):null():default(
             true),
-        InitialPasswordNeedModify = Col.BooleandField():cid(9):persistence_key(
-            'protect_power_off'):null():default(true),
-        InitialAccountPrivilegeRestrictEnabled = Col.BooleandField():cid(10):persistence_key(
-            'protect_power_off'):null():default(false),
+        InitialPasswordNeedModify = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null()
+            :default(true),
+        InitialAccountPrivilegeRestrictEnabled = Col.BooleandField():cid(10):persistence_key('protect_power_off'):null()
+            :default(false),
         MinPasswordValidDays = Col.IntegerField():cid(11):persistence_key('protect_power_off'):null():max_length(32)
             :default(0),
         MaxPasswordValidDays = Col.IntegerField():cid(12):persistence_key('protect_power_off'):null():max_length(32)
@@ -254,18 +254,20 @@ function AccountDBDatabase.new(path, datas)
             :default(2),
         InactiveDaysThreshold = Col.IntegerField():cid(15):persistence_key('protect_power_off'):null():max_length(32)
             :default(0),
-        WeakPasswordDictionaryEnabled = Col.BooleandField():cid(16):persistence_key(
-            'protect_power_off'):null():default(true),
+        WeakPasswordDictionaryEnabled = Col.BooleandField():cid(16):persistence_key('protect_power_off'):null():default(
+            true),
         HistoryPasswordCount = Col.IntegerField():cid(17):persistence_key('protect_power_off'):null():max_length(8)
             :default(5),
-        HostUserManagementEnabled = Col.BooleandField():cid(18):persistence_key('protect_power_off'):null()
+        MaxHistoryPasswordCount = Col.IntegerField():cid(18):persistence_key('protect_temporary'):null():max_length(8)
+            :default(5),
+        HostUserManagementEnabled = Col.BooleandField():cid(19):persistence_key('protect_power_off'):null()
             :default(true),
-        OSAdministratorPrivilegeEnabled = Col.BooleandField():cid(19):persistence_key('protect_power_off'):null()
+        OSAdministratorPrivilegeEnabled = Col.BooleandField():cid(20):persistence_key('protect_power_off'):null()
             :default(true),
-        SNMPv3TrapAccountLimitPolicy = Col.IntegerField():cid(20):null():max_length(8):default(2),
-        UserNamePasswordPrefixCompareEnabled = Col.BooleandField():cid(21):persistence_key('protect_power_off'):null()
+        SNMPv3TrapAccountLimitPolicy = Col.IntegerField():cid(21):null():max_length(8):default(2),
+        UserNamePasswordPrefixCompareEnabled = Col.BooleandField():cid(22):persistence_key('protect_power_off'):null()
             :default(false),
-        UserNamePasswordPrefixCompareLength = Col.IntegerField():cid(22):persistence_key('protect_power_off'):null()
+        UserNamePasswordPrefixCompareLength = Col.IntegerField():cid(23):persistence_key('protect_power_off'):null()
             :max_length(8):default(4),
         SNMPv3TrapAccountChangePolicy = Col.IntegerField():cid(23):persistence_key('protect_power_off'):null()
             :max_length(8):default(0),
@@ -281,8 +283,8 @@ function AccountDBDatabase.new(path, datas)
             def_types.TimeSource.TS_NOT_NTP),
         PasswordComplexityIsLock = Col.BooleandField():cid(32):persistence_key('protect_power_off'):null()
             :default(false),
-        PreviousPasswordsDisallowed = Col.IntegerField():cid(33):persistence_key(
-            'protect_power_off'):null():max_length(8):default(5),
+        PreviousPasswordsDisallowed = Col.IntegerField():cid(33):persistence_key('protect_power_off'):null():max_length(
+            8):default(5),
         Id = Col.IntegerField():cid(34):primary_key():persistence_key('protect_power_off'):max_length(8)
     }, 'protect_power_off'):create_if_not_exist(datas and datas['t_account_service'])
     obj.ManagerAccountDB = db:Table('t_manager_account', {
@@ -314,10 +316,10 @@ function AccountDBDatabase.new(path, datas)
         LastLoginTime = Col.IntegerField():cid(19):persistence_key('protect_power_off'):null():max_length(32):default(
             4294967295):critical(),
         LastLoginIP = Col.TextField():cid(20):persistence_key('protect_power_off'):null():default('\'\''):critical(),
-        LastLoginInterface = Col.EnumField(def_types.LoginInterface):cid(21):persistence_key(
-            'protect_power_off'):null():default(def_types.LoginInterface.Web):critical(),
-        FirstLoginPolicy = Col.EnumField(def_types.FirstLoginPolicy):cid(22):persistence_key(
-            'protect_power_off'):null():default(def_types.FirstLoginPolicy.ForcePasswordReset):critical(),
+        LastLoginInterface = Col.EnumField(def_types.LoginInterface):cid(21):persistence_key('protect_power_off'):null()
+            :default(def_types.LoginInterface.Web):critical(),
+        FirstLoginPolicy = Col.EnumField(def_types.FirstLoginPolicy):cid(22):persistence_key('protect_power_off'):null()
+            :default(def_types.FirstLoginPolicy.ForcePasswordReset):critical(),
         AccountType = Col.EnumField(def_types.AccountType):cid(23):persistence_key('protect_power_off'):null():default(
             def_types.AccountType.Local):critical(),
         LoginInterface = Col.IntegerField():cid(24):persistence_key('protect_power_off'):null():max_length(32)
@@ -372,10 +374,10 @@ function AccountDBDatabase.new(path, datas)
             :default(1),
         IsCallin = Col.IntegerField():cid(3):persistence_key('protect_power_off'):null():max_length(8):default(0),
         IsEnableAuth = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8):default(1),
-        IsEnableIpmiMsg = Col.IntegerField():cid(5):persistence_key(
-            'protect_power_off'):null():max_length(8):default(1),
-        IsEnableByPasswd = Col.EnumField(def_types.IpmiUserEnableByPassword):cid(6):persistence_key(
-            'protect_power_off'):null():default(def_types.IpmiUserEnableByPassword.Disable),
+        IsEnableIpmiMsg = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8)
+            :default(1),
+        IsEnableByPasswd = Col.EnumField(def_types.IpmiUserEnableByPassword):cid(6):persistence_key('protect_power_off')
+            :null():default(def_types.IpmiUserEnableByPassword.Disable),
         Privilege0 = Col.EnumField(def_types.IpmiPrivilege):cid(7):persistence_key('protect_power_off'):null():default(
             def_types.IpmiPrivilege.RESERVED),
         Privilege1 = Col.EnumField(def_types.IpmiPrivilege):cid(8):persistence_key('protect_power_off'):null():default(
@@ -435,7 +437,8 @@ function AccountDBDatabase.new(path, datas)
         Password = Col.TextField():cid(3):persistence_key('protect_permanent'),
         RoleId = Col.IntegerField():cid(4):persistence_key('protect_permanent'):null():max_length(8):default(0),
         LoginInterface = Col.IntegerField():cid(5):persistence_key('protect_permanent'):null():max_length(32)
-        :default(0),Enabled = Col.BooleandField():cid(6):persistence_key('protect_permanent'):null():default(false)
+            :default(0),
+        Enabled = Col.BooleandField():cid(6):persistence_key('protect_permanent'):null():default(false)
     }):create_if_not_exist(datas and datas['t_account_backup'])
     obj.PasswordPolicyDB = db:Table('t_password_policy', {
         AccountType = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),
@@ -455,8 +458,8 @@ function AccountDBDatabase.new(path, datas)
     obj.IpmiChannelConfig = db:Table('t_ipmi_channel_config', {
         PrivilegeLimit = Col.IntegerField():cid(1):persistence_key('protect_power_off'):null():max_length(8),
         IpmiMessagingEnabled = Col.BooleandField():cid(2):persistence_key('protect_power_off'):null():default(true),
-        LinkAuthenticationEnabled = Col.BooleandField():cid(3):persistence_key(
-            'protect_power_off'):null():default(true),
+        LinkAuthenticationEnabled = Col.BooleandField():cid(3):persistence_key('protect_power_off'):null()
+            :default(true),
         CallbackRestriction = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8),
         SessionLimit = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8),
         ClassName = Col.TextField():cid(6):null(),

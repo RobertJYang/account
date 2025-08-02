@@ -153,6 +153,16 @@
                             "PoweroffPer"
                         ]
                     },
+                    "MaxHistoryPasswordCount": {
+                        "default": 5,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["SecurityMgmt"]
+                        },
+                        "usage": [
+                            "TemporaryPer"
+                        ]
+                    },
                     "HostUserManagementEnabled": {
                         "privilege": {
                             "read": ["ReadOnly"],

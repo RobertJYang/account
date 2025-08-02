@@ -375,17 +375,35 @@ function global_account_config:get_min_user_num()
 end
 
 function global_account_config:set_history_password_count(count)
-    -- 历史密码数范围0-5
-    if count < 0 or count > 5 then
-        log:error('set history password count failed, count(%d) is out of range', count)
+    local max_count = self.m_db_account_service.MaxHistoryPasswordCount
+    -- 历史密码数范围由最大范围控制
+    if count < 0 or count > max_count then
+        log:error('set history password count failed, count(%d) is out of range, max history password count is(%d)', 
+        count, max_count)
         error(base_msg.PropertyValueNotInList('%HistoryPasswordCount:' .. count, '%HistoryPasswordCount'))
     end
     self.m_db_account_service.HistoryPasswordCount = count
     self.m_db_account_service:save()
 end
 
+function global_account_config:set_max_history_password_count(count)
+    local password_count = self.m_db_account_service.HistoryPasswordCount
+    -- 历史密码数范围5-100
+    if count < 5 or count > 100 or count < password_count then
+        log:error('set max history password count failed, count(%d) is out of range, history password count is (%d)', 
+        password_count ,count)
+        error(base_msg.PropertyValueNotInList('%MaxHistoryPasswordCount:' .. count, '%MaxHistoryPasswordCount'))
+    end
+    self.m_db_account_service.MaxHistoryPasswordCount = count
+    self.m_db_account_service:save()
+end
+
 function global_account_config:get_history_password_count()
     return self.m_db_account_service.HistoryPasswordCount
+end
+
+function global_account_config:get_max_history_password_count()
+    return self.m_db_account_service.MaxHistoryPasswordCount
 end
 
 function global_account_config:get_host_user_management_enabled()

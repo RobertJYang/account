@@ -319,6 +319,57 @@ end
 
 AccountService.HostUserManagementEnabled = THostUserManagementEnabled
 
+---@class AccountService.MaxHistoryPasswordCount
+---@field MaxHistoryPasswordCount integer
+local TMaxHistoryPasswordCount = {}
+TMaxHistoryPasswordCount.__index = TMaxHistoryPasswordCount
+TMaxHistoryPasswordCount.group = {}
+
+local function TMaxHistoryPasswordCount_from_obj(obj)
+    return setmetatable(obj, TMaxHistoryPasswordCount)
+end
+
+function TMaxHistoryPasswordCount.new(MaxHistoryPasswordCount)
+    return TMaxHistoryPasswordCount_from_obj({MaxHistoryPasswordCount = MaxHistoryPasswordCount or 5})
+end
+---@param obj AccountService.MaxHistoryPasswordCount
+function TMaxHistoryPasswordCount:init_from_obj(obj)
+    self.MaxHistoryPasswordCount = obj.MaxHistoryPasswordCount or 5
+end
+
+function TMaxHistoryPasswordCount:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TMaxHistoryPasswordCount.group)
+end
+
+TMaxHistoryPasswordCount.from_obj = TMaxHistoryPasswordCount_from_obj
+
+TMaxHistoryPasswordCount.proto_property = {'MaxHistoryPasswordCount'}
+
+TMaxHistoryPasswordCount.default = {0}
+
+TMaxHistoryPasswordCount.struct = {{name = 'MaxHistoryPasswordCount', is_array = false, struct = nil}}
+
+function TMaxHistoryPasswordCount:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'MaxHistoryPasswordCount', self.MaxHistoryPasswordCount, 'uint8', false, errs,
+        need_convert)
+
+    if self.MaxHistoryPasswordCount ~= nil then
+        validate.ranges(prefix .. 'MaxHistoryPasswordCount', self.MaxHistoryPasswordCount, 5, 100, errs, need_convert)
+    end
+
+    TMaxHistoryPasswordCount:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TMaxHistoryPasswordCount.proto_property, errs, need_convert)
+    return self
+end
+
+function TMaxHistoryPasswordCount:unpack(_)
+    return self.MaxHistoryPasswordCount
+end
+
+AccountService.MaxHistoryPasswordCount = TMaxHistoryPasswordCount
+
 ---@class AccountService.HistoryPasswordCount
 ---@field HistoryPasswordCount integer
 local THistoryPasswordCount = {}
@@ -355,7 +406,7 @@ function THistoryPasswordCount:validate(prefix, errs, need_convert)
     validate.Optional(prefix .. 'HistoryPasswordCount', self.HistoryPasswordCount, 'uint8', false, errs, need_convert)
 
     if self.HistoryPasswordCount ~= nil then
-        validate.ranges(prefix .. 'HistoryPasswordCount', self.HistoryPasswordCount, 0, 5, errs, need_convert)
+        validate.ranges(prefix .. 'HistoryPasswordCount', self.HistoryPasswordCount, 0, 100, errs, need_convert)
     end
 
     THistoryPasswordCount:remove_error_props(errs, self)
@@ -1553,6 +1604,7 @@ AccountService.interface = mdb.register_interface('bmc.kepler.AccountService', {
     InactiveDaysThreshold = {'u', {'EMIT_CHANGE'}, false, 0, false},
     WeakPasswordDictionaryEnabled = {'b', {}, false, true, false},
     HistoryPasswordCount = {'y', {'EMIT_CHANGE'}, false, 5, false},
+    MaxHistoryPasswordCount = {'y', {}, false, 5, false},
     HostUserManagementEnabled = {'b', {'EMIT_CHANGE'}, false, true, false},
     OSAdministratorPrivilegeEnabled = {'b', {}, false, true, false},
     SNMPv3TrapAccountLimitPolicy = {'y', {'EMIT_CHANGE'}, false, 2, false},
