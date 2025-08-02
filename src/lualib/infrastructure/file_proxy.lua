@@ -10,6 +10,7 @@ local log = require 'mc.logging'
 local class = require 'mc.class'
 local Singleton = require 'mc.singleton'
 local client = require 'account.client'
+local context = require 'mc.context'
 
 local file_proxy = class()
 
@@ -128,6 +129,23 @@ function file_proxy.proxy_chown(dst_path, uid, gid)
 
     if not ok then
         log:error("Chown failed, error is %s", err_info)
+        return false
+    end
+
+    return true
+end
+
+function file_proxy.proxy_ispermitted(dst_path, permission)
+    local file_obj = get_file_proxy_obj()
+    if not file_obj then
+        return false
+    end
+    local ctx = context.get_context()
+    local ok, result = pcall(function()
+        return file_obj:IsPermitted(ctx, dst_path, permission)
+    end)
+    if not ok or not result then
+        log:error("Permit check failed")
         return false
     end
 
