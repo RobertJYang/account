@@ -63,6 +63,7 @@ function account_service_mdb:init()
     config_mdb.WeakPasswordDictionaryEnabled = global_config.m_db_account_service.WeakPasswordDictionaryEnabled
     config_mdb.SNMPv3TrapAccountId = global_config.m_db_account_service.SNMPv3TrapAccountId
     config_mdb.HistoryPasswordCount = global_config.m_db_account_service.HistoryPasswordCount
+    config_mdb.MaxHistoryPasswordCount = global_config.m_db_account_service.MaxHistoryPasswordCount
     config_mdb.SNMPv3TrapAccountLimitPolicy = global_config.m_db_account_service.SNMPv3TrapAccountLimitPolicy
     config_mdb.HostUserManagementEnabled = global_config.m_db_account_service.HostUserManagementEnabled
     config_mdb.OSAdministratorPrivilegeEnabled = global_config.m_db_account_service.OSAdministratorPrivilegeEnabled
@@ -126,6 +127,13 @@ account_service_mdb.watch_property_hook = {
             ctx.operation_log.result = 'disable'
         end
     end, 'HistoryPasswordCount'),
+    MaxHistoryPasswordCount = operation_logger.proxy(function(self, ctx, value)
+        ctx.operation_log.params = { count = value }
+        self.m_account_service:set_max_history_password_count(value)
+        if value == 0 then
+            ctx.operation_log.result = 'disable'
+        end
+    end, 'MaxHistoryPasswordCount'),
     MinPasswordLength = operation_logger.proxy(function(self, ctx, value)
         ctx.operation_log.params = { length = value }
         self.m_account_config:set_password_min_length(value)
@@ -188,6 +196,7 @@ function account_service_mdb:new_config_to_mdb_tree(user_config)
     cls_config[INTERFACE_ACCOUNT_SERVICE].SNMPv3TrapAccountId = user_config.SNMPv3TrapAccountId
     cls_config[INTERFACE_ACCOUNT_SERVICE].SNMPv3TrapAccountLimitPolicy = user_config.SNMPv3TrapAccountLimitPolicy
     cls_config[INTERFACE_ACCOUNT_SERVICE].HistoryPasswordCount = user_config.HistoryPasswordCount
+    cls_config[INTERFACE_ACCOUNT_SERVICE].MaxHistoryPasswordCount = user_config.MaxHistoryPasswordCount
     cls_config[INTERFACE_ACCOUNT_SERVICE].HostUserManagementEnabled = user_config.HostUserManagementEnabled
     cls_config[INTERFACE_ACCOUNT_SERVICE].OSAdministratorPrivilegeEnabled = user_config.OSAdministratorPrivilegeEnabled
     cls_config[INTERFACE_ACCOUNT_SERVICE].UserNamePasswordPrefixCompareEnabled =

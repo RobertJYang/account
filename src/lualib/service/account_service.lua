@@ -603,6 +603,10 @@ function AccountService:set_history_password_count(count)
     self.m_account_collection:update_history_password_list()
 end
 
+function AccountService:set_max_history_password_count(count)
+    self.m_account_config:set_max_history_password_count(count)
+end
+
 local BASE_TIMESTAMP = 600 -- 10分钟600秒
 local MAC_COUNT = 12 * 60 * 2 -- 最大循环计数
 local MIN_SECOND_TO_RESET = 10 * 60 -- 判断跳变时间阈值

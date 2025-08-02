@@ -307,6 +307,47 @@ function TestAccount:test_when_delete_account_use_same_id_and_password_should_ne
     self.test_account_service:set_history_password_count(0)
 end
 
+function TestAccount:test_set_max_history_password_count_success()
+    --获取默认值
+    local max_histroy_count = self.test_global_account_config:get_max_history_password_count()
+    local history_count = self.test_global_account_config:get_history_password_count()
+    --查看能否设置和历史密码值相等
+    self.test_account_service:set_max_history_password_count(history_count)
+    lu.assertEquals(self.test_global_account_config:get_max_history_password_count(), history_count)
+    --查看能否设置到100次 
+    self.test_account_service:set_max_history_password_count(100)
+    lu.assertEquals(self.test_global_account_config:get_max_history_password_count(), 100)
+    --将历史密码分别设置100次和101次
+    self.test_account_service:set_history_password_count(100)
+    lu.assertEquals(self.test_global_account_config:get_history_password_count(), 100)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_account_service:set_history_password_count(101)
+    end)
+    --还原默认值
+    self.test_account_service:set_history_password_count(history_count)
+    self.test_account_service:set_max_history_password_count(max_histroy_count)
+    
+end
+
+function TestAccount:test_set_max_history_password_count_should_failed()
+    --获取默认值
+    local max_histroy_count = self.test_global_account_config:get_max_history_password_count()
+    local history_count = self.test_global_account_config:get_history_password_count()
+    --不能小于四次
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_account_service:set_max_history_password_count(4)
+    end)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_account_service:set_max_history_password_count(101)
+    end)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_account_service:set_max_history_password_count(history_count-1)
+    end)
+    --还原默认值
+    self.test_account_service:set_history_password_count(history_count)
+    self.test_account_service:set_max_history_password_count(max_histroy_count)
+end
+
 --- 当创建新用户ID为3时，当历史密码表中已存在ID为3的脏数据，应先删除脏数据，再插入
 function TestAccount:test_when_new_account_and_history_password_db_have_dirty_data_should_clear_it()
 
