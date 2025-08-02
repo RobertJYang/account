@@ -325,6 +325,19 @@ function ManagerAccount:set_ipmi_user_access(req, ctx)
     ipmi_channel_config_info.LinkAuthenticationEnabled = (req.AuthenticationEnable == 1)
     ipmi_channel_config_info.IpmiMessagingEnabled = (req.MessagingEnable == 1)
     self.m_ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
+    --同步写老表
+    self.m_ipmi_user_info_data.Privilege1 = enum.IpmiPrivilege.new(req.UserPrivilege)
+    if change_enable == 1 then
+        ctx.operation_log.params.session_limit = string.unpack('>B', req.SessionLimit)
+        ctx.operation_log.params.msg_enable = tostring(ipmi_channel_config_info.IpmiMessagingEnabled)
+        ctx.operation_log.params.link_auth = tostring(ipmi_channel_config_info.LinkAuthenticationEnabled)
+        ctx.operation_log.params.callback = req.UserRestricted
+        ctx.operation_log.result = 'changeable'
+        self.m_ipmi_user_info_data.IsCallin = req.UserRestricted
+        self.m_ipmi_user_info_data.IsEnableAuth = req.AuthenticationEnable
+        self.m_ipmi_user_info_data.IsEnableIpmiMsg = req.MessagingEnable
+    end
+    self.m_ipmi_user_info_data:save()
 end
 
 function ManagerAccount:get_ipmi_user_access(user_id, chan_num)
