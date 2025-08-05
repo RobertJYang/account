@@ -648,13 +648,13 @@ function app:collection_garbage_init()
 end
 
 function app:monitor_ipmi_channel_num()
-    client:OnChannelNumberMappingsPropertiesChanged(function(...)
+    client:OnChannelNumberMappingPropertiesChanged(function(...)
         self.ipmi_channel_mappings:on_channel_number_mappings_properties_changed(...)
     end)
-    client:OnChannelNumberMappingsInterfacesAdded(function(...)
+    client:OnChannelNumberMappingInterfacesAdded(function(...)
         self.ipmi_channel_mappings:on_channel_number_mappings_interfaces_added(...)
     end)
-    client:OnChannelNumberMappingsInterfacesRemoved(function(...)
+    client:OnChannelNumberMappingInterfacesRemoved(function(...)
         self.ipmi_channel_mappings:on_channel_number_mappings_interfaces_removed(...)
     end)
 end

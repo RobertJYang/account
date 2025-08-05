@@ -1,5 +1,10 @@
 All notable changes to this project will be documented in this file.
 
+## [1.90.16] - 2025-08-05
+bmc.kepler.IpmiService.ChannelNumberMappings接口名更新为bmc.kepler.IpmiService.ChannelNumberMapping
+ExternalChannelNumber修改为External
+InternalChannelNumber修改为Internal
+
 ## [1.90.15] - 2025-08-02
 新增属性:MaxAccountLockoutThreshold、MaxAccountLockoutDuration、MaxHistoryPasswordCount
 用来配置登录失败锁定次数和时间、历史密码的最大范围
