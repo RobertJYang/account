@@ -163,9 +163,9 @@ function MockClient:ForeachCipherSuitObjects(cb)
     return cb(obj)
 end
 
-function MockClient:GetChannelNumberMappingsObjects()
+function MockClient:GetChannelNumberMappingObjects()
     return {
-        ['mdb_path'] = {ExternalChannelNumber=1, InternalChannelNumber=1}
+        ['mdb_path'] = {External=1, Internal=1}
     }
 end
 

@@ -26,14 +26,14 @@ function channel_number_mappings:init()
 end
 
 function channel_number_mappings:init_ch_num_maps()
-    local map_objs = client:GetChannelNumberMappingsObjects()
+    local map_objs = client:GetChannelNumberMappingObjects()
     if not map_objs or next(map_objs) == nil then
         log:notice('Failed to get channel number mappings objects')
         return
     end
     for path, obj in pairs(map_objs) do
-        self.ch_num_maps[obj.ExternalChannelNumber] = obj.InternalChannelNumber
-        self.path_to_ch_num[path] = obj.ExternalChannelNumber
+        self.ch_num_maps[obj.External] = obj.Internal
+        self.path_to_ch_num[path] = obj.External
     end
     self.multi_channel_status = 1
 end
@@ -52,28 +52,28 @@ function channel_number_mappings:channel_number_translation(ch_num)
     return ch_num
 end
 
--- OnChannelNumberMappingsPropertiesChanged
+-- OnChannelNumberMappingPropertiesChanged
 function channel_number_mappings:on_channel_number_mappings_properties_changed(values, path)
-    if not values['ExternalChannelNumber'] then
+    if not values['External'] then
         return
     end
     local internal_channle_num = self.ch_num_maps[self.path_to_ch_num[path]]
-    local external_channel_num = values['ExternalChannelNumber']:value()
+    local external_channel_num = values['External']:value()
 
     self.ch_num_maps[self.path_to_ch_num[path]] = nil
     self.path_to_ch_num[path] = external_channel_num
     self.ch_num_maps[external_channel_num] = internal_channle_num
 end
 
--- OnChannelNumberMappingsInterfacesAdded
+-- OnChannelNumberMappingInterfacesAdded
 function channel_number_mappings:on_channel_number_mappings_interfaces_added(sender, path, values)
-    local external_channel_num = values['ExternalChannelNumber']:value()
-    self.ch_num_maps[external_channel_num] = values['InternalChannelNumber']:value()
+    local external_channel_num = values['External']:value()
+    self.ch_num_maps[external_channel_num] = values['Internal']:value()
     self.path_to_ch_num[path] = external_channel_num
     self.multi_channel_status = 1
 end
 
--- OnChannelNumberMappingsInterfacesRemoved
+-- OnChannelNumberMappingInterfacesRemoved
 function channel_number_mappings:on_channel_number_mappings_interfaces_removed(sender, path)
     self.ch_num_maps[self.path_to_ch_num[path]] = nil
     self.path_to_ch_num[path] = nil

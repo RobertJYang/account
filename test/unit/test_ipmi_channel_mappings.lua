@@ -11,12 +11,12 @@ local client = require 'account.client'
 local ipmi_channel_mappings = require 'domain.ipmi_channel_mappings'
 
 local ch_obj_ex = {
-    ExternalChannelNumber = {
+    External = {
         value = function ()
             return 8
         end
     },
-    InternalChannelNumber = {
+    Internal = {
         value = function ()
             return 2
         end
@@ -24,12 +24,12 @@ local ch_obj_ex = {
 }
 
 local ch_obj_ex2 = {
-    ExternalChannelNumber = {
+    External = {
         value = function ()
             return 10
         end
     },
-    InternalChannelNumber = {
+    Internal = {
         value = function ()
             return 1
         end
@@ -40,7 +40,7 @@ local path = 'bmc.kepler.test'
 local path1 = 'bmc.kepler.test1'
 
 function TestAccount:test_ipmi_channel_mappings()
-    client.GetChannelNumberMappingsObjects = function ()
+    client.GetChannelNumberMappingObjects = function ()
         return {
             path1 = ch_obj_ex2
         }
@@ -57,7 +57,7 @@ function TestAccount:test_ipmi_channel_mappings()
     ch_num = ch_obj:channel_number_translation(2)
     lu.assertIsNil(ch_num)
 
-    ch_obj_ex.ExternalChannelNumber = {
+    ch_obj_ex.External = {
         value = function ()
             return 7
         end
