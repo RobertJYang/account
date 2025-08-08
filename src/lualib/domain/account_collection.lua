@@ -145,6 +145,11 @@ function AccountCollection:init_account_collection(db)
             ipmi_info:delete()
         end
     end)
+    for account_id, _ in pairs(self.ipmi_channel_config.collection) do
+        if account_collection[account_id] == nil then
+            self.ipmi_channel_config:delete(account_id)
+        end
+    end
     self.collection = account_collection
 
     self.m_table_account = stmt_account.table
@@ -737,7 +742,7 @@ function AccountCollection:set_role_id(ctx, account_id, role_id, ipmi_privilege)
         account_id >= self.m_global_account_config:get_min_user_num() and
         account_id <= self.m_global_account_config:get_max_user_num() then
         ipmi_channel_config_list = self.ipmi_channel_config:get(account_id, 1)
-        ipmi_channel_config_list[1].PrivilegeLimit = privilege
+        ipmi_channel_config_list.PrivilegeLimit = privilege
         self.ipmi_channel_config.m_channel_config_changed:emit(account_id, 1, "PrivilegeLimit", privilege)
     end    
     self.m_account_changed:emit(account_id, "RoleId", role_id)
