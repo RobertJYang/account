@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.90.17] - 2025-08-08
+修复redfish创建用户报500及空定制config失败的问题
 
 ## [1.90.16] - 2025-08-05
 bmc.kepler.IpmiService.ChannelNumberMappings接口名更新为bmc.kepler.IpmiService.ChannelNumberMapping

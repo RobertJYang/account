@@ -79,6 +79,9 @@ function ipmi_channel_config_mdb:new_channel_config_to_mdb_tree(ipmi_channel_con
 end
 
 function ipmi_channel_config_mdb:delete_channel_config_from_mdb_tree(account_id)
+    if not self.m_channel_config[account_id] or next(self.m_channel_config[account_id]) == nil then
+        return
+    end
     for _, config in pairs(self.m_channel_config[account_id]) do
         self.m_mdb_cls:remove(config)
     end
