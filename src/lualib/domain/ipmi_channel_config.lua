@@ -36,6 +36,9 @@ end
 
 --- 获取指定用户指定通道的ipmi通道配置表
 function ipmi_channel_config:get(account_id, channel_number)
+    if not self.collection[account_id] then
+        return {}
+    end
     return self.collection[account_id][channel_number] or {}
 end
 
@@ -71,7 +74,7 @@ function ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
     local account_id = ipmi_channel_config_info.AccountId
     local channel_number = ipmi_channel_config_info.ChannelNumber
     local ipmi_channel_config_list = self:get(account_id, channel_number)
-    if ipmi_channel_config_list then
+    if ipmi_channel_config_list and next(ipmi_channel_config_list) ~= nil then
         ipmi_channel_config_list.PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit
         ipmi_channel_config_list.SessionLimit = ipmi_channel_config_info.SessionLimit
         -- changeable = 0 时以下字段保持原有配置

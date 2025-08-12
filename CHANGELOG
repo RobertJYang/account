@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.18] - 2025-08-12
+修复深度还原后互联网定制失败的问题
+
 ## [1.90.17] - 2025-08-08
 修复redfish创建用户报500及空定制config失败的问题
 

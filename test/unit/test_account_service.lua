@@ -1516,3 +1516,9 @@ function TestAccount:test_change_snmp_v3_account_when_is_emergency_account_shoul
     self.test_global_account_config:set_snmp_v3_trap_account(trap_id)
     self.test_global_account_config:set_emergency_account(emergency_id)
 end
+
+-- 测试获取ipmi_channel_config时不存在用户通道配置
+function TestAccount:test_get_ipmi_channel_config_when_user_config_not_exist()
+    local ipmi_channel_config_info = self.test_account_collection.ipmi_channel_config:get(101, 1)
+    lu.assertEquals(next(ipmi_channel_config_info), nil)
+end

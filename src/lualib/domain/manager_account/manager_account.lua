@@ -363,7 +363,7 @@ function ManagerAccount:get_ipmi_user_access(user_id, chan_num)
     rsp.PrivilegeLimit = enum.IpmiPrivilege.NO_ACCESS:value()
     -- 数据库读取配置信息
     local ipmi_channel_config_info = self.m_ipmi_channel_config:get(user_id, chan_num)
-    if ipmi_channel_config_info then
+    if ipmi_channel_config_info and next(ipmi_channel_config_info) ~= nil then
         rsp.ChaAccessMode = ipmi_channel_config_info.CallbackRestriction
         rsp.LinkAuthentication = ipmi_channel_config_info.LinkAuthenticationEnabled == true and 1 or 0
         rsp.IpmiMessaging = ipmi_channel_config_info.IpmiMessagingEnabled == true and 1 or 0
