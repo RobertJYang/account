@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.19] - 2025-08-14
+修复初始化时内存中没有默认通道配置导致定制失败的的问题
+
 ## [1.90.18] - 2025-08-12
 修复深度还原后互联网定制失败的问题
 

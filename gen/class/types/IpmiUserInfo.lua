@@ -14,6 +14,52 @@ local def_types = require 'class.types.types'
 
 local MIpmiUserInfo = {}
 
+---@class MIpmiUserInfo.IsSynced
+---@field IsSynced boolean
+local TIsSynced = {}
+TIsSynced.__index = TIsSynced
+TIsSynced.group = {}
+
+local function TIsSynced_from_obj(obj)
+    return setmetatable(obj, TIsSynced)
+end
+
+function TIsSynced.new(IsSynced)
+    return TIsSynced_from_obj({IsSynced = IsSynced or false})
+end
+---@param obj MIpmiUserInfo.IsSynced
+function TIsSynced:init_from_obj(obj)
+    self.IsSynced = obj.IsSynced or false
+end
+
+function TIsSynced:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIsSynced.group)
+end
+
+TIsSynced.from_obj = TIsSynced_from_obj
+
+TIsSynced.proto_property = {'IsSynced'}
+
+TIsSynced.default = {false}
+
+TIsSynced.struct = {{name = 'IsSynced', is_array = false, struct = nil}}
+
+function TIsSynced:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IsSynced', self.IsSynced, 'bool', false, errs, need_convert)
+
+    TIsSynced:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIsSynced.proto_property, errs, need_convert)
+    return self
+end
+
+function TIsSynced:unpack(_)
+    return self.IsSynced
+end
+
+MIpmiUserInfo.IsSynced = TIsSynced
+
 ---@class MIpmiUserInfo.Privilege1
 ---@field Privilege1 def_types.IpmiPrivilege
 local TPrivilege1 = {}

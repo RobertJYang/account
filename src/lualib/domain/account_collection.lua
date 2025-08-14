@@ -205,32 +205,25 @@ function AccountCollection:init_default_ipmi_channels()
             account_id > self.m_global_account_config:get_max_user_num() then
             goto continue
         end
+        if not self.ipmi_channel_config.collection[account_id] then
+            self.ipmi_channel_config.collection[account_id] = {}
+        end
         local role_id = collection.m_account_data.RoleId
-        local ok, err = pcall(function()
-            local existing_channels_map = {}
-            self.db:select(self.db.IpmiChannelConfig)
-                :where(self.db.IpmiChannelConfig.AccountId:eq(account_id))
-                :fold(function(record)
-                    existing_channels_map[record.ChannelNumber] = true
-                end)
-            for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
-                if not existing_channels_map[channel_num] then
-                    local new_channel_data = {
-                        AccountId = account_id,
-                        ChannelNumber = channel_num,
-                        CallbackRestriction = 0,
-                        LinkAuthenticationEnabled = true,
-                        IpmiMessagingEnabled = true,
-                        PrivilegeLimit = role_privilege_map.role_to_privilege_map[role_id],
-                        SessionLimit = 0
-                    }
-                    self.db:insert(self.db.IpmiChannelConfig):value(new_channel_data):exec()
-                end
+        local new_channel_data = {}
+        for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+            if not self.ipmi_channel_config.collection[account_id][channel_num] then
+                new_channel_data = {
+                    AccountId = account_id,
+                    ChannelNumber = channel_num,
+                    CallbackRestriction = 0,
+                    LinkAuthenticationEnabled = true,
+                    IpmiMessagingEnabled = true,
+                    PrivilegeLimit = role_privilege_map.role_to_privilege_map[role_id],
+                    SessionLimit = 0
+                }
+                self.db:insert(self.db.IpmiChannelConfig):value(new_channel_data):exec()
+                self.ipmi_channel_config.collection[account_id][channel_num] = new_channel_data
             end
-        end)
-        if not ok then
-            log:error("An error occurred while checking/inserting channel configs for AccountId %d: %s",
-                account_id, tostring(err))
         end
         ::continue::
     end
