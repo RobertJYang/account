@@ -198,3 +198,19 @@ t_account_policy:
   AllowedLoginInterfaces: 223
   Visible: false
   Deletable: false
+
+t_ipmi_channel_config:
+- AccountId: 2
+  ChannelNumber: 1
+  PrivilegeLimit: 4
+  CallbackRestriction: 0
+  LinkAuthenticationEnabled: true
+  IpmiMessagingEnabled: true
+  SessionLimit: 0
+- AccountId: 2
+  ChannelNumber: 2
+  PrivilegeLimit: 4
+  CallbackRestriction: 0
+  LinkAuthenticationEnabled: true
+  IpmiMessagingEnabled: true
+  SessionLimit: 0

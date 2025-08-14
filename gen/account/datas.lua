@@ -165,5 +165,24 @@ M.t_account_policy = {
     {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = true, Deletable = true},
     {AccountType = 8, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = false, Deletable = false}
 }
+M.t_ipmi_channel_config = {
+    {
+        AccountId = 2,
+        ChannelNumber = 1,
+        PrivilegeLimit = 4,
+        CallbackRestriction = 0,
+        LinkAuthenticationEnabled = true,
+        IpmiMessagingEnabled = true,
+        SessionLimit = 0
+    }, {
+        AccountId = 2,
+        ChannelNumber = 2,
+        PrivilegeLimit = 4,
+        CallbackRestriction = 0,
+        LinkAuthenticationEnabled = true,
+        IpmiMessagingEnabled = true,
+        SessionLimit = 0
+    }
+}
 
 return M
