@@ -221,8 +221,7 @@ function AccountCollection:init_default_ipmi_channels()
                     PrivilegeLimit = role_privilege_map.role_to_privilege_map[role_id],
                     SessionLimit = 0
                 }
-                self.db:insert(self.db.IpmiChannelConfig):value(new_channel_data):exec()
-                self.ipmi_channel_config.collection[account_id][channel_num] = new_channel_data
+                self.ipmi_channel_config:insert(new_channel_data, 0)
             end
         end
         ::continue::
