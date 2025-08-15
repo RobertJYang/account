@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.21] - 2025-08-15
+修复环境设置历史密码为边界值异常，返回值由PropertyValueNotInList改为PropertyValueOutOfRangeMessage
+
 ## [1.90.20] - 2025-08-15
 修复深度还原后概率性定制失败的问题
 
