@@ -207,10 +207,10 @@ end
 
 --- 当设置历史密码数不在0-5之间，应该设置失败
 function TestAccount:test_when_set_history_password_out_range_should_set_fail()
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_history_password_count(-1)
     end)
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_history_password_count(6)
     end)
     self.test_account_service:set_history_password_count(0)
@@ -320,7 +320,7 @@ function TestAccount:test_set_max_history_password_count_success()
     --将历史密码分别设置100次和101次
     self.test_account_service:set_history_password_count(100)
     lu.assertEquals(self.test_global_account_config:get_history_password_count(), 100)
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_history_password_count(101)
     end)
     --还原默认值
@@ -334,13 +334,13 @@ function TestAccount:test_set_max_history_password_count_should_failed()
     local max_histroy_count = self.test_global_account_config:get_max_history_password_count()
     local history_count = self.test_global_account_config:get_history_password_count()
     --不能小于四次
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_max_history_password_count(4)
     end)
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_max_history_password_count(101)
     end)
-    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+    lu.assertErrorMsgContains(custom_msg.PropertyValueOutOfRangeMessage.Name, function()
         self.test_account_service:set_max_history_password_count(history_count-1)
     end)
     --还原默认值

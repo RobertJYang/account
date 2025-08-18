@@ -380,7 +380,7 @@ function global_account_config:set_history_password_count(count)
     if count < 0 or count > max_count then
         log:error('set history password count failed, count(%d) is out of range, max history password count is(%d)', 
         count, max_count)
-        error(base_msg.PropertyValueNotInList('%HistoryPasswordCount:' .. count, '%HistoryPasswordCount'))
+        error(custom_msg.PropertyValueOutOfRange(count, 'HistoryPasswordCount'))
     end
     self.m_db_account_service.HistoryPasswordCount = count
     self.m_db_account_service:save()
@@ -392,7 +392,7 @@ function global_account_config:set_max_history_password_count(count)
     if count < 5 or count > 100 or count < password_count then
         log:error('set max history password count failed, count(%d) is out of range, history password count is (%d)', 
         password_count ,count)
-        error(base_msg.PropertyValueNotInList('%MaxHistoryPasswordCount:' .. count, '%MaxHistoryPasswordCount'))
+        error(custom_msg.PropertyValueOutOfRange(count, 'MaxHistoryPasswordCount'))
     end
     self.m_db_account_service.MaxHistoryPasswordCount = count
     self.m_db_account_service:save()
