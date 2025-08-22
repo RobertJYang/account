@@ -77,11 +77,11 @@ end
 
 function AccountPolicy:set_allowed_login_interfaces(interface_num)
     if interface_num <= 0 or interface_num == enum.LoginInterface.SFTP:value() then
-        log:error('set allowed login interfaces failed, interfaces must contain at least one valid item except SFTP')
+        log:error('Set allowed login interfaces failed, interfaces must contain at least one valid item except SFTP')
         error(custom_msg.ArrayPropertyInvalidItem('AllowedLoginInterfaces'))
     end
     if interface_num & config.DEFAULT_INTERFACES ~= interface_num then
-        log:error('set allowed login interfaces failed, interfaces : %d not supported', interface_num)
+        log:error('Set allowed login interfaces failed, interfaces : %d not supported', interface_num)
         error(base_msg.PropertyValueNotInList(interface_num, "LoginInterface"))
     end
     self.data.AllowedLoginInterfaces = interface_num

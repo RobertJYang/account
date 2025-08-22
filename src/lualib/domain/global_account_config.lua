@@ -195,7 +195,7 @@ function global_account_config:set_max_password_valid_days(max_age)
 
     -- 最长有效期范围0~365天
     if max_age > 365 or max_age < 0 then
-        log:error('set_max_password_valid_days failed, expired_time(%u) is error', max_age)
+        log:error('Set max password valid days failed, expired_time(%u) is error', max_age)
         error(base_msg.PropertyValueNotInList('%MaxPasswordValidDays:' .. max_age, '%MaxPasswordValidDays'))
     end
     if min_age ~= PROP_NOT_USE and max_age ~= PROP_NOT_USE and max_age <= min_age + MAX_MIN_DIFF then
@@ -378,7 +378,7 @@ function global_account_config:set_history_password_count(count)
     local max_count = self.m_db_account_service.MaxHistoryPasswordCount
     -- 历史密码数范围由最大范围控制
     if count < 0 or count > max_count then
-        log:error('set history password count failed, count(%d) is out of range, max history password count is(%d)', 
+        log:error('Set history password count failed, count(%d) is out of range, max history password count is(%d)', 
         count, max_count)
         error(custom_msg.PropertyValueOutOfRange(count, 'HistoryPasswordCount'))
     end
@@ -390,7 +390,7 @@ function global_account_config:set_max_history_password_count(count)
     local password_count = self.m_db_account_service.HistoryPasswordCount
     -- 历史密码数范围5-100
     if count < 5 or count > 100 or count < password_count then
-        log:error('set max history password count failed, count(%d) is out of range, history password count is (%d)', 
+        log:error('Set max history password count failed, count(%d) is out of range, history password count is (%d)', 
         password_count ,count)
         error(custom_msg.PropertyValueOutOfRange(count, 'MaxHistoryPasswordCount'))
     end

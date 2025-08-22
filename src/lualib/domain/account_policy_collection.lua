@@ -14,6 +14,7 @@ local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
 local local_account_policy = require 'domain.account_policies.local_account_policy'
 local oem_account_policy = require 'domain.account_policies.oem_account_policy'
+local core = require 'account_core'
 local utils = require 'infrastructure.utils'
 
 local AccountPolicyCollection = class()
@@ -71,6 +72,10 @@ function AccountPolicyCollection:check_user_name(account_type, user_name)
 end
 
 function AccountPolicyCollection:check_login_interface_is_allowed(account_type, login_interface)
+    if core.is_manufacture_mode() then
+        log:notice("Skip checking allowed login interface in manufacture mode")
+        return true
+    end
     return self.collection[account_type]:check_login_interface_is_allowed(login_interface)
 end
 

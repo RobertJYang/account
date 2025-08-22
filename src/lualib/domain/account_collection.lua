@@ -430,7 +430,7 @@ end
 
 function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_class, is_ipmi_or_snmp,
     is_password_validator)
-    log:info("start to add new account to db and mdb")
+    log:info("Start to add new account to db and mdb")
     local account_type = account_info.oem and enum.AccountType.OEM:value() or enum.AccountType.Local:value()
     -- 将新用户加入db与mdb
     local account_in_db = self.m_table_account({ Id = account_info.id, UserName = account_info.name,
