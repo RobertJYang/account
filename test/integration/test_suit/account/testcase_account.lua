@@ -325,13 +325,13 @@ end
 --- 当有ConfigureSelf权限用户，修改自身密码应该成功
 function AccountCases.test_when_account_have_config_self_privilege_should_change_self_password_success(bus)
     local account_id, role_id = 3, enum.RoleType.CustomRole1:value()
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000',
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001',
         role_id, { enum.LoginInterface.Web:value() }, 1)
     -- 修改自身密码
     local initial_context = test_case_utils.initiator
     local current_context = mc_context.new('IT', 'test3', '127.0.0.1')
     test_case_utils.initiator = current_context
-    local ok, err = pcall(test_case_utils.call_account_change_pwd, bus, account_id, 'Admin@900000')
+    local ok, err = pcall(test_case_utils.call_account_change_pwd, bus, account_id, 'Paswd@9001')
     test_case_utils.initiator = initial_context
     assert(ok and not err)
     -- 恢复操作
@@ -341,15 +341,15 @@ end
 --- 当非管理员用户修改其他用户密码，应该失败
 function AccountCases.test_when_not_admin_account_should_change_other_password_fail(bus)
     local role_id = enum.RoleType.CustomRole1:value()
-    test_case_utils.call_account_new(bus, 3, 'test3', 'Admin@90000',
+    test_case_utils.call_account_new(bus, 3, 'test3', 'Paswd@9001',
         role_id, { enum.LoginInterface.Web:value() }, 1)
-    test_case_utils.call_account_new(bus, 4, 'test4', 'Admin@90000',
+    test_case_utils.call_account_new(bus, 4, 'test4', 'Paswd@9001',
         role_id, { enum.LoginInterface.Web:value() }, 1)
     -- 修改自身密码
     local initial_context = test_case_utils.initiator
     local current_context = mc_context.new('IT', 'test3', '127.0.0.1')
     test_case_utils.initiator = current_context
-    local ok, err = pcall(test_case_utils.call_account_change_pwd, bus, 4, 'Admin@900000')
+    local ok, err = pcall(test_case_utils.call_account_change_pwd, bus, 4, 'Paswd@9001')
     test_case_utils.initiator = initial_context
     assert(not ok)
     assert(err.name == base_msg.InsufficientPrivilegeMessage.Name)
@@ -361,7 +361,7 @@ end
 --- 当用户修改的密码中含有中文时，应该失败
 function AccountCases.test_when_password_contains_chinese_should_change_fail(bus)
     local role_id = enum.RoleType.Administrator:value()
-    test_case_utils.call_account_new(bus, 3, 'test3', 'Admin@90000',
+    test_case_utils.call_account_new(bus, 3, 'test3', 'Paswd@9001',
         role_id, { enum.LoginInterface.Web:value() }, 1)
     local ok, err = pcall(test_case_utils.call_account_change_pwd, bus, 3, '中文damie@134')
     assert(not ok)
@@ -373,7 +373,7 @@ end
 --- 当用户为逃生用户，Deletable属性应该为false
 function AccountCases.test_when_account_is_emergency_account_should_deletable_is_false(bus)
     local account_id = 3
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000', 4,
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001', 4,
         { enum.LoginInterface.Web:value() }, 1)
     test_case_utils.set_account_service_property(bus, 'EmergencyLoginAccountId', account_id)
     local deletable = test_case_utils.get_account_property(bus, account_id, 'Deletable')
@@ -389,7 +389,7 @@ function AccountCases.test_when_account_is_snmp_v3_trap_account_should_deletable
     local origin = test_case_utils.get_account_service_property(bus, 'SNMPv3TrapAccountLimitPolicy')
     assert(origin == 2)
     local account_id = 3
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000', 4,
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001', 4,
         { enum.LoginInterface.Web:value() }, 1)
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountId', account_id)
     local deletable = test_case_utils.get_account_property(bus, account_id, 'Deletable')
@@ -417,7 +417,7 @@ end
 --- 当用户不为（逃生用户/SNMPv3Trap用户/最后一个使能管理员），Deletable属性应该为true
 function AccountCases.test_when_account_is_normal_should_deletable_is_true(bus)
     local account_id = 3
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000', 4, { enum.LoginInterface.Web:value() }, 1)
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001', 4, { enum.LoginInterface.Web:value() }, 1)
     local deletable = test_case_utils.get_account_property(bus, account_id, 'Deletable')
     assert(deletable == true)
     -- 恢复操作
@@ -430,7 +430,7 @@ function AccountCases.test_when_new_second_administrator_should_first_administra
     assert(deletable == false)
     -- 创建用户3为管理员
     local second_adminaccount_id = 3
-    test_case_utils.call_account_new(bus, second_adminaccount_id, 'test3', 'Admin@90000', 4,
+    test_case_utils.call_account_new(bus, second_adminaccount_id, 'test3', 'Paswd@9001', 4,
         { enum.LoginInterface.Web:value() }, 1)
     -- 设置用户3为snmptrapv3用户
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountId', 3)
@@ -446,7 +446,7 @@ end
 function AccountCases.test_when_set_seconde_administrator_should_first_administrator_is_deletable(bus)
     -- 创建用户3为非管理员
     local test_id = 3
-    test_case_utils.call_account_new(bus, test_id, 'test3', 'Admin@90000', 3,
+    test_case_utils.call_account_new(bus, test_id, 'test3', 'Paswd@9001', 3,
         { enum.LoginInterface.Web:value() }, 1)
     -- 设置用户3为snmptrapv3用户
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountId', 3)
@@ -467,7 +467,7 @@ function AccountCases.test_when_change_trap_limit_policy_to_1_should_rename_succ
     local origin = test_case_utils.get_account_service_property(bus, 'SNMPv3TrapAccountLimitPolicy')
     assert(origin == 2)
     local account_id = 3
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000', 4, { enum.LoginInterface.Web:value() }, 1)
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001', 4, { enum.LoginInterface.Web:value() }, 1)
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountId', account_id)
 
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountLimitPolicy', 1)
@@ -488,7 +488,7 @@ function AccountCases.test_when_change_trap_limit_policy_to_0_should_rename_succ
     local origin = test_case_utils.get_account_service_property(bus, 'SNMPv3TrapAccountLimitPolicy')
     assert(origin == 2)
     local account_id = 3
-    test_case_utils.call_account_new(bus, account_id, 'test3', 'Admin@90000', 4, { enum.LoginInterface.Web:value() }, 1)
+    test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001', 4, { enum.LoginInterface.Web:value() }, 1)
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountId', account_id)
 
     test_case_utils.set_account_service_property(bus, 'SNMPv3TrapAccountLimitPolicy', 0)
