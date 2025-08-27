@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.23] - 2025-08-26
+安全子系统敏感信息排查
+
 ## [1.90.22] - 2025-08-22
 装备模式跳过登录接口检查支持登录接口定制
 

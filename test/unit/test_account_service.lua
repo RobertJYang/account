@@ -178,7 +178,7 @@ function TestAccount:test_add_account_full()
         local account_info = {
             ['id'] = id,
             ['name'] = "test" .. tostring(id),
-            ['password'] = "Huawei12#$%",
+            ['password'] = "Manufacturer12#$%",
             ['role_id'] = enum.RoleType.Operator:value(),
             ['interface'] = interface,
             ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
