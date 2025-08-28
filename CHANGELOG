@@ -1,6 +1,7 @@
 All notable changes to this project will be documented in this file.
 ## [1.90.24] - 2025-08-28
 修复ipmi查询的用户信息与实际不一致问题
+修复ipmi设置权限时通道权限和用户权限不一致 
 
 ## [1.90.23] - 2025-08-26
 安全子系统敏感信息排查

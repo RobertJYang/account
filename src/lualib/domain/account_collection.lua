@@ -1088,13 +1088,16 @@ function AccountCollection:set_ipmi_user_access(req, ctx)
     self:ipmi_set_user_access_input_check(req, ctx)
     self:ipmi_set_user_access_restricted_scene_check(req, ctx)
     local account_id = req.UserId
-    self.collection[account_id]:set_ipmi_user_access(req, ctx)
+    local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and ctx.chan_num or
+        req.ChannelNumber)
     -- 单通道场景下需要设置用户角色
-    if self.ipmi_channel_mappings.multi_channel_status == 0 then
+    if self.ipmi_channel_mappings.multi_channel_status == 0 or
+        channel_number == enum.IpmiChannel.LAN1_CHAN_NUM:value() then
         local role_id = role_privilege_map.privilege_to_role_map[req.UserPrivilege]
         self:set_role_id(ctx, account_id, role_id, req.UserPrivilege)
         self.m_account_changed:emit(account_id, "RoleId", role_id)
-    end    
+    end
+    self.collection[account_id]:set_ipmi_user_access(req, ctx)
 end
 
 function AccountCollection:get_enabled_user()
