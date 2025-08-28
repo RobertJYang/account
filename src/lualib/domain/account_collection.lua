@@ -1114,6 +1114,7 @@ function AccountCollection:get_ipmi_user_access(user_id, chan_num)
     else
         rsp = self.collection[user_id]:get_ipmi_user_access(user_id, chan_num)
     end
+    rsp.EnabledUser = self.ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
     return rsp
 end
 
