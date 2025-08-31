@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.25] - 2025-08-31
+修复SetUserAccess操作日志未记录会话限制的问题
+
 ## [1.90.24] - 2025-08-28
 修复ipmi查询的用户信息与实际不一致问题
 修复ipmi设置权限时通道权限和用户权限不一致 
