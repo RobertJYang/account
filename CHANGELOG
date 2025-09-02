@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.29] - 2025-09-04
+修复ipmi创建用户并启用时密码复杂度校验问题
+
 ## [1.90.28] - 2025-09-04
 清除自动生成代码的冗余描述
 
