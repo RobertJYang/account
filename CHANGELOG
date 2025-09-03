@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.27] - 2025-09-03
+修复修改snmp鉴权算法后需要强制修改密码的问题
+
 ## [1.90.26] - 2025-09-03
 修复恢复用户删除同名用户时未清除通道配置的问题
 
