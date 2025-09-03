@@ -612,6 +612,8 @@ function AccountCollection:force_delete_account(ctx, account_id)
     self.m_account_file_removed:emit(account_id)
     -- 清除历史密码
     account.m_history_password:delete()
+    -- 清除通道配置
+    self.ipmi_channel_config:delete(account_id)
     -- 将用户从db与mbd移除
     account.m_account_data:delete()
     account.m_snmp_user_info_data:delete()

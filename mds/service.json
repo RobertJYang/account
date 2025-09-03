@@ -1,6 +1,6 @@
 {
     "name": "account",
-    "version": "1.90.25",
+    "version": "1.90.26",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",
@@ -39,7 +39,7 @@
                 "conan": "hwproxy/[>=1.60.0]"
             },
             {
-                "conan": "hwdiscovery/[>=1.60.0]"
+                "conan": "hwdiscovery/[>=1.60.0 <1.90.0]"
             },
             {
                 "conan": "bmc_network/[>=1.60.0]"

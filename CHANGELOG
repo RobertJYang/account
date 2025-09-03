@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.26] - 2025-09-03
+修复恢复用户删除同名用户时未清除通道配置的问题
+
 ## [1.90.25] - 2025-08-31
 修复SetUserAccess操作日志未记录会话限制的问题
 
