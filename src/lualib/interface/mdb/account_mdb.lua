@@ -403,7 +403,8 @@ function account_mdb:delete_ssh_public_key(ctx, account_id)
 end
 
 function account_mdb:set_authentication_protocol(ctx, account_id, protocol, auth_password, encry_password)
-    if not _privilege_check(ctx, account_id, self.m_account_collection) then
+    local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
+    if not privilege_ok then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
         ctx.operation_log.params.operation = 'set authentication protocol'
         error(base_msg.InsufficientPrivilege())

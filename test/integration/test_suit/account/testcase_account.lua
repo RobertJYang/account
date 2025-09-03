@@ -324,6 +324,8 @@ end
 --- 当没有ConfigureSelf权限用户，修改自身密码应该失败 (在框架层拦截)
 --- 当有ConfigureSelf权限用户，修改自身密码应该成功
 function AccountCases.test_when_account_have_config_self_privilege_should_change_self_password_success(bus)
+    -- 关闭历史密码校验
+    test_case_utils.set_account_service_property(bus, 'HistoryPasswordCount', 0)
     local account_id, role_id = 3, enum.RoleType.CustomRole1:value()
     test_case_utils.call_account_new(bus, account_id, 'test3', 'Paswd@9001',
         role_id, { enum.LoginInterface.Web:value() }, 1)
