@@ -109,39 +109,6 @@
                 }
             }
         },
-        "Options": {
-            "type": "object",
-            "properties": {
-                "volatile": {
-                    "allOf": [
-                        {
-                            "$ref": "base.json#/Boolean"
-                        }
-                    ]
-                },
-                "deprecated": {
-                    "allOf": [
-                        {
-                            "$ref": "base.json#/Boolean"
-                        }
-                    ]
-                },
-                "explicit": {
-                    "allOf": [
-                        {
-                            "$ref": "base.json#/Boolean"
-                        }
-                    ]
-                },
-                "emitsChangedSignal": {
-                    "allOf": [
-                        {
-                            "$ref": "base.json#/String"
-                        }
-                    ]
-                }
-            }
-        },
         "RoleType": {
             "type": "object",
             "properties": {

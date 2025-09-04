@@ -796,6 +796,94 @@ end
 
 Certificate.CertificateType = TCertificateType
 
+---@class Certificate.GetCertificateStringRsp
+---@field CertificateString string
+local TGetCertificateStringRsp = {}
+TGetCertificateStringRsp.__index = TGetCertificateStringRsp
+TGetCertificateStringRsp.group = {}
+
+local function TGetCertificateStringRsp_from_obj(obj)
+    return setmetatable(obj, TGetCertificateStringRsp)
+end
+
+function TGetCertificateStringRsp.new(CertificateString)
+    return TGetCertificateStringRsp_from_obj({CertificateString = CertificateString})
+end
+---@param obj Certificate.GetCertificateStringRsp
+function TGetCertificateStringRsp:init_from_obj(obj)
+    self.CertificateString = obj.CertificateString
+end
+
+function TGetCertificateStringRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetCertificateStringRsp.group)
+end
+
+TGetCertificateStringRsp.from_obj = TGetCertificateStringRsp_from_obj
+
+TGetCertificateStringRsp.proto_property = {'CertificateString'}
+
+TGetCertificateStringRsp.default = {''}
+
+TGetCertificateStringRsp.struct = {{name = 'CertificateString', is_array = false, struct = nil}}
+
+function TGetCertificateStringRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'CertificateString', self.CertificateString, 'string', false, errs, need_convert)
+
+    TGetCertificateStringRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetCertificateStringRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TGetCertificateStringRsp:unpack(_)
+    return self.CertificateString
+end
+
+Certificate.GetCertificateStringRsp = TGetCertificateStringRsp
+
+---@class Certificate.GetCertificateStringReq
+local TGetCertificateStringReq = {}
+TGetCertificateStringReq.__index = TGetCertificateStringReq
+TGetCertificateStringReq.group = {}
+
+local function TGetCertificateStringReq_from_obj(obj)
+    return setmetatable(obj, TGetCertificateStringReq)
+end
+
+function TGetCertificateStringReq.new()
+    return TGetCertificateStringReq_from_obj({})
+end
+---@param obj Certificate.GetCertificateStringReq
+function TGetCertificateStringReq:init_from_obj(obj)
+
+end
+
+function TGetCertificateStringReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetCertificateStringReq.group)
+end
+
+TGetCertificateStringReq.from_obj = TGetCertificateStringReq_from_obj
+
+TGetCertificateStringReq.proto_property = {}
+
+TGetCertificateStringReq.default = {}
+
+TGetCertificateStringReq.struct = {}
+
+function TGetCertificateStringReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    TGetCertificateStringReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetCertificateStringReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TGetCertificateStringReq:unpack(_)
+end
+
+Certificate.GetCertificateStringReq = TGetCertificateStringReq
+
 ---@class Certificate.DeleteCRLRsp
 local TDeleteCRLRsp = {}
 TDeleteCRLRsp.__index = TDeleteCRLRsp
@@ -898,6 +986,9 @@ Certificate.interface = mdb.register_interface('bmc.kepler.CertificateService.Ce
     CRLExpireTime = {'s', nil, true, nil, false},
     CertCount = {'u', nil, true, nil, false},
     KeyLength = {'u', nil, true, nil, false}
-}, {DeleteCRL = {'a{ss}', '', TDeleteCRLReq, TDeleteCRLRsp}}, {})
+}, {
+    DeleteCRL = {'a{ss}', '', TDeleteCRLReq, TDeleteCRLRsp},
+    GetCertificateString = {'a{ss}', 's', TGetCertificateStringReq, TGetCertificateStringRsp}
+}, {})
 
 return Certificate
