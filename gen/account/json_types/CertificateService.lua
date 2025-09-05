@@ -53,6 +53,7 @@ ECertificateUsageType.ManagerCACertificate = ECertificateUsageType.new(0)
 ECertificateUsageType.ManagerSSLCertificate = ECertificateUsageType.new(1)
 ECertificateUsageType.ManagerAccountCertificate = ECertificateUsageType.new(2)
 ECertificateUsageType.ManagerCMPCertificate = ECertificateUsageType.new(3)
+ECertificateUsageType.ManagerFirmwareCertificate = ECertificateUsageType.new(4)
 
 CertificateService.CertificateUsageType = ECertificateUsageType
 
@@ -87,6 +88,59 @@ ECertificateType.PEMchain = ECertificateType.new(1)
 ECertificateType.PKCS7 = ECertificateType.new(2)
 
 CertificateService.CertificateType = ECertificateType
+
+---@class CertificateService.Extra
+---@field key string
+---@field value string
+local TExtra = {}
+TExtra.__index = TExtra
+TExtra.group = {}
+
+local function TExtra_from_obj(obj)
+    return setmetatable(obj, TExtra)
+end
+
+function TExtra.new(dict)
+    return TExtra_from_obj(dict)
+end
+
+---@param obj CertificateService.Extra
+function TExtra:init_from_obj(obj)
+    self = obj
+end
+
+function TExtra:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TExtra.group)
+end
+
+TExtra.from_obj = TExtra_from_obj
+
+TExtra.proto_property = {}
+
+TExtra.default = {}
+
+TExtra.struct = {}
+
+function TExtra:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    for k, v in pairs(self) do
+
+        validate.Optional(prefix .. 'key', k, 'string', false, errs, need_convert)
+
+        validate.Optional(prefix .. 'value', v, 'string', false, errs, need_convert)
+
+    end
+
+    TExtra:remove_error_props(errs, self)
+    return self
+end
+
+function TExtra:unpack(_)
+    return self
+end
+
+CertificateService.Extra = TExtra
 
 ---@class CertificateService.CSRProperty
 ---@field key string
@@ -1626,6 +1680,158 @@ end
 
 CertificateService.StartGenerateCSRReq = TStartGenerateCSRReq
 
+---@class CertificateService.ImportCertificateRsp
+---@field Id integer
+---@field TaskId integer
+---@field Extra CertificateService.Extra
+local TImportCertificateRsp = {}
+TImportCertificateRsp.__index = TImportCertificateRsp
+TImportCertificateRsp.group = {}
+
+local function TImportCertificateRsp_from_obj(obj)
+    return setmetatable(obj, TImportCertificateRsp)
+end
+
+function TImportCertificateRsp.new(Id, TaskId, Extra)
+    return TImportCertificateRsp_from_obj({Id = Id, TaskId = TaskId, Extra = Extra})
+end
+---@param obj CertificateService.ImportCertificateRsp
+function TImportCertificateRsp:init_from_obj(obj)
+    self.Id = obj.Id
+    self.TaskId = obj.TaskId
+    self.Extra = obj.Extra
+end
+
+function TImportCertificateRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TImportCertificateRsp.group)
+end
+
+TImportCertificateRsp.from_obj = TImportCertificateRsp_from_obj
+
+TImportCertificateRsp.proto_property = {'Id', 'TaskId', 'Extra'}
+
+TImportCertificateRsp.default = {0, 0, CertificateService.Extra.default}
+
+TImportCertificateRsp.struct = {
+    {name = 'Id', is_array = false, struct = nil}, {name = 'TaskId', is_array = false, struct = nil},
+    {name = 'Extra', is_array = false, struct = CertificateService.Extra.struct}
+}
+
+function TImportCertificateRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    CertificateService.Extra.new(self.Extra):validate(prefix, errs, need_convert)
+
+    validate.Optional(prefix .. 'Id', self.Id, 'uint32', false, errs, need_convert)
+    validate.Optional(prefix .. 'TaskId', self.TaskId, 'uint32', false, errs, need_convert)
+
+    TImportCertificateRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TImportCertificateRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TImportCertificateRsp:unpack(_)
+    return self.Id, self.TaskId, self.Extra
+end
+
+CertificateService.ImportCertificateRsp = TImportCertificateRsp
+
+---@class CertificateService.ImportCertificateReq
+---@field CertificateUsageType CertificateService.CertificateUsageType
+---@field Type string
+---@field Content string
+---@field Id integer
+---@field WithEncryptedKey boolean
+---@field Password string
+---@field Extra CertificateService.Extra
+local TImportCertificateReq = {}
+TImportCertificateReq.__index = TImportCertificateReq
+TImportCertificateReq.group = {}
+
+local function TImportCertificateReq_from_obj(obj)
+    obj.CertificateUsageType = obj.CertificateUsageType and
+                                   CertificateService.CertificateUsageType.new(obj.CertificateUsageType)
+    return setmetatable(obj, TImportCertificateReq)
+end
+
+function TImportCertificateReq.new(CertificateUsageType, Type, Content, Id, WithEncryptedKey, Password, Extra)
+    return TImportCertificateReq_from_obj({
+        CertificateUsageType = CertificateUsageType,
+        Type = Type,
+        Content = Content,
+        Id = Id,
+        WithEncryptedKey = WithEncryptedKey,
+        Password = Password,
+        Extra = Extra
+    })
+end
+---@param obj CertificateService.ImportCertificateReq
+function TImportCertificateReq:init_from_obj(obj)
+    self.CertificateUsageType = obj.CertificateUsageType
+    self.Type = obj.Type
+    self.Content = obj.Content
+    self.Id = obj.Id
+    self.WithEncryptedKey = obj.WithEncryptedKey
+    self.Password = obj.Password
+    self.Extra = obj.Extra
+end
+
+function TImportCertificateReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TImportCertificateReq.group)
+end
+
+TImportCertificateReq.from_obj = TImportCertificateReq_from_obj
+
+TImportCertificateReq.proto_property = {
+    'CertificateUsageType', 'Type', 'Content', 'Id', 'WithEncryptedKey', 'Password', 'Extra'
+}
+
+TImportCertificateReq.default = {
+    CertificateService.CertificateUsageType.default, '', '', 0, false, '', CertificateService.Extra.default
+}
+
+TImportCertificateReq.struct = {
+    {name = 'CertificateUsageType', is_array = false, struct = CertificateService.CertificateUsageType.struct},
+    {name = 'Type', is_array = false, struct = nil}, {name = 'Content', is_array = false, struct = nil},
+    {name = 'Id', is_array = false, struct = nil}, {name = 'WithEncryptedKey', is_array = false, struct = nil},
+    {name = 'Password', is_array = false, struct = nil},
+    {name = 'Extra', is_array = false, struct = CertificateService.Extra.struct}
+}
+
+function TImportCertificateReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    CertificateService.CertificateUsageType.new():validate(prefix, errs, need_convert)
+    CertificateService.Extra.new(self.Extra):validate(prefix, errs, need_convert)
+
+    validate.Optional(prefix .. 'Type', self.Type, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'Content', self.Content, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'Id', self.Id, 'uint32', false, errs, need_convert)
+    validate.Optional(prefix .. 'WithEncryptedKey', self.WithEncryptedKey, 'bool', false, errs, need_convert)
+    validate.Optional(prefix .. 'Password', self.Password, 'string', false, errs, need_convert)
+
+    if self.Type ~= nil then
+        validate.lens(prefix .. 'Type', self.Type, 1, 5, errs, need_convert)
+    end
+    if self.Id ~= nil then
+        validate.ranges(prefix .. 'Id', self.Id, 0, 32, errs, need_convert)
+    end
+    if self.Password ~= nil then
+        validate.lens(prefix .. 'Password', self.Password, 0, 127, errs, need_convert)
+    end
+
+    TImportCertificateReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TImportCertificateReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TImportCertificateReq:unpack(raw)
+    local CertificateUsageType = utils.unpack_enum(raw, self.CertificateUsageType)
+    return CertificateUsageType, self.Type, self.Content, self.Id, self.WithEncryptedKey, self.Password, self.Extra
+end
+
+CertificateService.ImportCertificateReq = TImportCertificateReq
+
 ---@class CertificateService.ImportCertWithKeyRsp
 ---@field TaskId integer
 local TImportCertWithKeyRsp = {}
@@ -1986,6 +2192,7 @@ CertificateService.interface = mdb.register_interface('bmc.kepler.CertificateSer
     GetCertPath = {'a{ss}i', 's', TGetCertPathReq, TGetCertPathRsp},
     ImportCert = {'a{ss}issu', 'uu', TImportCertReq, TImportCertRsp},
     ImportCertWithKey = {'a{ss}isss', 'u', TImportCertWithKeyReq, TImportCertWithKeyRsp},
+    ImportCertificate = {'a{ss}issubsa{ss}', 'uua{ss}', TImportCertificateReq, TImportCertificateRsp},
     StartGenerateCSR = {'a{ss}ssssssas', 'su', TStartGenerateCSRReq, TStartGenerateCSRRsp},
     GenerateCSR = {'a{ss}ssssssasasia{ss}', 'sus', TGenerateCSRReq, TGenerateCSRRsp},
     ExportCSR = {'a{ss}s', 'u', TExportCSRReq, TExportCSRRsp},

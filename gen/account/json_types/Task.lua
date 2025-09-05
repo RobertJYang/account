@@ -13,6 +13,144 @@ local mdb = require 'mc.mdb'
 
 local Task = {}
 
+---@class Task.Description
+---@field Description string
+local TDescription = {}
+TDescription.__index = TDescription
+TDescription.group = {}
+
+local function TDescription_from_obj(obj)
+    return setmetatable(obj, TDescription)
+end
+
+function TDescription.new(Description)
+    return TDescription_from_obj({Description = Description})
+end
+---@param obj Task.Description
+function TDescription:init_from_obj(obj)
+    self.Description = obj.Description
+end
+
+function TDescription:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TDescription.group)
+end
+
+TDescription.from_obj = TDescription_from_obj
+
+TDescription.proto_property = {'Description'}
+
+TDescription.default = {''}
+
+TDescription.struct = {{name = 'Description', is_array = false, struct = nil}}
+
+function TDescription:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Description', self.Description, 'string', true, errs, need_convert)
+
+    TDescription:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TDescription.proto_property, errs, need_convert)
+    return self
+end
+
+function TDescription:unpack(_)
+    return self.Description
+end
+
+Task.Description = TDescription
+
+---@class Task.Stage
+---@field Stage string
+local TStage = {}
+TStage.__index = TStage
+TStage.group = {}
+
+local function TStage_from_obj(obj)
+    return setmetatable(obj, TStage)
+end
+
+function TStage.new(Stage)
+    return TStage_from_obj({Stage = Stage})
+end
+---@param obj Task.Stage
+function TStage:init_from_obj(obj)
+    self.Stage = obj.Stage
+end
+
+function TStage:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TStage.group)
+end
+
+TStage.from_obj = TStage_from_obj
+
+TStage.proto_property = {'Stage'}
+
+TStage.default = {''}
+
+TStage.struct = {{name = 'Stage', is_array = false, struct = nil}}
+
+function TStage:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Stage', self.Stage, 'string', true, errs, need_convert)
+
+    TStage:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TStage.proto_property, errs, need_convert)
+    return self
+end
+
+function TStage:unpack(_)
+    return self.Stage
+end
+
+Task.Stage = TStage
+
+---@class Task.EstimatedDuration
+---@field EstimatedDuration integer
+local TEstimatedDuration = {}
+TEstimatedDuration.__index = TEstimatedDuration
+TEstimatedDuration.group = {}
+
+local function TEstimatedDuration_from_obj(obj)
+    return setmetatable(obj, TEstimatedDuration)
+end
+
+function TEstimatedDuration.new(EstimatedDuration)
+    return TEstimatedDuration_from_obj({EstimatedDuration = EstimatedDuration})
+end
+---@param obj Task.EstimatedDuration
+function TEstimatedDuration:init_from_obj(obj)
+    self.EstimatedDuration = obj.EstimatedDuration
+end
+
+function TEstimatedDuration:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TEstimatedDuration.group)
+end
+
+TEstimatedDuration.from_obj = TEstimatedDuration_from_obj
+
+TEstimatedDuration.proto_property = {'EstimatedDuration'}
+
+TEstimatedDuration.default = {0}
+
+TEstimatedDuration.struct = {{name = 'EstimatedDuration', is_array = false, struct = nil}}
+
+function TEstimatedDuration:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'EstimatedDuration', self.EstimatedDuration, 'uint32', true, errs, need_convert)
+
+    TEstimatedDuration:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TEstimatedDuration.proto_property, errs, need_convert)
+    return self
+end
+
+function TEstimatedDuration:unpack(_)
+    return self.EstimatedDuration
+end
+
+Task.EstimatedDuration = TEstimatedDuration
+
 ---@class Task.MessageArgs
 ---@field MessageArgs string[]
 local TMessageArgs = {}
@@ -494,7 +632,10 @@ Task.interface = mdb.register_interface('bmc.kepler.TaskService.Task', {
     Status = {'s', nil, true, nil, false},
     Parameters = {'s', nil, true, nil, false},
     MessageId = {'s', nil, true, nil, false},
-    MessageArgs = {'as', nil, true, nil, false}
+    MessageArgs = {'as', nil, true, nil, false},
+    EstimatedDuration = {'u', nil, true, nil, false},
+    Stage = {'s', nil, true, nil, false},
+    Description = {'s', nil, true, nil, false}
 }, {}, {})
 
 return Task
