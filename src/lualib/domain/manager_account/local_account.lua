@@ -74,10 +74,16 @@ function local_account:set_enabled(enabled)
             error(custom_msg.InvalidPassword())
         end
         local plain_password = self.kmc_client:decrypt_password(self.m_account_data.IpmiPassword)
-        local min_password_length = self.m_account_config:get_password_min_length()
-        if self.m_account_config:get_password_complexity_enable() and
-            not core.is_pass_complexity_check_pass(self:get_user_name(), plain_password, min_password_length) then
-            log:error('check password complexity failed.')
+        -- 校验密码复杂度
+        local info = {
+            ["password"] = plain_password,
+            ["username"] = self:get_user_name()
+        }
+        local ok, err = pcall(function()
+            self.password_validator_obj:validate(info)
+        end)
+        if not ok then
+            log:error('check password complexity failed, err: %s', err)
             error(custom_msg.PasswordComplexityCheckFail())
         end
     end
