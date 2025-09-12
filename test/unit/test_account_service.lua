@@ -455,6 +455,13 @@ function TestAccount:test_set_ipmi_user_name()
     req.UserId = 3
     self.test_account_collection:set_user_name(self.ctx, req.UserId, req.UserName)
     lu.assertEquals(false, self.test_account_collection:check_user_id_exist(req.UserId))
+
+    -- 非法用户ID
+    req.UserName = 'dafdfa'
+    req.UserId = 18
+    lu.assertErrorMsgContains(custom_msg.IPMIOutOfRangeMessage.Name, function ()
+        self.test_account_collection:set_user_name(self.ctx, req.UserId, req.UserName)
+    end)
 end
 
 function TestAccount:test_set_ipmi_login_interface()

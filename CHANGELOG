@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.30] - 2025-09-12
+修复修改id不在范围用户名日志记录异常问题
+
 ## [1.90.29] - 2025-09-04
 修复ipmi创建用户并启用时密码复杂度校验问题
 

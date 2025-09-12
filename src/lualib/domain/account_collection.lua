@@ -788,7 +788,13 @@ end
 
 function AccountCollection:set_user_name(ctx, account_id, user_name)
     ctx.operation_log.params = { id = account_id, name = user_name }
-    utils.check_ipmi_account_id(account_id)
+    local ok, err = pcall(function ()
+        utils.check_ipmi_account_id(account_id)
+    end)
+    if not ok then
+        ctx.operation_log.result = 'user_id_invalid'
+        error(err)
+    end
     local old_user_name = ''
     if self:check_user_id_exist(account_id) then
         old_user_name = self:get_user_name(account_id)
