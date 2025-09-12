@@ -110,9 +110,10 @@ function local_account:update_inactive_status(have_only_enabled_admin, limit)
         return
     end
 
-    -- 逃生用户，已被禁用，最后1个使能管理员不需要判断是否禁用
+    -- 逃生用户，已被禁用，最后1个使能可操作bmc的管理员不需要判断是否禁用
     if self:get_id() == self.m_account_config:get_emergency_account() or
-        (have_only_enabled_admin and self:check_is_enabled_admin()) then
+        (have_only_enabled_admin and self:check_is_enabled_admin() and
+        self:check_is_allowed_operate_interfaces()) then
         return
     end
     local inactive_start_time = self:get_inactive_start_time()
@@ -131,8 +132,9 @@ function local_account:update_deletable(have_only_enabled_admin)
         (self:get_id() == self.m_account_config:get_snmp_v3_trap_account_id() and
             self.m_account_config:get_snmp_v3_trap_account_change_policy() == 0 and
             self.m_account_config:get_snmp_v3_trap_account_limit_policy() ~=
-                enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value()) or
-                    (have_only_enabled_admin and self:check_is_enabled_admin()) then
+            enum.SNMPv3TrapAccountLimitPolicy.Modifiable:value()) or
+            (have_only_enabled_admin and self:check_is_enabled_admin() and
+            self:check_is_allowed_operate_interfaces()) then
         self.m_account_data.Deletable = false
         self.m_account_update_signal:emit("Deletable", false)
         return
@@ -185,6 +187,11 @@ function local_account:check_is_enabled_admin()
     local is_admin = self:get_ipmi_user_privilege() == enum.IpmiPrivilege.ADMIN:value() or
         self:get_role_id() == enum.RoleType.Administrator:value()
     return is_admin and self:get_enabled()
+end
+
+function local_account:check_is_allowed_operate_interfaces()
+    local interface_num = self.m_account_data.LoginInterface
+    return interface_num ~= enum.LoginInterface.Invalid:value() and interface_num ~= enum.LoginInterface.SFTP:value()
 end
 
 function local_account:password_validator(ctx, user_name, password, is_initial, is_config_self)

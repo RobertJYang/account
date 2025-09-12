@@ -141,7 +141,7 @@ function account_recover:cover_account_info(account_id, account_data, ipmi_data,
     local account = self.account_collection:get_account_by_account_id(account_id)
     if account:get_role_id() == enum.RoleType.Administrator:value() and
         account_data.RoleId ~= enum.RoleType.Administrator:value() and
-        self.account_collection:check_is_last_enabled_admin(account_id) then
+        self.account_collection:check_is_last_operate_admin(account_id) then
         log:error('[Recover] account%d is last enabled admin, cannot recover', account_id)
         error(base_msg.ActionNotSupported())
     end

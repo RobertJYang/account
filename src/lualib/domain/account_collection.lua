@@ -559,7 +559,7 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
             log:error('Delete account failed, account (user%d) is emergency user.', account_id)
             error(custom_msg.AccountForbidRemoved())
         end
-        if self:check_is_last_enabled_admin(account_id) then
+        if self:check_is_last_operate_admin(account_id) then
             log:error('Delete account failed, account (user%d) is last enabled admin.', account_id)
             error(custom_msg.CannotDeleteLastAdministrator())
         end
@@ -641,6 +641,12 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
     end
     -- 判断本地2-17用户要开启的登录接口是否在AllowedLoginInterfaces内
     local interface_num = utils.cover_interface_str_to_num(interface)
+    if self:check_is_last_operate_admin(account_id) and (interface_num == enum.LoginInterface.SFTP:value() or
+        interface_num == enum.LoginInterface.Invalid:value()) then
+        log:error('modify failed, The last admin(user%d) who can performs operations cannot be set.', account_id)
+        error(custom_msg.SettingPropertyFailedExtend('LoginInterface',
+            'The last administrator who can performs operations cannot be set'))
+    end
     local account_type = account:get_account_type():value()
     if account_type == enum.AccountType.Local:value() and
         not self.account_policy_collection:check_login_interface_is_allowed(account_type, interface_num) then
@@ -717,7 +723,7 @@ function AccountCollection:set_role_id(ctx, account_id, role_id, ipmi_privilege)
         error(base_msg.PropertyValueNotInList('%RoleId:' .. 'Unknown', '%RoleId'))
     end
     ctx.operation_log.params.role = role_name
-    if enum.RoleType.Administrator:value() ~= role_id and self:check_is_last_enabled_admin(account_id) then
+    if enum.RoleType.Administrator:value() ~= role_id and self:check_is_last_operate_admin(account_id) then
         ctx.operation_log.result = 'exclude_user_or_last_admin'
         log:error('Set RoleId failed, account (user%d) is last enabled admin.', account_id)
         error(base_msg.AccountNotModified())
@@ -948,7 +954,7 @@ end
 
 function AccountCollection:set_enabled(account_id, status)
     local account = self.collection[account_id]
-    if not status and self:check_is_last_enabled_admin(account_id) then
+    if not status and self:check_is_last_operate_admin(account_id) then
         log:error('Disable account failed, account (user%d) is last enabled admin.', account_id)
         error(custom_msg.CannotDisableLastAdministrator())
     end
@@ -1004,16 +1010,20 @@ function AccountCollection:check_is_emergency_user(account_id)
     return account_id == emergency_user_id
 end
 
---- 检查是否为最后一个使能的管理员
+--- 检查是否为最后一个可操作的管理员
 ---@param account_id number
 ---@return boolean
-function AccountCollection:check_is_last_enabled_admin(account_id)
-    local enabled_admin_num = self:get_enabled_admin_number()
-    if enabled_admin_num > 1 then
-        return false
+function AccountCollection:check_is_last_operate_admin(account_id)
+    local enabled_operate_admin_num = 0
+    for _, account in pairs(self.collection) do
+        if account:check_is_enabled_admin() and account:check_is_allowed_operate_interfaces() then
+            enabled_operate_admin_num = enabled_operate_admin_num + 1
+        end
     end
-    -- 如果当前用户为仅有的使能的管理员
-    if enabled_admin_num <= 1 and self.collection[account_id]:check_is_enabled_admin() then
+
+    -- 如果当前用户为仅有的可操作的管理员
+    if enabled_operate_admin_num <= 1 and self.collection[account_id]:check_is_enabled_admin() and
+        self.collection[account_id]:check_is_allowed_operate_interfaces() then
         return true
     end
     return false

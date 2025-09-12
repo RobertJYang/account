@@ -674,6 +674,12 @@ function ManagerAccount:check_is_enabled_admin()
     return false
 end
 
+--- 检查是否使能登录接口（除SFTP）
+---@return boolean
+function ManagerAccount:check_is_allowed_operate_interfaces()
+    return false
+end
+
 --- 校验设置密码
 ---@param ctx table
 ---@param user_name string
