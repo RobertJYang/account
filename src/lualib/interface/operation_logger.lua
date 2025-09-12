@@ -90,6 +90,7 @@ local operation_log_map = {
     ChangeUserName = {
         success = "Modify user{id}'s username ({oldName} -> {name}) successfully",
         fail = "Modify user{id}'s username ({oldName} -> {name}) failed",
+        user_id_invalid = "Set user{id}'s username failed",
         user_mgnt_disabled = "Modify user{id}'s username to ({name}) failed"
     },
     ImportSSHPublicKey = {

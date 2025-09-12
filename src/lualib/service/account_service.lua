@@ -486,7 +486,7 @@ function AccountService:set_ipmi_user_name(req, ctx)
             self.m_account_collection:set_user_name(ctx, user_id, user_name)
         end)
         if not ok then
-            if err_code.name == custom_msg.InvalidUserName.name then
+            if err_code.name == custom_msg.InvalidUserNameMessage.Name then
                 error(custom_msg.IPMIInvalidFieldRequest())
             else
                 error(err_code)
