@@ -1,0 +1,12 @@
+{
+    "ConfigData": {
+        "CustomSettings": {
+            "BMCSet_InitialPwdPrompt": {
+                "Value": "on"
+            },
+            "BMCSet_InitialPasswordNeedModify": {
+                "Value": "on"
+            }
+        }
+    }
+}
