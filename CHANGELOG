@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.32] - 2025-09-13
+修复修改id不在范围用户名日志记录异常问题
+
 ## [1.90.31] - 2025-09-12
 修复定制项顺序依赖定制失败问题
 
