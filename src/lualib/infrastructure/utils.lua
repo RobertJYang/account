@@ -26,6 +26,7 @@ local vos = require 'utils.vos'
 local utils = class()
 utils.queue = queue()
 
+local MIN_USER_NUM = 2
 local MAX_USER_NUM = 17
 
 local pattern_collection = {
@@ -393,17 +394,8 @@ end
 
 function utils.check_ipmi_account_id(user_id)
     -- 匿名用户
-    if user_id == nil or type(user_id) ~= "number" then
+    if type(user_id) ~= "number" or user_id < MIN_USER_NUM or user_id > MAX_USER_NUM then
         error(custom_msg.IPMIInvalidFieldRequest())
-    end
-    if user_id == 1 then
-        error(custom_msg.IPMICommandCannotExecute())
-    end
-    if user_id == 0 then
-        error(custom_msg.IPMIInvalidFieldRequest())
-    end
-    if user_id > MAX_USER_NUM then
-        error(custom_msg.IPMIOutOfRange())
     end
     return true
 end

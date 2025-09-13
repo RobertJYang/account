@@ -1,6 +1,6 @@
 {
     "name": "account",
-    "version": "1.90.31",
+    "version": "1.90.32",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",

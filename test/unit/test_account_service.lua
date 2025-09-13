@@ -459,7 +459,7 @@ function TestAccount:test_set_ipmi_user_name()
     -- 非法用户ID
     req.UserName = 'dafdfa'
     req.UserId = 18
-    lu.assertErrorMsgContains(custom_msg.IPMIOutOfRangeMessage.Name, function ()
+    lu.assertErrorMsgContains(custom_msg.IPMIInvalidFieldRequestMessage.Name, function ()
         self.test_account_collection:set_user_name(self.ctx, req.UserId, req.UserName)
     end)
 end
