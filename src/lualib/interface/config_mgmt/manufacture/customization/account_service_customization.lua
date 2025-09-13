@@ -117,10 +117,8 @@ function AccountServiceCustomization.convert_initial_password_prompt_enable(cust
 end
 
 function AccountServiceCustomization.set_initial_password_prompt_enable(self, ctx, value)
-    local ok, _ = pcall(self.m_account_service.set_initial_password_prompt_enable, self.m_account_service, value)
-    if ok then
-        self.m_account_service.m_config_changed:emit('InitialPasswordPromptEnable', value)
-    end
+    self.m_account_service:set_initial_password_prompt_enable(value)
+    self.m_account_service.m_config_changed:emit('InitialPasswordPromptEnable', value)
 end
 
 function AccountServiceCustomization.get_initial_password_prompt_enable(self)

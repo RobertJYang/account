@@ -708,4 +708,46 @@ function utils.string_equal_without_space_and_case(str1, str2)
     return s1 == s2
 end
 
+function utils.topo_sort(deps)
+    local indegree = {}
+    local graph = {}
+
+    -- 初始化图和入度
+    for node, pre_list in pairs(deps) do
+        indegree[node] = 0
+        if not graph[node] then graph[node] = {} end
+        for _, pre in ipairs(pre_list) do
+            if not graph[pre] then graph[pre] = {} end
+            table.insert(graph[pre], node)
+            indegree[node] = indegree[node] + 1
+        end
+    end
+
+    -- 找到所有入度为0的节点
+    local queue = {}
+    for node, deg in pairs(indegree) do
+        if deg == 0 then table.insert(queue, node) end
+    end
+
+    -- 拓扑排序
+    local result = {}
+    while #queue > 0 do
+        local node = table.remove(queue, 1)
+        table.insert(result, node)
+        for _, child in ipairs(graph[node] or {}) do
+            indegree[child] = indegree[child] - 1
+            if indegree[child] == 0 then
+                table.insert(queue, child)
+            end
+        end
+    end
+
+    -- 检查是否有环
+    if #result < #indegree then
+        error(base_msg.InternalError())
+    end
+
+    return result
+end
+
 return Singleton(utils)

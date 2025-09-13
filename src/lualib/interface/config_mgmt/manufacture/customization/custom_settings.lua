@@ -14,6 +14,7 @@ local account_service_ipmi = require 'interface.ipmi.account_service_ipmi'
 local config_mgmt = require 'interface.config_mgmt.config_mgmt'
 local singleton = require 'mc.singleton'
 local operation_logger = require 'interface.operation_logger'
+local utils = require 'infrastructure.utils'
 
 local AccountServiceCustomization =
     require 'interface.config_mgmt.manufacture.customization.account_service_customization'
@@ -81,7 +82,9 @@ local custom_settings_adapter = {
     BMCSet_InitialPwdPrompt = {
         import_convert = AccountServiceCustomization.convert_initial_password_prompt_enable,
         import = AccountServiceCustomization.set_initial_password_prompt_enable,
-        export = AccountServiceCustomization.get_initial_password_prompt_enable
+        export = AccountServiceCustomization.get_initial_password_prompt_enable,
+        -- BMCSet_InitialPwdPrompt需要在BMCSet_initialPasswordNeedModify使能时才能开启
+        deps = {'BMCSet_InitialPasswordNeedModify'}
     },
     BMCSet_InitialPasswordNeedModify = {
         import = AccountServiceCustomization.set_first_login_enable,
@@ -146,7 +149,17 @@ function CustomSettings:on_import(ctx, object)
 
     ctx.operation_log = { params = {} }
 
-    for custom_setting_name, custom_setting in pairs(custom_settings) do
+    local deps = {}
+    for k, v in pairs(custom_settings_adapter) do
+        deps[k] = v.deps or {}
+    end
+    local topo_sort_keys = utils.topo_sort(deps)
+
+    for _, custom_setting_name in pairs(topo_sort_keys) do
+        local custom_setting = custom_settings[custom_setting_name]
+        if not custom_setting then
+            goto continue
+        end
 
         local match_oem_account_conf = string.match(custom_setting_name, "(BMCSet_OEMName)")
         if match_oem_account_conf and string.match(custom_setting_name, "%d$") then
@@ -171,11 +184,6 @@ function CustomSettings:on_import(ctx, object)
         custom_setting_funcs.import(self, ctx, custom_value)
         log:notice('Import %s successfully in customize config.', custom_setting_name)
         ::continue::
-    end
-    -- BMCSet_InitialPwdPrompt需要在BMCSet_initialPasswordNeedModify使能时才能开启
-    if custom_settings.BMCSet_InitialPwdPrompt and custom_settings.BMCSet_InitialPwdPrompt.Value == 'on' then
-        custom_settings_adapter.BMCSet_InitialPwdPrompt.import(self, ctx, true)
-        log:notice('ImportBMCSet_initialPwdPrompt successfully for the second time.')
     end
     ctx.operation_log = nil
 end
