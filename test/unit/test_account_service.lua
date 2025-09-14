@@ -1158,6 +1158,27 @@ function TestAccount:test_ipmi_set_user_access_when_sessionlimit_invalid_should_
     lu.assertIsFalse(ret)
 end
 
+-- 设置set user access命令长度超长测试
+function TestAccount:test_ipmi_set_user_access_when_sessionlimit_too_long_should_fail()
+    local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
+    local ret = pcall(function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsTrue(ret)
+    -- 更改用户配置
+    req.ChangeEnable = 1
+
+    req.MessagingEnable = 0
+    req.AuthenticationEnable = 0
+    req.UserRestricted = 0
+    req.UserPrivilege = 2
+    req.SessionLimit = string.pack(">BB", 1, 1)
+    lu.assertErrorMsgContains(custom_msg.IPMIRequestLengthInvalidMessage.Name, function()
+        self.test_account_collection:set_ipmi_user_access(req, ctx)
+    end)
+    self.test_account_collection:delete_account(ctx, 4)
+end
+
 -- 设置通道为当前通道且不满足通道校验限制失败测试
 -- 设置通道异常值失败测试
 function TestAccount:test_ipmi_set_user_access_when_present_channel_invalid_should_fail()
