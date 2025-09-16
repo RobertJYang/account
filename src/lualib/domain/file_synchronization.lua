@@ -21,7 +21,7 @@ local file_proxy = require 'infrastructure.file_proxy'
 
 -- 文件同步管理，将passwd/shadow/group/ipmi几个文件的同步和刷新机制放在此处处理
 local file_synchronization = class()
-function file_synchronization:ctor(db, account_collection, linux_file_path)
+function file_synchronization:ctor(db, account_collection, linux_file_path, skynet_queue)
     self.db = db
     self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
     self.shadow_path = linux_file_path['shadow'] or config.SHADOW_FILE
@@ -34,6 +34,7 @@ function file_synchronization:ctor(db, account_collection, linux_file_path)
         ipmi_path = self.ipmi_path
     }
     self.m_account_collection = account_collection
+    self.m_linux_account_queue = skynet_queue
 end
 
 function file_synchronization:init()
@@ -43,19 +44,19 @@ end
 
 function file_synchronization:regist_file_sync_signals()
     self.m_account_collection.m_account_file_added:on(function(...)
-        self:add_user(...)
+        self.m_linux_account_queue(self.add_user, self, ...)
     end)
     self.m_account_collection.m_account_file_removed:on(function(...)
-        self:remove_user(...)
+        self.m_linux_account_queue(self.remove_user, self, ...)
     end)
     self.m_account_collection.m_account_file_flush:on(function(...)
-        self:flush_account()
+        self.m_linux_account_queue(self.flush_account, self, ...)
     end)
     self.m_account_collection.m_account_file_changed:on(function(...)
-        self:update_user(...)
+        self.m_linux_account_queue(self.update_user, self, ...)
     end)
     self.m_account_collection.m_account_ipmi_changed:on(function(...)
-        self:flush_ipmi(...)
+        self.m_linux_account_queue(self.flush_ipmi, self, ...)
     end)
 end
 
@@ -202,7 +203,7 @@ function file_synchronization:account_monitor()
         while true do
             -- 等待5秒钟，保证account启动后，尽快同步
             skynet.sleep(500)
-            self:flush_account()
+            self.m_linux_account_queue(self.flush_account, self)
             -- 等待55秒钟
             skynet.sleep(5500)
         end

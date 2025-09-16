@@ -42,6 +42,7 @@ local accoutn_service_ipmi = require 'interface.ipmi.account_service_ipmi'
 local core = require 'account_core'
 local lu = require('luaunit')
 local test_common = require 'test_common.utils'
+local queue = require 'skynet.queue'
 
 loadfile(os.getenv('CONFIG_FILE'), 't', { package = package, os = os })()
 
@@ -125,6 +126,7 @@ function TestAccount:setupClass()
     self.tally_dir = test_data_dir .. '/tally'
     os.execute('mkdir -p ' .. self.tally_dir)
     self.db = open_db(test_data_dir .. '/account.test.db', datas)
+    self.m_linux_account_queue = queue()
     self.test_kmc_client = kmc_client.new(nil, nil, true)
     self.test_global_account_config = global_account_config.new(self.db, nil)
     self.test_password_validator_collection = password_validator_collection.new(self.db,
@@ -135,9 +137,10 @@ function TestAccount:setupClass()
     self.test_ipmi_channel_config = ipmi_channel_config.new(self.db)
     self.test_account_collection = account_collection.new(nil, self.db, self.test_global_account_config,
         self.test_role_collection, nil, self.test_password_validator_collection,
-        self.test_account_policy_collection, self.test_ipmi_channel_config, {})
+        self.test_account_policy_collection, self.test_ipmi_channel_config, {}, self.m_linux_account_queue)
     self.test_account_permanent_backup = account_permanent_backup.new(self.db, self.test_account_collection)
-    self.test_file_synchronization = file_synchronization.new(self.db, self.test_account_collection, {})
+    self.test_file_synchronization = file_synchronization.new(self.db, self.test_account_collection, {},
+        self.m_linux_account_queue)
     self.test_file_synchronization:regist_file_sync_signals()
     self.test_account_service = account_service.new(self.test_global_account_config, self.test_account_collection,
         self.test_file_synchronization, self.test_role_collection, self.test_account_policy_collection)
