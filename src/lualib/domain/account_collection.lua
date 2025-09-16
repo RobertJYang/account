@@ -1034,8 +1034,11 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
         error(custom_msg.IPMIOutOfRange())
     end
     ctx.operation_log.params.privilege = role_privilege_map.privilege_to_string_map[privilege]
-
-    utils.check_ipmi_account_id(account_id)
+    local ok, err = pcall(function() utils.check_ipmi_account_id(account_id) end)
+    if not ok then
+        ctx.operation_log.result = 'no_user'
+        error(err)
+    end
     if not self.collection[account_id] then
         ctx.operation_log.result = 'no_user'
         error(custom_msg.IPMIOutOfRange())
@@ -1065,6 +1068,10 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
         channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() then
         log:error("channel number(%s) is invalid", channel_number)
         error(custom_msg.IPMICommandCannotExecute())
+    end
+    if #req.SessionLimit ~= 0 and #req.SessionLimit ~= 1 then
+        log:error("SessionLimit is length %s error", #req.SessionLimit)
+        error(custom_msg.IPMIRequestLengthInvalid())
     end
     if not req.SessionLimit or req.SessionLimit == "" then
         req.SessionLimit = string.pack(">B", 0)
