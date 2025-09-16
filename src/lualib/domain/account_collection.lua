@@ -55,7 +55,7 @@ local DEFAULT_MAX_USER_NUM = 17
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
-    password_validator_collection, account_policy_collection, ipmi_channel_config, linux_file_path)
+    password_validator_collection, account_policy_collection, ipmi_channel_config, linux_file_path, skynet_queue)
     self.persist = persist
     self.db = db
     self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
@@ -75,6 +75,7 @@ function AccountCollection:ctor(persist, db, global_account_config, role_collect
     self.account_policy_collection = account_policy_collection
     self.ipmi_channel_config = ipmi_channel_config
     self.ipmi_channel_mappings = ipmi_channel_mappings.get_instance()
+    self.m_linux_account_queue = skynet_queue
 end
 
 AccountCollection.operation_type_check = {
@@ -857,8 +858,12 @@ function AccountCollection:change_user_name(account_id, user_name)
         -- 调整为信号量触发，将几个关键文件的读写操作解耦
         self.m_account_file_changed:emit(account_id, old_username)
     end
-    local la = linux_account.new(self.linux_files, false)
-    local home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    
+    local home_path
+    self.m_linux_account_queue(function ()
+        local la = linux_account.new(self.linux_files, false)
+        home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    end)
     self.collection[account_id]:delete_ssh_public_key(home_path)
 
     account:update_inactive_user_start_time(true)
@@ -1366,9 +1371,13 @@ function AccountCollection:import_ssh_public_key(ctx, account_id, path)
         error(custom_msg.PublicKeyImportFailed())
     end
 
-    local la = linux_account.new(self.linux_files, false)
-    local uid, gid = la:get_uid_gid(account_id, self.collection[account_id]:get_role_id())
-    local home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    local uid, gid, home_path
+    self.m_linux_account_queue(function ()
+        local la = linux_account.new(self.linux_files, false)
+        uid, gid = la:get_uid_gid(account_id, self.collection[account_id]:get_role_id())
+        home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    end)
+
 
     local ok, rsp = pcall(function()
         self.collection[account_id]:import_ssh_public_key(path, home_path, uid, gid)
@@ -1384,8 +1393,11 @@ end
 --- 删除公钥
 ---@param account_id number
 function AccountCollection:delete_ssh_public_key(ctx, account_id)
-    local la = linux_account.new(self.linux_files, false)
-    local home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    local home_path
+    self.m_linux_account_queue(function ()
+        local la = linux_account.new(self.linux_files, false)
+        home_path = la.home_dir:get(self.collection[account_id]:get_user_name())
+    end)
     local ssh_path = table.concat({ home_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME }, '/')
     -- 公钥不存在, 删除失败
     if not vos_utils.get_file_accessible(ssh_path) then
@@ -1461,8 +1473,10 @@ function AccountCollection:get_uid_gid_by_username(ctx, username)
     end
     if config.ENABLE_GET_UID_GID_BY_PASSWD == false or config.ENABLE_GET_UID_GID_BY_PASSWD == 'false' then
         local acount = self:get_account_data_by_name(username)
-        local la = linux_account.new(self.linux_files, false)
-        return la:get_uid_gid(acount.Id, acount.RoleId)
+        return self.m_linux_account_queue(function ()
+            local la = linux_account.new(self.linux_files, false)
+            return la:get_uid_gid(acount.Id, acount.RoleId)
+        end)
     end
     -- bmc系统中的root用户存在linux中的名称为<root>，调用框架方法前做个转换
     username = username == config.ACTUAL_ROOT_USER_NAME and config.RESERVED_ROOT_USER_NAME or username

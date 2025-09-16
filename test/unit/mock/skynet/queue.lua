@@ -7,8 +7,8 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local queue = function()
-    local func = function(func_input)
-        func_input()
+    local func = function(func_input, ...)
+        return func_input(...)
     end
     return func
 end
