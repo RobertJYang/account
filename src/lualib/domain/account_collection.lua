@@ -1306,19 +1306,19 @@ function AccountCollection:update_inactive_start_time(timediff)
     end
 end
 
+local custom_msg_code_map = {
+    [custom_msg.InvalidPasswordMessage.Name] = err_cfg.USER_SET_PASSWORD_EMPTY,
+    [custom_msg.PasswordComplexityCheckFailMessage.Name] = err_cfg.USER_PASS_COMPLEXITY_FAIL
+}
+
 function AccountCollection:enable_user_operation(account_id, enable)
     local ok, err = pcall(function()
         self:set_enabled(account_id, enable)
     end)
     if not ok then
-        if err.name == custom_msg.InvalidPasswordMessage.Name then
-            return err_cfg.USER_SET_PASSWORD_EMPTY
-        elseif err.name == custom_msg.PasswordComplexityCheckFailMessage.Name then
-            return err_cfg.USER_PASS_COMPLEXITY_FAIL
-        elseif err.name == custom_msg.CannotDisableLastAdministratorMessage.Name then
-            return err_cfg.UNKNOWN
-        end
+        return custom_msg_code_map[err.name] or err_cfg.UNKNOWN
     end
+
     self.m_account_changed:emit(account_id, "Enabled", enable)
     self.m_account_permanent_changed:emit(account_id, "Enabled")
     return err_cfg.USER_OPER_SUCCESS

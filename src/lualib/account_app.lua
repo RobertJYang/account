@@ -418,14 +418,14 @@ function app:register_ipmi_methods()
         local rsp = ipmi_cmds.DisableAccount.rsp.new()
         req.Operation = enum.IpmiUserOperater.OPERATION_DISABLE_USER:value()
         return self.account_service_ipmi:set_account_password(req, rsp, ctx)
-    end, 'ChangeAccountPwd'))
+    end, 'IpmiAccountEnabled'))
 
     -- 注册使能用户
     self:register_ipmi_cmd(ipmi_cmds.EnableAccount, operation_logger.proxy(function(req, ctx)
         local rsp = ipmi_cmds.EnableAccount.rsp.new()
         req.Operation = enum.IpmiUserOperater.OPERATION_ENABLE_USER:value()
         return self.account_service_ipmi:set_account_password(req, rsp, ctx)
-    end, 'ChangeAccountPwd'))
+    end, 'IpmiAccountEnabled'))
 
     -- 注册设置用户密码
     self:register_ipmi_cmd(ipmi_cmds.SetAccountPassword, operation_logger.proxy(function(req, ctx)

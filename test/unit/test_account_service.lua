@@ -506,8 +506,8 @@ function TestAccount:test_set_user_password()
     local req = {}
     local ctx = {}
     req.UserId = 3
-    req.PasswordSize = 1
-    req.PasswordData = 'Paswd@90001'
+    req.PasswordSize = 0 -- 16字节长
+    req.PasswordData = 'Paswd@90001\0\0\0\0\0' -- 通过\0补齐到16字节
     ctx.ChanType = 3
     ctx.session = {}
     ctx.session.user = {}
@@ -523,6 +523,65 @@ function TestAccount:test_set_user_password()
     req.Operation = 2 -- set password
     self.test_account_service:ipmi_set_account_password(req, ctx)
 
+    self.test_account_collection:delete_account(self.ctx, 3)
+end
+
+function TestAccount:test_set_user_password_fail()
+    local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish, enum.LoginInterface.SFTP }
+    local account_info = {
+        ['id'] = 3,
+        ['name'] = "test3",
+        ['password'] = "Paswd@9001",
+        ['role_id'] = enum.RoleType.Administrator:value(),
+        ['interface'] = interface,
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
+    }
+    self.test_account_collection:new_account(self.ctx, account_info, false)
+    local account = self.test_account_collection:get_account_by_account_id(3)
+    local req = {}
+    local ctx = {}
+    req.UserId = 3
+    ctx.ChanType = 3
+    ctx.session = {}
+    ctx.session.user = {}
+    ctx.session.user.name = 'Administrator'
+    ctx.session.user.id = 2
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    req.Operation = 2 -- set password
+
+    req.PasswordSize = 0 -- 16字节长
+    req.PasswordData = 'Paswd@90001\0\0\0' -- 不够16字节
+    lu.assertErrorMsgContains(custom_msg.IPMIRequestLengthInvalidMessage.Name, function()
+        self.test_account_service:ipmi_set_account_password(req, ctx)
+    end)
+
+    req.PasswordSize = 0 -- 16字节长
+    req.PasswordData = 'Paswd@90001\0\0\0\0\0\0\0\0\0\0' -- 超过16字节
+    lu.assertErrorMsgContains(custom_msg.IPMIRequestLengthInvalidMessage.Name, function()
+        self.test_account_service:ipmi_set_account_password(req, ctx)
+    end)
+
+    req.PasswordSize = 1 -- 20字节长
+    req.PasswordData = 'Paswd@900010\0\0\0\0\0\0\0' -- 不够20字节
+    lu.assertErrorMsgContains(custom_msg.IPMIRequestLengthInvalidMessage.Name, function()
+        self.test_account_service:ipmi_set_account_password(req, ctx)
+    end)
+
+    req.PasswordSize = 1 -- 20字节长
+    req.PasswordData = 'Paswd@90001\0\0\0\0\0\0\0\0\0\0' -- 不够20字节
+    lu.assertErrorMsgContains(custom_msg.IPMIRequestLengthInvalidMessage.Name, function()
+        self.test_account_service:ipmi_set_account_password(req, ctx)
+    end)
+
+    -- 禁用紧急用户
+    req.Operation = 0 -- disable user
+    self.test_account_service:set_emergency_account(self.ctx, req.UserId)
+    self.test_account_service:ipmi_set_account_password(req, ctx)
+
+    lu.assertEquals(true, account:get_enabled())
+
+    self.test_account_service:set_emergency_account(self.ctx, 0)
     self.test_account_collection:delete_account(self.ctx, 3)
 end
 

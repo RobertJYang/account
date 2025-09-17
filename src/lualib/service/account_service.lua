@@ -401,13 +401,32 @@ end
 ---@param ctx any
 ---@return integer
 function AccountService:__ipmi_set_account_password_precheck(req, ctx)
-    utils.check_ipmi_account_id(req.UserId)
     local operation = req.Operation
-    if operation ~= enum.IpmiUserOperater.OPERATION_DISABLE_USER:value() and
-    operation ~= enum.IpmiUserOperater.OPERATION_ENABLE_USER:value() and
-    operation ~= enum.IpmiUserOperater.OPERATION_SET_PASSWD:value() then
+    if operation == enum.IpmiUserOperater.OPERATION_DISABLE_USER:value() then
+        ctx.operation_log.params.operate = 'Disable'
+    elseif operation == enum.IpmiUserOperater.OPERATION_ENABLE_USER:value() then
+        ctx.operation_log.params.operate = 'Enable'
+    elseif operation == enum.IpmiUserOperater.OPERATION_SET_PASSWD:value() then
+        ctx.operation_log.params.operate = 'Modify'
+    else
         error(custom_msg.IPMIOutOfRange())
     end
+
+    utils.check_ipmi_account_id(req.UserId)
+
+    -- 获取合法user id的用户名, 保证操作日志中包含用户名
+    local account = self.m_account_collection:get_account_by_account_id(req.UserId)
+    ctx.operation_log.params.name = account:get_user_name()
+
+    if operation == enum.IpmiUserOperater.OPERATION_SET_PASSWD:value() then
+        local user_password_size_1_5 = 16 -- IPMI1.5密码16位
+        local user_password_size_2 = 20 -- IPMI2.0密码20位
+        if ((req.PasswordSize == 0) and (string.len(req.PasswordData) ~= user_password_size_1_5)) or 
+        ((req.PasswordSize == 1) and (string.len(req.PasswordData) ~= user_password_size_2)) then
+            error(custom_msg.IPMIRequestLengthInvalid())
+        end
+    end
+
     self.m_account_collection:check_ipmi_host_user_mgnt_enabled(ctx)
 end
 
@@ -426,7 +445,6 @@ function AccountService:ipmi_set_account_password(req, ctx)
     if not self:check_ipmi_password_privilege(handler_user_id, account:get_id()) then
         error(err.un_supported())
     end
-    ctx.operation_log.params.name = account:get_user_name()
     if req.Operation == enum.IpmiUserOperater.OPERATION_SET_PASSWD:value() then
         local ret = self:set_account_password(ctx, handler_user_id, req.UserId, password_data)
         ctx.operation_log.params.ret = ret
@@ -445,18 +463,18 @@ function AccountService:ipmi_set_account_password(req, ctx)
         end
         return ret
     elseif req.Operation == enum.IpmiUserOperater.OPERATION_DISABLE_USER:value() then
-        ctx.operation_log.operation = 'IpmiAccountEnabled'
-        ctx.operation_log.params.operate = 'Disable'
         local ret = self.m_account_collection:enable_user_operation(req.UserId, false)
-        if ret == err_cfg.UNKNOWN then
-            ctx.operation_log.result = 'fail'
+        if ret ~= err_cfg.USER_OPER_SUCCESS then
+            ctx.operation_log.result = 'fail_ret'
             ctx.operation_log.params.ret = ret
         end
         return ret
     elseif req.Operation == enum.IpmiUserOperater.OPERATION_ENABLE_USER:value() then
-        ctx.operation_log.params.operate = 'Enable'
         local ret = self.m_account_collection:enable_user_operation(req.UserId, true)
-        ctx.operation_log.params.ret = ret
+        if ret ~= err_cfg.USER_OPER_SUCCESS then
+            ctx.operation_log.result = 'fail_ret'
+            ctx.operation_log.params.ret = ret
+        end
         return ret
     else
         error(err.un_supported())
