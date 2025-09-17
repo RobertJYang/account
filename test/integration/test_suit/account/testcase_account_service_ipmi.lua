@@ -47,13 +47,13 @@ function AccountServiceIpmiCaes.test_ipmi_first_login_change_other_account_passw
     test_case_utils.set_account_service_property(bus, "InitialAccountPrivilegeRestrictEnabled", true)
 
     local ipmi_req = {
-        ManufactureId = MANUFACTURE_ID,             -- 厂商ID
-        UserId        = 0x02,                       -- 用户ID
-        Reserved1      = 0x00,                      -- 预留位
-        PasswordSize  = string.len("Admin@90002"),  -- 密码长度
-        Operation     = 0x02,                       -- 修改密码
-        Reserved2     = 0x00,                       -- 预留位2
-        PasswordData  = "Admin@90002"               -- 密码
+        ManufactureId = MANUFACTURE_ID,                      -- 厂商ID
+        UserId        = 0x02,                                -- 用户ID
+        Reserved1      = 0x00,                               -- 预留位
+        PasswordSize  = 1,  -- 密码长度 20字节
+        Operation     = 0x02,                                -- 修改密码
+        Reserved2     = 0x00,                                -- 预留位2
+        PasswordData  = "Admin@90002\0\0\0\0\0\0\0\0\0"      -- 密码
     }
 
     local ctx = json.encode({ChanType = enums.ChannelType.CT_ME:value(),

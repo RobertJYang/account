@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+## [1.90.35] - 2025-09-17
+修复ipmi命令set user password未按标准规范校验密码长度问题
+修复ipmi命令禁用紧急用户问题
+
 ## [1.90.34] - 2025-09-16
 修复ipmi set user access user id超范围操作日志打印错误
 修复ipmi set user access 命令长度超限报错

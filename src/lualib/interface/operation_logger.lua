@@ -142,7 +142,9 @@ local operation_log_map = {
     },
     IpmiAccountEnabled = {
         success = '{operate} user({name}|user{id}) successfully',
-        fail = '{operate} user({name}|user{id}) failed, ret = {ret}'
+        user_mgnt_disabled = '{operate} user({name}|user{id}) failed',
+        fail = '{operate} user({name}|user{id}) failed',
+        fail_ret = '{operate} user({name}|user{id}) failed, ret = {ret}'
     },
     IpmiSetUserPassComplexity = {
         success = '{state} local user password complexity check successfully',
