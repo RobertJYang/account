@@ -207,7 +207,7 @@ function global_account_config:set_max_password_valid_days(max_age)
     self.m_db_account_service:save()
 end
 
-function global_account_config:check_password_in_weak_passwd_dictionary(ctx, password)
+function global_account_config:check_password_in_weak_passwd_dictionary(ctx, password, passwd_type)
     if self.m_weak_password_dictionary_config_status == enum.WeakPwdDictEnum.WEAK_PWDDICT_IN_PROCESS then
         ctx.operation_log.params.ret = err_cfg.USER_SET_PASSWORD_TOO_WEAK
         error(custom_msg.OperationInProcess())
@@ -216,7 +216,12 @@ function global_account_config:check_password_in_weak_passwd_dictionary(ctx, pas
         if v == password then
             ctx.operation_log.params.ret = err_cfg.USER_SET_PASSWORD_TOO_WEAK
             log:error('Password is found in weak password dictionary.')
-            error(custom_msg.PasswordInWeakPWDDict())
+            if ctx.Interface == "WEB" and passwd_type == "snmp_password" then
+                error(custom_msg.PasswordInWeakPWDDict("The snmp privacy password"))
+            else
+                error(custom_msg.PasswordInWeakPWDDict("Password"))
+            end
+           
         end
     end
 end

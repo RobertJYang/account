@@ -155,7 +155,7 @@ function OEMAccount:password_validator(ctx, user_name, password, is_initial, is_
     end
     -- 校验用户密码是否属于弱口令
     if self.m_account_config:get_weak_pwd_dictionary_enable() then
-        self.m_account_config:check_password_in_weak_passwd_dictionary(ctx, password)
+        self.m_account_config:check_password_in_weak_passwd_dictionary(ctx, password, 'user_password')
     end
     -- 和历史密码比较, 创建用户不应和历史比较
     if not is_initial and not self.m_history_password:check(password) then

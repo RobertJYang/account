@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.37] - 2025-09-18
+修复snmp加密密码在弱口令字典中
+
 ## [1.90.36] - 2025-09-17
 修复禁用最后一个管理员用户全部登录接口导致无法登录问题
 

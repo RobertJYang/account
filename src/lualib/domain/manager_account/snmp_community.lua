@@ -26,7 +26,7 @@ function SnmpCommunity:password_validator(ctx, _, password, _, _)
 
     -- 校验用户密码是否属于弱口令
     if self.m_account_config:get_weak_pwd_dictionary_enable() then
-        self.m_account_config:check_password_in_weak_passwd_dictionary(ctx, password)
+        self.m_account_config:check_password_in_weak_passwd_dictionary(ctx, password, 'snmp_community')
     end
 
     local info = {
