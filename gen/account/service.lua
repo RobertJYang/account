@@ -141,6 +141,16 @@ local account_service = class(app_base.Service)
 
 account_service.package = 'account'
 
+function account_service:CreateAccountService(prop_setting_cb)
+    return object_manage.create_object('AccountService', 'AccountService_0', '/bmc/kepler/AccountService',
+        prop_setting_cb)
+end
+
+function account_service:CreateManagerAccounts(prop_setting_cb)
+    return object_manage.create_object('ManagerAccounts', 'ManagerAccounts_0', '/bmc/kepler/AccountService/Accounts',
+        prop_setting_cb)
+end
+
 function account_service:CreateManagerAccount(Id, prop_setting_cb)
     local path = '/bmc/kepler/AccountService/Accounts/' .. Id
     return object_manage.create_object('ManagerAccount', path, path, prop_setting_cb)
@@ -151,6 +161,10 @@ function account_service:CreateRule(RuleId, prop_setting_cb)
     return object_manage.create_object('Rule', path, path, prop_setting_cb)
 end
 
+function account_service:CreateRoles(prop_setting_cb)
+    return object_manage.create_object('Roles', 'Roles_0', '/bmc/kepler/AccountService/Roles', prop_setting_cb)
+end
+
 function account_service:CreateRole(Id, prop_setting_cb)
     local path = '/bmc/kepler/AccountService/Roles/' .. Id
     return object_manage.create_object('Role', path, path, prop_setting_cb)
@@ -159,6 +173,11 @@ end
 function account_service:CreateSnmpCommunity(ManagerId, prop_setting_cb)
     local path = '/bmc/kepler/Managers/' .. ManagerId .. '/SnmpService/SnmpCommunity'
     return object_manage.create_object('SnmpCommunity', path, path, prop_setting_cb)
+end
+
+function account_service:CreateLocalAccountAuthN(prop_setting_cb)
+    return object_manage.create_object('LocalAccountAuthN', 'LocalAccountAuthN_0',
+        '/bmc/kepler/AccountService/LocalAccountAuthN', prop_setting_cb)
 end
 
 function account_service:CreatePasswordPolicy(AccountType, prop_setting_cb)
@@ -359,10 +378,6 @@ end
 
 function account_service:init()
     account_service.super.init(self)
-    object_manage.create_object('AccountService', '/bmc/kepler/AccountService', '/bmc/kepler/AccountService',
-        function(obj)
-            obj.ObjectName = 'AccountService_0'
-        end)
     object_manage.create_object('ManagerAccounts', '/bmc/kepler/AccountService/Accounts',
         '/bmc/kepler/AccountService/Accounts', function(obj)
             obj.ObjectName = 'ManagerAccounts_0'
