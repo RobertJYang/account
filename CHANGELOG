@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.38] - 2025-09-19
+修改AccountService资源上树方式
+
 ## [1.90.37] - 2025-09-18
 修复snmp加密密码在弱口令字典中
 

@@ -20,6 +20,7 @@ local custom_msg = require 'messages.custom'
 local skynet_ready, skynet = pcall(require, 'skynet')
 local config = require 'common_config'
 local operation_logger = require 'interface.operation_logger'
+local service = require 'account.service'
 
 local INTERFACE_ACCOUNT_SERVICE = 'bmc.kepler.AccountService'
 
@@ -32,6 +33,7 @@ function account_service_mdb:ctor(account_service, task_manager, file_transfer)
     self.task_manager = task_manager
     self.REMOTE_WEAKPWD_DICT_IMPORT_REGEX = '^((https|sftp|nfs|cifs|scp)://.{1,1000}|' ..
         config.TMP_PATH .. '/.{1,251})$'
+    self.m_account_service_property = {}
 end
 
 function account_service_mdb:regist_account_signals()
@@ -65,6 +67,7 @@ function account_service_mdb:init()
     config_mdb.HistoryPasswordCount = global_config.m_db_account_service.HistoryPasswordCount
     config_mdb.MaxHistoryPasswordCount = global_config.m_db_account_service.MaxHistoryPasswordCount
     config_mdb.SNMPv3TrapAccountLimitPolicy = global_config.m_db_account_service.SNMPv3TrapAccountLimitPolicy
+    config_mdb.SNMPv3TrapAccountChangePolicy = global_config.m_db_account_service.SNMPv3TrapAccountChangePolicy
     config_mdb.HostUserManagementEnabled = global_config.m_db_account_service.HostUserManagementEnabled
     config_mdb.OSAdministratorPrivilegeEnabled = global_config.m_db_account_service.OSAdministratorPrivilegeEnabled
     config_mdb.UserNamePasswordPrefixCompareEnabled =
@@ -180,38 +183,40 @@ function account_service_mdb:watch_service_property(service)
 end
 
 function account_service_mdb:new_config_to_mdb_tree(user_config)
-    local cls_config = cls_mng('AccountService'):get("/bmc/kepler/AccountService")
-    cls_config[INTERFACE_ACCOUNT_SERVICE].MaxPasswordLength = user_config.MaxPasswordLength
-    cls_config[INTERFACE_ACCOUNT_SERVICE].MinPasswordLength = user_config.MinPasswordLength
-    cls_config[INTERFACE_ACCOUNT_SERVICE].PasswordComplexityEnable = user_config.PasswordComplexityEnable
-    cls_config[INTERFACE_ACCOUNT_SERVICE].InitialPasswordPromptEnable = user_config.InitialPasswordPromptEnable
-    cls_config[INTERFACE_ACCOUNT_SERVICE].InitialPasswordNeedModify = user_config.InitialPasswordNeedModify
-    cls_config[INTERFACE_ACCOUNT_SERVICE].InitialAccountPrivilegeRestrictEnabled =
-        user_config.InitialAccountPrivilegeRestrictEnabled
-    cls_config[INTERFACE_ACCOUNT_SERVICE].MaxPasswordValidDays = user_config.MaxPasswordValidDays
-    cls_config[INTERFACE_ACCOUNT_SERVICE].MinPasswordValidDays = user_config.MinPasswordValidDays
-    cls_config[INTERFACE_ACCOUNT_SERVICE].EmergencyLoginAccountId = user_config.EmergencyLoginAccountId
-    cls_config[INTERFACE_ACCOUNT_SERVICE].InactiveDaysThreshold = user_config.InactiveDaysThreshold
-    cls_config[INTERFACE_ACCOUNT_SERVICE].WeakPasswordDictionaryEnabled = user_config.WeakPasswordDictionaryEnabled
-    cls_config[INTERFACE_ACCOUNT_SERVICE].SNMPv3TrapAccountId = user_config.SNMPv3TrapAccountId
-    cls_config[INTERFACE_ACCOUNT_SERVICE].SNMPv3TrapAccountLimitPolicy = user_config.SNMPv3TrapAccountLimitPolicy
-    cls_config[INTERFACE_ACCOUNT_SERVICE].HistoryPasswordCount = user_config.HistoryPasswordCount
-    cls_config[INTERFACE_ACCOUNT_SERVICE].MaxHistoryPasswordCount = user_config.MaxHistoryPasswordCount
-    cls_config[INTERFACE_ACCOUNT_SERVICE].HostUserManagementEnabled = user_config.HostUserManagementEnabled
-    cls_config[INTERFACE_ACCOUNT_SERVICE].OSAdministratorPrivilegeEnabled = user_config.OSAdministratorPrivilegeEnabled
-    cls_config[INTERFACE_ACCOUNT_SERVICE].UserNamePasswordPrefixCompareEnabled =
-        user_config.UserNamePasswordPrefixCompareEnabled
-    cls_config[INTERFACE_ACCOUNT_SERVICE].UserNamePasswordPrefixCompareLength =
-        user_config.UserNamePasswordPrefixCompareLength
-    self:watch_service_property(cls_config)
+    local account_service = service:CreateAccountService(function(account_service)
+        account_service.MaxPasswordLength = user_config.MaxPasswordLength
+        account_service.MinPasswordLength = user_config.MinPasswordLength
+        account_service.PasswordComplexityEnable = user_config.PasswordComplexityEnable
+        account_service.InitialPasswordPromptEnable = user_config.InitialPasswordPromptEnable
+        account_service.InitialPasswordNeedModify = user_config.InitialPasswordNeedModify
+        account_service.InitialAccountPrivilegeRestrictEnabled =
+            user_config.InitialAccountPrivilegeRestrictEnabled
+        account_service.MaxPasswordValidDays = user_config.MaxPasswordValidDays
+        account_service.MinPasswordValidDays = user_config.MinPasswordValidDays
+        account_service.EmergencyLoginAccountId = user_config.EmergencyLoginAccountId
+        account_service.InactiveDaysThreshold = user_config.InactiveDaysThreshold
+        account_service.WeakPasswordDictionaryEnabled = user_config.WeakPasswordDictionaryEnabled
+        account_service.SNMPv3TrapAccountId = user_config.SNMPv3TrapAccountId
+        account_service.SNMPv3TrapAccountLimitPolicy = user_config.SNMPv3TrapAccountLimitPolicy
+        account_service.SNMPv3TrapAccountChangePolicy = user_config.SNMPv3TrapAccountChangePolicy
+        account_service.HistoryPasswordCount = user_config.HistoryPasswordCount
+        account_service.MaxHistoryPasswordCount = user_config.MaxHistoryPasswordCount
+        account_service.HostUserManagementEnabled = user_config.HostUserManagementEnabled
+        account_service.OSAdministratorPrivilegeEnabled = user_config.OSAdministratorPrivilegeEnabled
+        account_service.UserNamePasswordPrefixCompareEnabled =
+            user_config.UserNamePasswordPrefixCompareEnabled
+        account_service.UserNamePasswordPrefixCompareLength =
+            user_config.UserNamePasswordPrefixCompareLength
+        self:watch_service_property(account_service)
+    end)
+    self.m_account_service_property[INTERFACE_ACCOUNT_SERVICE] = account_service
 end
 
 function account_service_mdb:config_mdb_update(property, value)
-    local cls_config = cls_mng('AccountService'):get("/bmc/kepler/AccountService")
-    if cls_config[INTERFACE_ACCOUNT_SERVICE][property] == nil then
+    if self.m_account_service_property[INTERFACE_ACCOUNT_SERVICE][property] == nil then
         return
     end
-    cls_config[INTERFACE_ACCOUNT_SERVICE][property] = value
+    self.m_account_service_property[INTERFACE_ACCOUNT_SERVICE][property] = value
 end
 
 function account_service_mdb:_import_remote_weak_pwd_dictionary(ctx, path)
