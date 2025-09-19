@@ -4,8 +4,10 @@ project(account)
 set(TARGET_LIB ${PROJECT_NAME})
 set(BUILD_DIR temp)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+    conan_basic_setup()
+endif()
 
 set(APP_INSTALL_DIR opt/bmc/apps/${PROJECT_NAME})
 set(LUACLIB_INSTALL_DIR ${APP_INSTALL_DIR}/luaclib)

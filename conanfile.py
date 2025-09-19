@@ -7,13 +7,15 @@
 # EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
-from conanbase import ConanBase
+from conanbase import ConanBase, copy, os
+
+required_conan_version = ">=1.60.0"
 
 
 class AccountConan(ConanBase):
     def package(self):
         super().package()
-        self.copy("permissions.ini",src="dist/")
+        copy(self, "permissions.ini", src=os.path.join(self.source_folder, "dist"), dst=self.package_folder)
 
     def package_info(self):
         self.cpp_info.libdirs = ["opt/bmc/apps/account"]
