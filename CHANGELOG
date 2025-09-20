@@ -1,4 +1,10 @@
 All notable changes to this project will be documented in this file.
+## [1.90.40] - 2025-09-20
+删除导入公钥废弃接口
+
+## [1.90.39] - 2025-09-19
+account组件适配conan2
+
 ## [1.90.38] - 2025-09-19
 修改AccountService资源上树方式
 
