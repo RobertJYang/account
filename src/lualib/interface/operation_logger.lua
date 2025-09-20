@@ -138,6 +138,8 @@ local operation_log_map = {
     ------------------------   Ipmi  ------------------------
     IpmiNewAccount = {
         success = "Add user{id}'s username ({name}) successfully",
+        user_mgnt_disabled = "Add user{id}'s username ({name}) failed",
+        user_id_invalid = "Add user{id}'s username ({name}) failed",
         fail = "Add user{id}'s username ({name}) failed"
     },
     IpmiAccountEnabled = {
@@ -157,6 +159,7 @@ local operation_log_map = {
     IpmiDeleteAccount = {
         success = "Delete user{id}'s username ({name}) successfully",
         fail = "Delete user{id}'s username ({name}) failed",
+        user_id_invalid = "Delete user{id} failed",
         user_mgnt_disabled = "Delete user{id} failed"
     },
     IpmiSetUserAccess = {

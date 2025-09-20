@@ -41,19 +41,20 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
             local ok, err = pcall(function()
                 operation_logger.proxy(function(obj, ctx)
                     AccountProfile.set_user_name(profile_adapter, ctx, instance_id, instance.UserName.Value)
-                end, 'ChangeUserName')(nil, ctx)
+                end, 'IpmiNewAccount')(nil, ctx)
             end)
             if not ok then
                 log:error("import account config precheck failed, cannot add account(id:%d), %s", instance_id,
                     tostring(err))
             end
+            goto continue
         end
         -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
         if instance_name == '' and profile_adapter.m_account_collection:get_account_data_by_id(instance_id) ~= nil then
             local ok, ret = pcall(function()
                 operation_logger.proxy(function(obj, ctx)
                     AccountProfile.set_user_name(profile_adapter, ctx, instance_id, '')
-                end, 'ChangeUserName')(nil, ctx)
+                end, 'IpmiDeleteAccount')(nil, ctx)
             end)
             if not ok then
                 log:error("import account config precheck failed, cannot delete account(id:%d), %s", instance_id,
@@ -96,9 +97,13 @@ function AccountProfile.set_user_name(self, ctx, account_id, value)
     if not self.m_account_policy_collection:check_user_name(enum.AccountType.Local:value(), value) and value ~= '' then
         error(custom_msg.InvalidUserName())
     end
+    local is_add = self.m_account_collection:get_account_data_by_id(account_id) == nil
+
     self.m_account_collection:set_user_name(ctx, account_id, value)
-    local account = self.m_account_collection:get_account_by_account_id(account_id)
-    account.m_account_update_signal:emit('UserName', value)
+    if is_add then
+        local account = self.m_account_collection:get_account_by_account_id(account_id)
+        account.m_account_update_signal:emit('UserName', value)
+    end
 end
 
 function AccountProfile.get_user_name(self, account_id)
