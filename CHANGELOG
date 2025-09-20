@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.42] - 2025-09-20
+修复组件启动时未清理共享内存问题
+
 ## [1.90.41] - 2025-09-20
 修复配置导入用户时操作日志记录错误问题
 

@@ -10,6 +10,7 @@ local skynet  = require 'skynet'
 local class   = require 'mc.class'
 local log     = require 'mc.logging'
 local mc_admin = require 'mc.mc_admin'
+local mdb_service = require 'mc.mdb.mdb_service'
 local orm_object_manage = require 'mc.orm.object_manage'
 local reboot = require 'mc.mdb.micro_component.reboot'
 local utils_core = require 'utils.core'
@@ -102,8 +103,23 @@ local function destroy_instance_cache()
     account_collection.destroy()
 end
 
+-- 清理共享内存残留
+local function remove_shm_data()
+    -- account interface
+    local account_shm_interface_table = {
+        'bmc.kepler.AccountService'
+    }
+    for _, interface in pairs(account_shm_interface_table) do
+        local ok, _ = pcall(mdb_service.remove_shm_objects, nil, 'bmc.kepler.account', interface)
+        if not ok then
+            log:error('Delete interface(%s) shm data failed.', interface)
+        end
+    end
+end
+
 function app:ctor()
     update_config()
+    remove_shm_data()
     destroy_instance_cache()
 
     -- 持久化数据恢复注册
