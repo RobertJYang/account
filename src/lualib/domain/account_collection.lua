@@ -739,13 +739,15 @@ function AccountCollection:set_role_id(ctx, account_id, role_id, ipmi_privilege)
     self.collection[account_id]:set_ipmi_user_privilege(privilege)
     -- 单通道场景下将通道权限与用户权限绑定
     local ipmi_channel_config_list
-    if self.ipmi_channel_mappings.multi_channel_status == 0 and
-        account_id >= self.m_global_account_config:get_min_user_num() and
+    if account_id >= self.m_global_account_config:get_min_user_num() and
         account_id <= self.m_global_account_config:get_max_user_num() then
         ipmi_channel_config_list = self.ipmi_channel_config:get(account_id, 1)
-        ipmi_channel_config_list.PrivilegeLimit = privilege
-        self.ipmi_channel_config.m_channel_config_changed:emit(account_id, 1, "PrivilegeLimit", privilege)
-    end    
+        if ipmi_channel_config_list and next(ipmi_channel_config_list) ~= nil then
+            ipmi_channel_config_list.PrivilegeLimit = privilege
+            ipmi_channel_config_list:save()
+            self.ipmi_channel_config.m_channel_config_changed:emit(account_id, 1, "PrivilegeLimit", privilege)
+        end
+    end
     self.m_account_changed:emit(account_id, "RoleId", role_id)
     self.m_account_permanent_changed:emit(account_id, "RoleId")
     self.m_account_security_changed:emit(account_id, userName)
