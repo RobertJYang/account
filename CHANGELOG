@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.90.43] - 2025-09-23
+修复多通道场景设置角色未同步修改LAN1通道权限的问题
+
 ## [1.90.42] - 2025-09-20
 修复组件启动时未清理共享内存问题
 
