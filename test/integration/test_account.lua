@@ -79,6 +79,7 @@ end
 -- 所有服务退出
 function TestServer:stop()
     skynet.timeout(0, function()
+        skynet.call('.rmcpd', 'lua', 'exit')
         skynet.sleep(20)
         skynet.abort()
         log:notice('- clear test data')
