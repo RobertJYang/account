@@ -161,11 +161,6 @@ function CustomSettings:on_import(ctx, object)
             goto continue
         end
 
-        local match_oem_account_conf = string.match(custom_setting_name, "(BMCSet_OEMName)")
-        if match_oem_account_conf and string.match(custom_setting_name, "%d$") then
-            self:import_oem_account_settings(ctx, custom_setting_name, custom_setting)
-            goto continue
-        end
         if not custom_settings_adapter[custom_setting_name] then
             goto continue
         end
@@ -184,6 +179,14 @@ function CustomSettings:on_import(ctx, object)
         custom_setting_funcs.import(self, ctx, custom_value)
         log:notice('Import %s successfully in customize config.', custom_setting_name)
         ::continue::
+    end
+
+    -- 处理OEM用户配置
+    for custom_setting_name, custom_setting in pairs(custom_settings) do
+        local match_oem_account_conf = string.match(custom_setting_name, "(BMCSet_OEMName)")
+        if match_oem_account_conf and string.match(custom_setting_name, "%d$") then
+            self:import_oem_account_settings(ctx, custom_setting_name, custom_setting)
+        end
     end
     ctx.operation_log = nil
 end

@@ -6,6 +6,9 @@
             },
             "BMCSet_InitialPasswordNeedModify": {
                 "Value": "on"
+            },
+            "BMCSet_OEMName1": {
+                "Value": "OEM1"
             }
         }
     }
