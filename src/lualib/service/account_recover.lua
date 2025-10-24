@@ -26,7 +26,8 @@ function account_recover:ctor(db, account_back_db, account_service)
 end
 
 -- 恢复用户信息-待恢复ID无用户场景
-function account_recover:recover_account_while_id_not_exist(ctx, account_id, account_data, ipmi_data, snmp_data)
+function account_recover:recover_account_while_id_not_exist(ctx, account_id, backup_data)
+    local account_data = backup_data.account_data
     local account_info = {
         ['id'] = account_data.Id,
         ['name'] = account_data.UserName,
@@ -57,7 +58,7 @@ function account_recover:recover_account_while_id_not_exist(ctx, account_id, acc
 
     -- 覆盖用户信息，失败的场景下需要删除新建的用户，可能需要恢复被改名的用户
     ok, err = pcall(function()
-        self:cover_account_info(account_id, account_data, ipmi_data, snmp_data)
+        self:cover_account_info(account_id, backup_data)
     end)
     if not ok then
         log:error("[Recover] cover account info failed")
@@ -75,7 +76,8 @@ function account_recover:recover_account_while_id_not_exist(ctx, account_id, acc
 end
 
 -- 恢复用户信息-待恢复ID有用户场景
-function account_recover:recover_account_while_id_exist(ctx, account_id, account_data, ipmi_data, snmp_data)
+function account_recover:recover_account_while_id_exist(ctx, account_id, backup_data)
+    local account_data = backup_data.account_data
     -- 判断是否有重名用户，有的话先改名
     local account, id = self.account_collection:get_account_by_name(account_data.UserName)
     local is_dup_user = account and id ~= account_id
@@ -86,7 +88,7 @@ function account_recover:recover_account_while_id_exist(ctx, account_id, account
 
     -- 覆盖用户信息，失败的场景下需要删除新建的用户，可能需要恢复被改名的用户
     local ok, err = pcall(function()
-        self:cover_account_info(account_id, account_data, ipmi_data, snmp_data)
+        self:cover_account_info(account_id, backup_data)
     end)
     if not ok then
         log:error("[Recover] cover account info failed")
@@ -121,24 +123,32 @@ function account_recover:recover_account(ctx, account_id, policy)
         log:error('[Recover] get account%d`s back-up data failed', account_id)
         error(base_msg.PropertyMissing('id'))
     end
+    local ipmi_channel_data = nil
+    if backup_info.IpmiChannelData ~= nil then
+        ipmi_channel_data = json.decode(backup_info.IpmiChannelData)
+    end
     -- 解析备份表中的json字符串
-    local account_data = json.decode(backup_info.ManagerAccountData)
-    local ipmi_data = json.decode(backup_info.IpmiAccountData)
-    local snmp_data = json.decode(backup_info.SnmpAccountData)
+    local backup_data = { 
+        account_data = json.decode(backup_info.ManagerAccountData),
+        ipmi_data = json.decode(backup_info.IpmiAccountData),
+        snmp_data = json.decode(backup_info.SnmpAccountData),
+        ipmi_channel_data = ipmi_channel_data,
+    }
     -- 根据业务场景做策略
     local ok = pcall(function ()
         self.account_collection:get_account_by_account_id(account_id)
     end)
     if not ok then
-        self:recover_account_while_id_not_exist(ctx, account_id, account_data, ipmi_data, snmp_data)
+        self:recover_account_while_id_not_exist(ctx, account_id, backup_data)
     else
-        self:recover_account_while_id_exist(ctx, account_id, account_data, ipmi_data, snmp_data)
+        self:recover_account_while_id_exist(ctx, account_id, backup_data)
     end
     log:info('[Recover] recover user %d successfully', account_id)
 end
 
-function account_recover:cover_account_info(account_id, account_data, ipmi_data, snmp_data)
+function account_recover:cover_account_info(account_id, backup_data)
     local account = self.account_collection:get_account_by_account_id(account_id)
+    local account_data = backup_data.account_data
     if account:get_role_id() == enum.RoleType.Administrator:value() and
         account_data.RoleId ~= enum.RoleType.Administrator:value() and
         self.account_collection:check_is_last_operate_admin(account_id) then
@@ -148,7 +158,7 @@ function account_recover:cover_account_info(account_id, account_data, ipmi_data,
     if account_id == self.m_global_account_config:get_snmp_v3_trap_account_id() then
         log:notice('[Recover] account%d is trap v3 account, will be recovered', account_id)
     end
-    account:recover(account_data, ipmi_data, snmp_data)
+    account:recover(backup_data)
     self.account_collection.m_account_removed:emit(account_id)
     self.account_collection.m_account_added:emit(account.m_account_data, account.m_snmp_user_info_data,
         account.m_account_update_signal, account.m_snmp_update_signal)

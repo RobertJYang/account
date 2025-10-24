@@ -21,12 +21,13 @@ function account_backup_db:ctor(db)
     end, {})
 end
 
-function account_backup_db:new_data(id, account_data, ipmi_data, snmp_data)
+function account_backup_db:new_data(id, backup_data)
     local row_data = self.db.ManagerAccountBackup({
         Id = id,
-        ManagerAccountData = account_data,
-        IpmiAccountData = ipmi_data,
-        SnmpAccountData = snmp_data,
+        ManagerAccountData = backup_data.account_data,
+        IpmiAccountData = backup_data.ipmi_data,
+        SnmpAccountData = backup_data.snmp_data,
+        IpmiChannelData = backup_data.ipmi_channel_data,
     })
     row_data:save()
     self.account_backup_collection[id] = row_data

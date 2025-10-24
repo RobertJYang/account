@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.2] - 2025-10-24
+修复busctl恢复用户未恢复ipmi通道权限问题
+
 ## [1.100.1] - 2025-10-22
 修复定制OEM用户名称失败的问题
 

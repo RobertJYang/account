@@ -859,6 +859,15 @@
                     "PoweroffPer"
                 ],
                 "sensitive": true
+            },
+            "IpmiChannelData": {
+                "baseType": "String",
+                "description": "ipmi channel config数据表备份",
+                "notAllowNull": false,
+                "usage": [
+                    "PoweroffPer"
+                ],
+                "sensitive": false
             }
         }
     },
