@@ -325,7 +325,7 @@ function ManagerAccount:set_ipmi_user_access(req, ctx)
     ipmi_channel_config_info.LinkAuthenticationEnabled = (req.AuthenticationEnable == 1)
     ipmi_channel_config_info.IpmiMessagingEnabled = (req.MessagingEnable == 1)
     self.m_ipmi_channel_config:update(ipmi_channel_config_info, change_enable)
-    --同步写老表
+    --同步写老表, 保持兼容（用于备份恢复历史用户的ipmi channel）
     self.m_ipmi_user_info_data.Privilege1 = enum.IpmiPrivilege.new(req.UserPrivilege)
     ctx.operation_log.params.session_limit = string.unpack('>B', req.SessionLimit)
     if change_enable == 1 then
@@ -781,11 +781,33 @@ function ManagerAccount:recover_snmp_data(snmp_data)
     self.m_snmp_user_info_data:save()
 end
 
+function ManagerAccount:recover_ipmi_channel_data(ipmi_channel_data, ipmi_data)
+    if ipmi_channel_data == nil then
+        -- 兼容历史用户, 未备份ipmi channel配置信息, 通过ipmi_data的旧表数据更新通道配置
+        for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
+            local new_channel_data = {
+                AccountId = ipmi_data.AccountId,
+                ChannelNumber = channel_num,
+                PrivilegeLimit = ipmi_data.Privilege1,
+                CallbackRestriction = ipmi_data.IsCallin,
+                LinkAuthenticationEnabled = ipmi_data.IsEnableAuth,
+                IpmiMessagingEnabled = ipmi_data.IsEnableIpmiMsg,
+                SessionLimit = 0
+            }
+            self.m_ipmi_channel_config:update(new_channel_data, 1)
+        end
+    else
+        for _, ipmi_channel_config_data in pairs(ipmi_channel_data) do
+            self.m_ipmi_channel_config:update(ipmi_channel_config_data, 1)
+        end
+    end
+end
 
-function ManagerAccount:recover(account_data, ipmi_data, snmp_data)
-    self:recover_account_data(account_data)
-    self:recover_ipmi_data(ipmi_data)
-    self:recover_snmp_data(snmp_data)
+function ManagerAccount:recover(backup_data)
+    self:recover_account_data(backup_data.account_data)
+    self:recover_ipmi_data(backup_data.ipmi_data)
+    self:recover_snmp_data(backup_data.snmp_data)
+    self:recover_ipmi_channel_data(backup_data.ipmi_channel_data, backup_data.ipmi_data)
 end
 
 function ManagerAccount:get_accoutn_data_str()
@@ -858,11 +880,32 @@ function ManagerAccount:get_snmp_data_str()
     return json.encode(snmp_data)
 end
 
+function ManagerAccount:get_ipmi_channel_data_str()
+    local ipmi_channels = {}
+    local account_ipmi_channel_config = self.m_ipmi_channel_config.collection[self.m_account_data.Id]
+    for channel_num, channel_config in pairs(account_ipmi_channel_config) do
+        local ipmi_channel_config_data = {
+            AccountId = channel_config.AccountId,
+            ChannelNumber = channel_config.ChannelNumber,
+            PrivilegeLimit = channel_config.PrivilegeLimit,
+            SessionLimit = channel_config.SessionLimit,
+            CallbackRestriction = channel_config.CallbackRestriction,
+            LinkAuthenticationEnabled = channel_config.LinkAuthenticationEnabled,
+            IpmiMessagingEnabled = channel_config.IpmiMessagingEnabled,
+        }
+        ipmi_channels[channel_num] = ipmi_channel_config_data
+    end
+    return json.encode(ipmi_channels)
+end
+
 function ManagerAccount:get_backup_info()
-    local account_data_str = self:get_accoutn_data_str()
-    local ipmi_data_str    = self:get_ipmi_data_str()
-    local snmp_data_str    = self:get_snmp_data_str()
-    return account_data_str, ipmi_data_str, snmp_data_str
+    local backup_data = {
+        account_data = self:get_accoutn_data_str(),
+        ipmi_data = self:get_ipmi_data_str(),
+        snmp_data = self:get_snmp_data_str(),
+        ipmi_channel_data = self:get_ipmi_channel_data_str(),
+    }
+    return backup_data
 end
 
 function ManagerAccount:is_delete_ipmi_interface(interface_num)

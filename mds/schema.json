@@ -8,7 +8,6 @@
                             "$ref": "base.json#/U8"
                         },
                         {
-                            "description": "\u8d26\u6237Id",
                             "privilege": {
                                 "read": [
                                     "ConfigureSelf"

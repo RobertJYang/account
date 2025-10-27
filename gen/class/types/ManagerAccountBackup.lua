@@ -12,6 +12,52 @@ local utils = require 'mc.utils'
 
 local MManagerAccountBackup = {}
 
+---@class MManagerAccountBackup.IpmiChannelData
+---@field IpmiChannelData string
+local TIpmiChannelData = {}
+TIpmiChannelData.__index = TIpmiChannelData
+TIpmiChannelData.group = {}
+
+local function TIpmiChannelData_from_obj(obj)
+    return setmetatable(obj, TIpmiChannelData)
+end
+
+function TIpmiChannelData.new(IpmiChannelData)
+    return TIpmiChannelData_from_obj({IpmiChannelData = IpmiChannelData})
+end
+---@param obj MManagerAccountBackup.IpmiChannelData
+function TIpmiChannelData:init_from_obj(obj)
+    self.IpmiChannelData = obj.IpmiChannelData
+end
+
+function TIpmiChannelData:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIpmiChannelData.group)
+end
+
+TIpmiChannelData.from_obj = TIpmiChannelData_from_obj
+
+TIpmiChannelData.proto_property = {'IpmiChannelData'}
+
+TIpmiChannelData.default = {''}
+
+TIpmiChannelData.struct = {{name = 'IpmiChannelData', is_array = false, struct = nil}}
+
+function TIpmiChannelData:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IpmiChannelData', self.IpmiChannelData, 'string', false, errs, need_convert)
+
+    TIpmiChannelData:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIpmiChannelData.proto_property, errs, need_convert)
+    return self
+end
+
+function TIpmiChannelData:unpack(_)
+    return self.IpmiChannelData
+end
+
+MManagerAccountBackup.IpmiChannelData = TIpmiChannelData
+
 ---@class MManagerAccountBackup.SnmpAccountData
 ---@field SnmpAccountData string
 local TSnmpAccountData = {}

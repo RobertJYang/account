@@ -92,6 +92,7 @@ local def_types = require 'class.types.types'
 ---@field ManagerAccountData FieldBase
 ---@field IpmiAccountData FieldBase
 ---@field SnmpAccountData FieldBase
+---@field IpmiChannelData FieldBase
 
 ---@class SNMPUserInfoTable: Table
 ---@field AccountId FieldBase
@@ -346,7 +347,8 @@ function AccountDBDatabase.new(path, datas)
         Id = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),
         ManagerAccountData = Col.TextField():cid(2):persistence_key('protect_power_off'):null(),
         IpmiAccountData = Col.TextField():cid(3):persistence_key('protect_power_off'):null(),
-        SnmpAccountData = Col.TextField():cid(4):persistence_key('protect_power_off'):null()
+        SnmpAccountData = Col.TextField():cid(4):persistence_key('protect_power_off'):null(),
+        IpmiChannelData = Col.TextField():cid(5):persistence_key('protect_power_off'):null()
     }):create_if_not_exist(datas and datas['t_manager_account_backup'])
     obj.SNMPUserInfo = db:Table('t_snmp_user_info', {
         AccountId = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),

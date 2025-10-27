@@ -1251,13 +1251,21 @@ local ManagerAccountBackup = {
             ['usage'] = {'PoweroffPer'},
             ['sensitive'] = true,
             ['validator'] = manager_account_backup_class_types.SnmpAccountData
+        },
+        ['IpmiChannelData'] = {
+            ['baseType'] = 'String',
+            ['notAllowNull'] = false,
+            ['usage'] = {'PoweroffPer'},
+            ['sensitive'] = false,
+            ['validator'] = manager_account_backup_class_types.IpmiChannelData
         }
     },
     ['default_props'] = {
         ['Id'] = manager_account_backup_class_types.Id.default[1],
         ['ManagerAccountData'] = manager_account_backup_class_types.ManagerAccountData.default[1],
         ['IpmiAccountData'] = manager_account_backup_class_types.IpmiAccountData.default[1],
-        ['SnmpAccountData'] = manager_account_backup_class_types.SnmpAccountData.default[1]
+        ['SnmpAccountData'] = manager_account_backup_class_types.SnmpAccountData.default[1],
+        ['IpmiChannelData'] = manager_account_backup_class_types.IpmiChannelData.default[1]
     }
 }
 
