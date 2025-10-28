@@ -790,8 +790,8 @@ function ManagerAccount:recover_ipmi_channel_data(ipmi_channel_data, ipmi_data)
                 ChannelNumber = channel_num,
                 PrivilegeLimit = ipmi_data.Privilege1,
                 CallbackRestriction = ipmi_data.IsCallin,
-                LinkAuthenticationEnabled = ipmi_data.IsEnableAuth,
-                IpmiMessagingEnabled = ipmi_data.IsEnableIpmiMsg,
+                LinkAuthenticationEnabled = ipmi_data.IsEnableAuth == 1,
+                IpmiMessagingEnabled = ipmi_data.IsEnableIpmiMsg == 1,
                 SessionLimit = 0
             }
             self.m_ipmi_channel_config:update(new_channel_data, 1)
