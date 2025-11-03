@@ -406,15 +406,6 @@ function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
         log:error('new account failed, unknown role id')
         error(base_msg.PropertyValueNotInList(account_info.role_id, 'RoleId'))
     end
-    -- AllowedLoginInterfaces仅限制本地用户
-    if not account_info.oem and
-        not self.account_policy_collection:
-        check_login_interface_is_allowed(account_info.account_type,
-        utils.cover_interface_enum_to_num(account_info.interface)) then
-        local interfaces_str = utils.interface_enum_table_to_string(account_info.interface)
-        log:error('LoginInterface is illegal, interface : %s', interfaces_str)
-        error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. interfaces_str, '%LoginInterface'))
-    end
     -- account_info中包含oem值时意味着此时新建oem用户
     local account_class = account_info.oem and oem_account or local_account
     local account_id = self:get_valid_account_id(account_info.id, account_class)
@@ -646,12 +637,6 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
         log:error('modify failed, The last admin(user%d) who can performs operations cannot be set.', account_id)
         error(custom_msg.SettingPropertyFailedExtend('LoginInterface',
             'The last administrator who can performs operations cannot be set'))
-    end
-    local account_type = account:get_account_type():value()
-    if account_type == enum.AccountType.Local:value() and
-        not self.account_policy_collection:check_login_interface_is_allowed(account_type, interface_num) then
-        log:error('LoginInterface is illegal, interface : %s', table.concat(interface, ', '))
-        error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. table.concat(interface, " "), '%LoginInterface'))
     end
     -- 判断要取消ipmi接口
     if account:is_delete_ipmi_interface(interface_num) then
