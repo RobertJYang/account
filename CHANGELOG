@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.4] - 2025-11-03
+修改allowedloginInterface属性策略
+
 ## [1.100.3] - 2025-10-27
 修复busctl恢复用户未恢复历史用户ipmi通道权限问题
 
