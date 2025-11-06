@@ -366,7 +366,7 @@ function global_account_config:set_inactive_time_threshold(threshold)
 
     if threshold > MAX_INACT_DAYS or (threshold < MIN_INACT_DAYS and threshold ~= PROP_NOT_USE) then
         log:error('set_inactive_time_threshold failed, inactive_user_threshold(%d) is error', threshold)
-        error(base_msg.PropertyValueNotInList())
+        error(base_msg.PropertyValueNotInList(threshold, "AccountInactiveTimeLimit"))
     end
     self.m_db_account_service.InactiveDaysThreshold = threshold
     self.m_db_account_service:save()
