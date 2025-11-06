@@ -85,6 +85,10 @@ function global_account_config:get_password_complexity_enable()
 end
 
 function global_account_config:set_password_complexity_enable(enable)
+    local lock = self:get_password_complexity_lock()
+    if lock and not enable then
+        error(custom_msg.PasswordForbidSetComplexityCheck())
+    end
     self.m_db_account_service.PasswordComplexityEnable = enable
     self.m_db_account_service:save()
 end

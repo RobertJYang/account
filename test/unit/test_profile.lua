@@ -12,6 +12,7 @@ local profile_adapter = require 'interface.config_mgmt.profile.profile_adapter'
 local mc_context = require 'mc.context'
 local cjson = require 'cjson'
 local enum = require 'class.types.types'
+local custom_msg = require 'messages.custom'
 
 local function make_interface()
     local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish,
@@ -215,4 +216,30 @@ function TestAccount:test_when_exist_custom_role_then_delete_should_success()
     --恢复环境
     self.test_role_collection:set_extended_custom_role_enabled(false)
     self.test_role_collection:clear_extended_custom_role(self.ctx)
+end
+
+function TestAccount:test_password_complexity_check_should_fail()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local object = {
+        PasswdSetting = {
+            EnableStrongPassword = {
+                Value = false,
+                AttributeType = "ImportAndExport",
+                Import = true
+            }
+        }
+    }
+
+    local complexity_enable = true
+    self.test_global_account_config:set_password_complexity_enable(complexity_enable)
+    self.test_global_account_config:set_password_complexity_lock(true)
+    local config_service = profile_adapter.new()
+    lu.assertErrorMsgContains(custom_msg.CollectingConfigurationErrorDescMessage.Name, function ()
+        config_service:on_import(ctx, object)
+    end)
+
+    local data = self.test_global_account_config:get_password_complexity_enable()
+    lu.assertEquals(data, complexity_enable)
+    --恢复环境
+    self.test_global_account_config:set_password_complexity_lock(false)
 end

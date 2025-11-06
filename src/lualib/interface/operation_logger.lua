@@ -152,8 +152,7 @@ local operation_log_map = {
         success = '{state} local user password complexity check successfully',
         fail = '{state} local user password complexity check failed',
         ['kepler.account.HostUserManagementDiabled']  = 'Set local user password complexity check status failed',
-        ['kepler.account.InvalidParameter']  = 'Set local user password complexity check status failed',
-        ['kepler.account.PasswordForbidSetComplexityCheck'] = 'Set local user password complexity check status failed',
+        failed = 'Set local user password complexity check status failed',
         user_mgnt_disabled = 'Set local user password complexity check status failed'
     },
     IpmiDeleteAccount = {

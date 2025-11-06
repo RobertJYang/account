@@ -156,12 +156,6 @@
             "http_response": 401,
             "severity": "error"
         },
-        "kepler.account.PasswordForbidSetComplexityCheck": {
-            "message": "It is not allowed to enable or disable password complexity check when password complexity check enhancement enabled.",
-            "ipmi_response": "0xFF",
-            "http_response": 401,
-            "severity": "error"
-        },
         "kepler.account.InvalidDataField": {
             "message": "The user data field is invalid.",
             "ipmi_response": "0xCC",

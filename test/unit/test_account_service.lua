@@ -424,14 +424,42 @@ function TestAccount:test_set_ipmi_password_complexity()
     self.test_account_service:set_ipmi_password_complexity(req, ctx)
     local data = self.test_account_service:get_ipmi_password_complexity(req, ctx)
     lu.assertEquals(data, req.Control)
+
     req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value()
     self.test_account_service:set_ipmi_password_complexity(req, ctx)
     data = self.test_account_service:get_ipmi_password_complexity(req, ctx)
     lu.assertEquals(data, req.Control)
+
     req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE:value()
     self.test_account_service:set_ipmi_password_complexity(req, ctx)
+    data = self.test_global_account_config:get_password_complexity_lock()
+    lu.assertEquals(data, true)
     data = self.test_account_service:get_ipmi_password_complexity(req, ctx)
     lu.assertEquals(data, req.Control)
+
+    -- 开启强检查后，再次关闭密码复杂度检查
+    req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value()
+    lu.assertErrorMsgContains(custom_msg.PasswordForbidSetComplexityCheckMessage.Name, function ()
+        self.test_account_service:set_ipmi_password_complexity(req, ctx)
+    end)
+    data = self.test_account_service:get_ipmi_password_complexity(req, ctx)
+    lu.assertNotEquals(data, req.Control)
+
+    -- 关闭密码复杂度强检查, 还原配置
+    self.test_global_account_config:set_password_complexity_lock(false)
+
+    -- 不合法的Control
+    req.Control = 3
+    lu.assertErrorMsgContains(custom_msg.IPMIOutOfRangeMessage.Name, function ()
+        self.test_account_service:set_ipmi_password_complexity(req, ctx)
+    end)
+
+    req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value()
+    -- 不合法的ManufactureId
+    req.ManufactureId = 0x0007DA
+    lu.assertErrorMsgContains(err.InvalidParameter, function ()
+        self.test_account_service:set_ipmi_password_complexity(req, ctx)
+    end)
 end
 
 function TestAccount:test_set_ipmi_user_name()
