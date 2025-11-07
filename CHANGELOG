@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.5] - 2025-11-05
+修复修改不活跃用户检测时间为非法值报错信息格式错误的问题
+
 ## [1.100.4] - 2025-11-03
 修改allowedloginInterface属性策略
 

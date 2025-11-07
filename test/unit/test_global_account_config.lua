@@ -219,3 +219,15 @@ function TestAccount:test_host_user_mgmt_check_from_os_should_fail()
 
     self.test_global_account_config:set_host_user_management_enabled(old_user_mgmt_value)
 end
+
+-- 不活跃用户检测时间校验
+function TestAccount:test_inactive_time_limit_should_fail()
+    local MAX_INACT_DAYS = 365  -- 不活跃阈值最长365天
+    local MIN_INACT_DAYS = 30   -- 不活跃阈值最短30天
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_global_account_config:set_inactive_time_threshold(MAX_INACT_DAYS + 1)
+    end)
+    lu.assertErrorMsgContains(base_msg.PropertyValueNotInListMessage.Name, function()
+        self.test_global_account_config:set_inactive_time_threshold(MIN_INACT_DAYS - 1)
+    end)
+end
