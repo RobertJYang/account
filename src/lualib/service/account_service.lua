@@ -189,15 +189,19 @@ function AccountService:set_ipmi_password_complexity(req, ctx)
     local control = req.Control
     local manufacture_id = req.ManufactureId
     self.m_account_collection:check_ipmi_host_user_mgnt_enabled(ctx)
-    if manufacture_id ~= utils.get_manufacture_id() or
-        control > enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE:value() then
+    if manufacture_id ~= utils.get_manufacture_id() then
+        ctx.operation_log.result = "failed"
         error(err:invalid_parameter())
+    end
+    if control > enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE:value() then
+        ctx.operation_log.result = "failed"
+        error(custom_msg.IPMIOutOfRange())
     end
     local lock = self.m_account_config:get_password_complexity_lock()
     if lock == true then
         if control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value() or
             control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_ENABLE:value() then
-            error(err:password_forbid_set_complexity_check())
+            error(custom_msg.PasswordForbidSetComplexityCheck())
         end
     end
     -- 如果为强制检查，则需要将设置锁定开关，且不允许修改

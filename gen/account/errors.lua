@@ -375,21 +375,6 @@ function M.value_out_of_range()
     return err_data
 end
 
-local PasswordForbidSetComplexityCheck = {
-    name = 'kepler.account.PasswordForbidSetComplexityCheck',
-    format = [=[It is not allowed to enable or disable password co]=] ..
-        [=[mplexity check when password complexity check enha]=] .. [=[ncement enabled.]=],
-    severity = 'error'
-}
-M.PasswordForbidSetComplexityCheck = PasswordForbidSetComplexityCheck.name
----@return Error
-function M.password_forbid_set_complexity_check()
-    local err_data = new_error(PasswordForbidSetComplexityCheck.name, PasswordForbidSetComplexityCheck.format)
-    regist_err_eng(PasswordForbidSetComplexityCheck, 401, nil, 0xFF)
-    print_log(log.ERROR, PasswordForbidSetComplexityCheck.format)
-    return err_data
-end
-
 local InvalidDataField = {
     name = 'kepler.account.InvalidDataField',
     format = [=[The user data field is invalid.]=],
