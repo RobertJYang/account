@@ -462,6 +462,28 @@ function TestAccount:test_set_ipmi_password_complexity()
     end)
 end
 
+function TestAccount:test_set_ipmi_password_complexity_in_manufacture_mode()
+    local base_func = core.is_manufacture_mode
+    core.is_manufacture_mode = (function () return true end)
+    local req = {}
+    local ctx = {}
+    ctx.operation_log = {}
+    req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_STRONG_ENABLE:value()
+    req.ManufactureId = 0x0007DB
+    self.test_account_service:set_ipmi_password_complexity(req, ctx)
+
+    req.Control = enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value()
+    self.test_account_service:set_ipmi_password_complexity(req, ctx)
+
+    -- 装备模式下，开启强检查后，可以再次关闭密码复杂度检查
+    data = self.test_account_service:get_ipmi_password_complexity(req, ctx)
+    lu.assertEquals(data, req.Control)
+
+    -- 还原配置
+    self.test_global_account_config:set_password_complexity_lock(false)
+    core.is_manufacture_mode = base_func
+end
+
 function TestAccount:test_set_ipmi_user_name()
     local req = {}
     local ctx = {}

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.6] - 2025-11-06
+装备包中跳过密码复杂度锁定校验，支持装备定制化
+
 ## [1.100.5] - 2025-11-05
 修复修改不活跃用户检测时间为非法值报错信息格式错误的问题
 修复IPMI设置密码复杂度强制开启后, 使用web接口还可以关闭密码复杂度问题

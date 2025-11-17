@@ -87,7 +87,11 @@ end
 function global_account_config:set_password_complexity_enable(enable)
     local lock = self:get_password_complexity_lock()
     if lock and not enable then
-        error(custom_msg.PasswordForbidSetComplexityCheck())
+        if core.is_manufacture_mode() then
+            log:notice("Skip checking password complexity check lock in manufacture mode")
+        else
+            error(custom_msg.PasswordForbidSetComplexityCheck())
+        end
     end
     self.m_db_account_service.PasswordComplexityEnable = enable
     self.m_db_account_service:save()
