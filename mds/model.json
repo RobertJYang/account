@@ -437,6 +437,12 @@
                             "read": ["ConfigureSelf"],
                             "write": ["UserMgmt"]
                         }
+                    },
+                    "IsOnline": {
+                        "privilege": {
+                            "read": ["ConfigureSelf"],
+                            "write": ["UserMgmt"]
+                        }
                     }
                 },
                 "methods": {
@@ -817,6 +823,14 @@
                 "critical": true,
                 "usage": [
                     "PoweroffPer"
+                ]
+            },
+            "IsOnline": {
+                "baseType": "Boolean",
+                "description": "账户是否在线",
+                "default": false,
+                "usage": [
+                    "TemporaryPer"
                 ]
             }
         }
@@ -1543,6 +1557,13 @@
                             "write": ["UserMgmt"]
                         },
                         "default": false
+                    },
+                    "OnlineDeletable": {
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "default": true
                     }
                 }
             }
@@ -1584,6 +1605,13 @@
                 "default": false,
                 "usage": [
                     "PoweroffPer"
+                ]
+            },
+            "OnlineDeletable": {
+                "baseType": "Boolean",
+                "default": true,
+                "usage": [
+                    "TemporaryPer"
                 ]
             }
         }

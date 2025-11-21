@@ -299,14 +299,16 @@ M.t_account_policy = {
         NamePattern = [=[]=],
         AllowedLoginInterfaces = 223,
         Visible = true,
-        Deletable = true
+        Deletable = true,
+        OnlineDeletable = true
     },
     {
         AccountType = 8,
         NamePattern = [=[]=],
         AllowedLoginInterfaces = 223,
         Visible = false,
-        Deletable = false
+        Deletable = false,
+        OnlineDeletable = true
     }
 }
 return M

@@ -14,6 +14,52 @@ local def_types = require 'class.types.types'
 
 local MManagerAccountDB = {}
 
+---@class MManagerAccountDB.IsOnline
+---@field IsOnline boolean
+local TIsOnline = {}
+TIsOnline.__index = TIsOnline
+TIsOnline.group = {}
+
+local function TIsOnline_from_obj(obj)
+    return setmetatable(obj, TIsOnline)
+end
+
+function TIsOnline.new(IsOnline)
+    return TIsOnline_from_obj({IsOnline = IsOnline or false})
+end
+---@param obj MManagerAccountDB.IsOnline
+function TIsOnline:init_from_obj(obj)
+    self.IsOnline = obj.IsOnline or false
+end
+
+function TIsOnline:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIsOnline.group)
+end
+
+TIsOnline.from_obj = TIsOnline_from_obj
+
+TIsOnline.proto_property = {'IsOnline'}
+
+TIsOnline.default = {false}
+
+TIsOnline.struct = {{name = 'IsOnline', is_array = false, struct = nil}}
+
+function TIsOnline:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IsOnline', self.IsOnline, 'bool', false, errs, need_convert)
+
+    TIsOnline:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIsOnline.proto_property, errs, need_convert)
+    return self
+end
+
+function TIsOnline:unpack(_)
+    return self.IsOnline
+end
+
+MManagerAccountDB.IsOnline = TIsOnline
+
 ---@class MManagerAccountDB.SNMPPasswordWritable
 ---@field SNMPPasswordWritable boolean
 local TSNMPPasswordWritable = {}

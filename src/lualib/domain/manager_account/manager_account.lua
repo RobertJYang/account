@@ -184,6 +184,7 @@ function ManagerAccount:init_account(account_info)
     self.m_account_data.LastLoginTime = 0xffffffff
     self.m_account_data.LastLoginIP = ""
     self.m_account_data.PasswordValidStartTime = vos_utils.vos_get_cur_time_stamp()
+    self.m_account_data.IsOnline = false
 end
 
 function ManagerAccount:make_rmcp_code_with_passwd(auth_algo, data)
@@ -291,6 +292,15 @@ end
 
 function ManagerAccount:get_password_change_required()
     return self.m_account_data.PasswordChangeRequired
+end
+
+function ManagerAccount:get_is_online()
+    return self.m_account_data.IsOnline
+end
+ 
+function ManagerAccount:set_is_online(required)
+    self.m_account_data.IsOnline = required
+    self.m_account_data:save()
 end
 
 function ManagerAccount:set_first_login_policy(policy)
@@ -751,6 +761,7 @@ function ManagerAccount:recover_account_data(account_data)
     self.m_account_data.AuthenticationProtocolWritable = account_data.AuthenticationProtocolWritable
     self.m_account_data.EncryptionProtocolWritable = account_data.EncryptionProtocolWritable
     self.m_account_data.SNMPPasswordWritable = account_data.SNMPPasswordWritable
+    self.m_account_data.IsOnline = account_data.IsOnline
     self.m_account_data:save()
 end
 
@@ -845,7 +856,8 @@ function ManagerAccount:get_accoutn_data_str()
         LoginRuleIdsWritable = self.m_account_data.LoginRuleIdsWritable,
         AuthenticationProtocolWritable = self.m_account_data.AuthenticationProtocolWritable,
         EncryptionProtocolWritable = self.m_account_data.EncryptionProtocolWritable,
-        SNMPPasswordWritable = self.m_account_data.SNMPPasswordWritable
+        SNMPPasswordWritable = self.m_account_data.SNMPPasswordWritable,
+        IsOnline = self.m_account_data.IsOnline
     }
     return json.encode(account_data)
 end

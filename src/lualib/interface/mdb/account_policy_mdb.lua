@@ -69,6 +69,9 @@ AccountPolicyMdb.watch_property_hook = {
     Deletable = operation_logger.proxy(function(self, ctx, account_type, value)
         self.m_policy_collection:set_deletable(ctx, account_type, value)
     end, 'DeletableChange'),
+    OnlineDeletable = operation_logger.proxy(function(self, ctx, account_type, value)
+        self.m_policy_collection:set_online_deletable(account_type, value)
+    end, 'OnlineDeletable')
 }
 
 function AccountPolicyMdb:watch_policy_property(policy, account_type)
@@ -96,6 +99,8 @@ function AccountPolicyMdb:new_policy_to_mdb_tree(policy_info)
         policy.AllowedLoginInterfaces = utils.convert_num_to_interface_str(policy_info.AllowedLoginInterfaces, true)
         policy.Visible  = policy_info.Visible
         policy.Deletable = policy_info.Deletable
+        -- 默认在线用户可删除
+        policy.OnlineDeletable = true
         self:watch_policy_property(policy, policy_info.AccountType)
     end)
     self.m_mdb_policys[policy_info.AccountType] = cur_policy

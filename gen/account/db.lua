@@ -86,6 +86,7 @@ local def_types = require 'class.types.types'
 ---@field AuthenticationProtocolWritable FieldBase
 ---@field EncryptionProtocolWritable FieldBase
 ---@field SNMPPasswordWritable FieldBase
+---@field IsOnline FieldBase
 
 ---@class ManagerAccountBackupTable: Table
 ---@field Id FieldBase
@@ -185,6 +186,7 @@ local def_types = require 'class.types.types'
 ---@field AllowedLoginInterfaces FieldBase
 ---@field Visible FieldBase
 ---@field Deletable FieldBase
+---@field OnlineDeletable FieldBase
 
 ---@class IpmiChannelConfigTable: Table
 ---@field PrivilegeLimit FieldBase
@@ -341,7 +343,8 @@ function AccountDBDatabase.new(path, datas)
         EncryptionProtocolWritable = Col.BooleandField():cid(34):persistence_key('protect_power_off'):null():default(
             true):critical(),
         SNMPPasswordWritable = Col.BooleandField():cid(35):persistence_key('protect_power_off'):null():default(true)
-            :critical()
+            :critical(),
+        IsOnline = Col.BooleandField():cid(36):persistence_key('protect_temporary'):null():default(false)
     }):create_if_not_exist(datas and datas['t_manager_account'])
     obj.ManagerAccountBackup = db:Table('t_manager_account_backup', {
         Id = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),
@@ -450,7 +453,8 @@ function AccountDBDatabase.new(path, datas)
         AllowedLoginInterfaces = Col.IntegerField():cid(3):persistence_key('protect_power_off'):null():max_length(32)
             :default(223),
         Visible = Col.BooleandField():cid(4):persistence_key('protect_power_off'):null():default(false),
-        Deletable = Col.BooleandField():cid(5):persistence_key('protect_power_off'):null():default(false)
+        Deletable = Col.BooleandField():cid(5):persistence_key('protect_power_off'):null():default(false),
+        OnlineDeletable = Col.BooleandField():cid(6):persistence_key('protect_temporary'):null():default(true)
     }):create_if_not_exist(datas and datas['t_account_policy'])
     obj.IpmiChannelConfig = db:Table('t_ipmi_channel_config', {
         PrivilegeLimit = Col.IntegerField():cid(1):persistence_key('protect_power_off'):null():max_length(8),

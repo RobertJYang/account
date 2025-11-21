@@ -157,8 +157,21 @@ M.t_password_policy = {
     {AccountType = 8, AccountTypeName = [=[Oem]=], Policy = 1, Pattern = [=[]=], MaxPasswordLength = 20}
 }
 M.t_account_policy = {
-    {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = true, Deletable = true},
-    {AccountType = 8, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = false, Deletable = false}
+    {
+        AccountType = 0,
+        NamePattern = [=[]=],
+        AllowedLoginInterfaces = 223,
+        Visible = true,
+        Deletable = true,
+        OnlineDeletable = true
+    }, {
+        AccountType = 8,
+        NamePattern = [=[]=],
+        AllowedLoginInterfaces = 223,
+        Visible = false,
+        Deletable = false,
+        OnlineDeletable = true
+    }
 }
 M.t_ipmi_channel_config = {
     {

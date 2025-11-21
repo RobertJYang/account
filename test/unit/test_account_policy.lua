@@ -11,6 +11,10 @@ local lu = require 'luaunit'
 local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
+local account_policy_collection = require 'domain.account_policy_collection'
+local account_policy = require 'domain.account_policies.account_policy'
+local manager_account = require 'domain.manager_account.manager_account'
+local account_collection = require 'domain.account_collection'
 
 --- 用户名合法，应该检查成功
 function TestAccount:test_when_unsername_valid_should_check_success()
@@ -149,4 +153,105 @@ function TestAccount:test_set_oem_account_deletable()
     lu.assertEquals(result, true)
     --恢复环境
     self.test_account_policy_collection:set_deletable(self.ctx, account_type, false)
+end
+
+--- 获取Local用户online_deletable属性
+function TestAccount:test_get_local_account_online_deletable()
+    local account_type = enum.AccountType.Local:value()
+    account_policy_collection.collection = {
+        [0] = {
+            get_online_deletable = nil
+        }
+    }
+    local ok, _ = pcall(function ()
+        account_policy_collection:get_online_deletable(account_type)
+    end)
+    lu.assertEquals(ok, false)
+    account_policy_collection.collection = {
+        [0] = {
+            get_online_deletable = function ()
+                return true
+            end,
+            set_online_deletable = function (value)
+                return true
+            end
+        }
+    }
+    local ok, _ = pcall(function ()
+        account_policy_collection:get_online_deletable(account_type)
+    end)
+    lu.assertEquals(ok, true)
+end
+
+--- 获取Local用户set online_deletable属性
+function TestAccount:test_set_local_account_online_deletable()
+    account_policy_collection.collection = {
+        [0] = {
+            get_online_deletable = function ()
+                return true
+            end,
+            set_online_deletable = function (value)
+                return true
+            end
+        }
+    }
+    account_policy_collection.m_config_changed = {
+        emit = function(account_type, method, value)
+        end
+    }
+    local account_type = enum.AccountType.Local:value()
+    local ok, _ = pcall(function ()
+        account_policy_collection:set_online_deletable(account_type, 1)
+    end)
+    lu.assertEquals(ok, true)
+end
+
+function TestAccount:test_account_policy_set_online_deletable()
+    account_policy.data = {OnlineDeletable = true}
+    local ok, _ = pcall(function ()
+        account_policy:get_online_deletable(1)
+    end)
+    lu.assertEquals(ok, true)
+
+    local ok, _ = pcall(function ()
+        account_policy:set_online_deletable(1)
+    end)
+    lu.assertEquals(ok, true)
+end
+
+function TestAccount:test_manager_account_get_is_online()
+    manager_account.m_account_data = {
+        IsOnline = true,
+        save = function()
+        end
+    }
+    local ok, _ = pcall(function ()
+        manager_account:get_is_online()
+    end)
+    lu.assertEquals(ok, true)
+
+    local ok, _ = pcall(function ()
+        manager_account:set_is_online(1)
+    end)
+    lu.assertEquals(ok, true)
+end
+
+function TestAccount:test_account_collection_set_is_online_change_required()
+    account_collection.collection = {
+        [1] = nil
+    }
+    local ok, _ = pcall(function ()
+        account_collection:set_is_online_change_required(1, 1)
+    end)
+    lu.assertEquals(ok, false)
+    account_collection.collection = {
+        [1] = {
+            set_is_online = function ()
+            end
+        }
+    }
+    local ok, _ = pcall(function ()
+        account_collection:set_is_online_change_required(1, 1)
+    end)
+    lu.assertEquals(ok, true)
 end
