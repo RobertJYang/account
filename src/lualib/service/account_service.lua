@@ -21,6 +21,7 @@ local err_cfg = require 'error_config'
 local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local privilege = require 'domain.privilege'
+local core = require 'account_core'
 
 -- AccountService
 local AccountService = class()
@@ -199,7 +200,9 @@ function AccountService:set_ipmi_password_complexity(req, ctx)
     end
     local lock = self.m_account_config:get_password_complexity_lock()
     if lock == true then
-        if control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value() or
+        if core.is_manufacture_mode() then
+            log:notice("Skip checking password complexity check lock in manufacture mode")
+        elseif control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value() or
             control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_ENABLE:value() then
             error(custom_msg.PasswordForbidSetComplexityCheck())
         end
