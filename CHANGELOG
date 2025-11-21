@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.7] - 2025-11-20
+【修改描述】支持登录用户和最后一个用户不可删除
+
 ## [1.100.6] - 2025-11-06
 装备包中跳过密码复杂度锁定校验，支持装备定制化
 

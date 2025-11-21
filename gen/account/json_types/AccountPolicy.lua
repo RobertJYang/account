@@ -13,6 +13,52 @@ local mdb = require 'mc.mdb'
 
 local AccountPolicy = {}
 
+---@class AccountPolicy.OnlineDeletable
+---@field OnlineDeletable boolean
+local TOnlineDeletable = {}
+TOnlineDeletable.__index = TOnlineDeletable
+TOnlineDeletable.group = {}
+
+local function TOnlineDeletable_from_obj(obj)
+    return setmetatable(obj, TOnlineDeletable)
+end
+
+function TOnlineDeletable.new(OnlineDeletable)
+    return TOnlineDeletable_from_obj({OnlineDeletable = OnlineDeletable == nil and true or OnlineDeletable})
+end
+---@param obj AccountPolicy.OnlineDeletable
+function TOnlineDeletable:init_from_obj(obj)
+    self.OnlineDeletable = obj.OnlineDeletable == nil and true or obj.OnlineDeletable
+end
+
+function TOnlineDeletable:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TOnlineDeletable.group)
+end
+
+TOnlineDeletable.from_obj = TOnlineDeletable_from_obj
+
+TOnlineDeletable.proto_property = {'OnlineDeletable'}
+
+TOnlineDeletable.default = {false}
+
+TOnlineDeletable.struct = {{name = 'OnlineDeletable', is_array = false, struct = nil}}
+
+function TOnlineDeletable:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'OnlineDeletable', self.OnlineDeletable, 'bool', false, errs, need_convert)
+
+    TOnlineDeletable:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TOnlineDeletable.proto_property, errs, need_convert)
+    return self
+end
+
+function TOnlineDeletable:unpack(_)
+    return self.OnlineDeletable
+end
+
+AccountPolicy.OnlineDeletable = TOnlineDeletable
+
 ---@class AccountPolicy.Deletable
 ---@field Deletable boolean
 local TDeletable = {}
@@ -212,7 +258,8 @@ AccountPolicy.interface = mdb.register_interface('bmc.kepler.AccountService.Acco
     NamePattern = {'s', {}, false, '', false},
     AllowedLoginInterfaces = {'as', {}, false, {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}, false},
     Visible = {'b', {}, false, false, false},
-    Deletable = {'b', {}, false, false, false}
+    Deletable = {'b', {}, false, false, false},
+    OnlineDeletable = {'b', {}, false, true, false}
 }, {}, {})
 
 return AccountPolicy

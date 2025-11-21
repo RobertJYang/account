@@ -38,6 +38,7 @@ local snmp_community = require 'domain.manager_account.snmp_community'
 local inter_chassis_account = require 'domain.manager_account.inter_chassis_account'
 local core = require 'account_core'
 local cert_service_enum = require 'account.json_types.CertificateService'
+local account_policy_collection = require 'domain.account_policy_collection'
 
 local account_type_map = {
     [enum.AccountType.Local:value()] = local_account,
@@ -542,6 +543,11 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
             error(err.invalid_account_id())
         end
         ctx.operation_log.params.name = account:get_user_name()
+        if not self.account_policy_collection:get_online_deletable(enum.AccountType.Local:value()) and
+            account:get_is_online() then
+            log:error('Delete account failed, account (user%d) is online.', account_id)
+            error(base_msg.AccountNotModified())
+        end
         if not account:get_property_writable('UserNameWritable') then
             log:error('Delete account failed, account (user%d) is not writable.', account_id)
             error(custom_msg.AccountForbidRemoved())
@@ -987,6 +993,13 @@ end
 function AccountCollection:get_first_login_policy_by_id(id)
     local account = self:get_account_by_account_id(id)
     return account:get_first_login_policy()
+end
+
+function AccountCollection:set_is_online_change_required(account_id, required)
+    if self.collection[account_id] == nil then
+        error(err.invalid_account_id())
+    end
+    self.collection[account_id]:set_is_online(required)
 end
 
 --- 检查是否为逃生用户

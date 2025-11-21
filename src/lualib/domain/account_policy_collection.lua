@@ -113,4 +113,17 @@ function AccountPolicyCollection:get_deletable(account_type)
     return self.collection[account_type]:get_deletable()
 end
 
+function AccountPolicyCollection:get_online_deletable(account_type)
+    if not self.collection[account_type] then
+        log:debug('can not get online deletable, account_type:%s', account_type)
+        return true
+    end
+    return self.collection[account_type]:get_online_deletable()
+end
+
+function AccountPolicyCollection:set_online_deletable(account_type, value)
+    self.collection[account_type]:set_online_deletable(value)
+    self.m_config_changed:emit(account_type, 'OnlineDeletable', value)
+end
+
 return singleton(AccountPolicyCollection)

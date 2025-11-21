@@ -193,11 +193,13 @@ t_account_policy:
   AllowedLoginInterfaces: 223
   Visible: true
   Deletable: true
+  OnlineDeletable: true
 - AccountType: 8
   NamePattern: ''
   AllowedLoginInterfaces: 223
   Visible: false
   Deletable: false
+  OnlineDeletable: true
 
 t_ipmi_channel_config:
 - AccountId: 2

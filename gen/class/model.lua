@@ -725,6 +725,14 @@ local ManagerAccount = {
                 ['readOnly'] = true,
                 ['privilege'] = {['read'] = {'ConfigureSelf'}, ['write'] = {'UserMgmt'}},
                 ['validator'] = manager_account_intf_types.Privileges
+            },
+            ['IsOnline'] = {
+                ['baseType'] = 'Boolean',
+                ['readOnly'] = false,
+                ['default'] = false,
+                ['options'] = {['emitsChangedSignal'] = 'false'},
+                ['privilege'] = {['read'] = {'ConfigureSelf'}, ['write'] = {'UserMgmt'}},
+                ['validator'] = manager_account_intf_types.IsOnline
             }
         },
         ['bmc.kepler.AccountService.ManagerAccount.SnmpUser'] = {
@@ -853,7 +861,8 @@ local ManagerAccount = {
                 ['LastLoginInterface'] = manager_account_intf_types.LastLoginInterface.default[1],
                 ['FirstLoginPolicy'] = 2,
                 ['LoginInterface'] = manager_account_intf_types.LoginInterface.default[1],
-                ['Privileges'] = manager_account_intf_types.Privileges.default[1]
+                ['Privileges'] = manager_account_intf_types.Privileges.default[1],
+                ['IsOnline'] = false
             },
             ['privileges'] = {
                 ['path'] = privilege.ConfigureSelf,
@@ -878,7 +887,8 @@ local ManagerAccount = {
                     ['LastLoginInterface'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt},
                     ['FirstLoginPolicy'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt},
                     ['LoginInterface'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt},
-                    ['Privileges'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt}
+                    ['Privileges'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt},
+                    ['IsOnline'] = {['read'] = privilege.ConfigureSelf, ['write'] = privilege.UserMgmt}
                 },
                 ['methods'] = {
                     ['Delete'] = privilege.UserMgmt,
@@ -1181,6 +1191,12 @@ local ManagerAccountDB = {
             ['critical'] = true,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.SNMPPasswordWritable
+        },
+        ['IsOnline'] = {
+            ['baseType'] = 'Boolean',
+            ['default'] = false,
+            ['usage'] = {'TemporaryPer'},
+            ['validator'] = manager_account_db_class_types.IsOnline
         }
     },
     ['default_props'] = {
@@ -1218,7 +1234,8 @@ local ManagerAccountDB = {
         ['LoginRuleIdsWritable'] = true,
         ['AuthenticationProtocolWritable'] = true,
         ['EncryptionProtocolWritable'] = true,
-        ['SNMPPasswordWritable'] = true
+        ['SNMPPasswordWritable'] = true,
+        ['IsOnline'] = false
     }
 }
 
@@ -2255,6 +2272,14 @@ local AccountPolicy = {
                 ['options'] = {['emitsChangedSignal'] = 'false'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
                 ['validator'] = account_policy_intf_types.Deletable
+            },
+            ['OnlineDeletable'] = {
+                ['baseType'] = 'Boolean',
+                ['readOnly'] = false,
+                ['default'] = true,
+                ['options'] = {['emitsChangedSignal'] = 'false'},
+                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
+                ['validator'] = account_policy_intf_types.OnlineDeletable
             }
         },
         ['bmc.kepler.Object.Properties'] = {
@@ -2283,7 +2308,8 @@ local AccountPolicy = {
                 ['NamePattern'] = '',
                 ['AllowedLoginInterfaces'] = {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'},
                 ['Visible'] = false,
-                ['Deletable'] = false
+                ['Deletable'] = false,
+                ['OnlineDeletable'] = true
             },
             ['privileges'] = {
                 ['path'] = privilege.ReadOnly,
@@ -2291,7 +2317,8 @@ local AccountPolicy = {
                     ['NamePattern'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
                     ['AllowedLoginInterfaces'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt},
                     ['Visible'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt},
-                    ['Deletable'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt}
+                    ['Deletable'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt},
+                    ['OnlineDeletable'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt}
                 }
             },
             ['interface_types'] = account_policy_intf_types
@@ -2340,6 +2367,12 @@ local AccountPolicyDB = {
             ['default'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = account_policy_db_class_types.Deletable
+        },
+        ['OnlineDeletable'] = {
+            ['baseType'] = 'Boolean',
+            ['default'] = true,
+            ['usage'] = {'TemporaryPer'},
+            ['validator'] = account_policy_db_class_types.OnlineDeletable
         }
     },
     ['default_props'] = {
@@ -2347,7 +2380,8 @@ local AccountPolicyDB = {
         ['NamePattern'] = '',
         ['AllowedLoginInterfaces'] = 223,
         ['Visible'] = false,
-        ['Deletable'] = false
+        ['Deletable'] = false,
+        ['OnlineDeletable'] = true
     }
 }
 

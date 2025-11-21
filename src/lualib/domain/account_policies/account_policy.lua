@@ -110,4 +110,13 @@ function AccountPolicy:get_deletable()
     return self.data.Deletable
 end
 
+function AccountPolicy:get_online_deletable()
+    return self.data.OnlineDeletable
+end
+
+function AccountPolicy:set_online_deletable(value)
+    log:debug('set onlinedeletable to %s', value)
+    self.data.OnlineDeletable = value
+end
+
 return singleton(AccountPolicy)

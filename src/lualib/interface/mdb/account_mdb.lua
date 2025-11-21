@@ -126,7 +126,10 @@ account_mdb.watch_property_hook = {
     end, 'PasswordChangeRequired'),
     FirstLoginPolicy = operation_logger.proxy(function(self, ctx, account_id, value)
         self.m_account_collection:set_first_login_policy(ctx, account_id, value)
-    end, 'FirstLoginPolicy')
+    end, 'FirstLoginPolicy'),
+    IsOnline = operation_logger.proxy(function(self, ctx, account_id, value)
+        self.m_account_collection:set_is_online_change_required(account_id, value)
+    end, 'IsOnline')
 }
 
 function account_mdb:watch_account_property(account)
@@ -136,7 +139,7 @@ function account_mdb:watch_account_property(account)
             log:info('change the property(%s), sender is nil', name)
             return true
         end
-        
+
         if not self.watch_property_hook[name] then
             log:error('change the property(%s), invalid', name)
             error(base_msg.InternalError())

@@ -91,6 +91,52 @@ EEnumLoginPolicy.LP_ForcePasswordReset = EEnumLoginPolicy.new(2)
 
 ManagerAccount.EnumLoginPolicy = EEnumLoginPolicy
 
+---@class ManagerAccount.IsOnline
+---@field IsOnline boolean
+local TIsOnline = {}
+TIsOnline.__index = TIsOnline
+TIsOnline.group = {}
+
+local function TIsOnline_from_obj(obj)
+    return setmetatable(obj, TIsOnline)
+end
+
+function TIsOnline.new(IsOnline)
+    return TIsOnline_from_obj({IsOnline = IsOnline or false})
+end
+---@param obj ManagerAccount.IsOnline
+function TIsOnline:init_from_obj(obj)
+    self.IsOnline = obj.IsOnline or false
+end
+
+function TIsOnline:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIsOnline.group)
+end
+
+TIsOnline.from_obj = TIsOnline_from_obj
+
+TIsOnline.proto_property = {'IsOnline'}
+
+TIsOnline.default = {false}
+
+TIsOnline.struct = {{name = 'IsOnline', is_array = false, struct = nil}}
+
+function TIsOnline:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IsOnline', self.IsOnline, 'bool', false, errs, need_convert)
+
+    TIsOnline:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIsOnline.proto_property, errs, need_convert)
+    return self
+end
+
+function TIsOnline:unpack(_)
+    return self.IsOnline
+end
+
+ManagerAccount.IsOnline = TIsOnline
+
 ---@class ManagerAccount.Privileges
 ---@field Privileges string[]
 local TPrivileges = {}
@@ -1533,7 +1579,8 @@ ManagerAccount.interface = mdb.register_interface('bmc.kepler.AccountService.Man
     LastLoginInterface = {'s', nil, true, nil, false},
     FirstLoginPolicy = {'y', nil, false, 2, false},
     LoginInterface = {'as', nil, false, nil, false},
-    Privileges = {'as', nil, true, nil, false}
+    Privileges = {'as', nil, true, nil, false},
+    IsOnline = {'b', {}, false, false, false}
 }, {
     Delete = {'a{ss}', '', TDeleteReq, TDeleteRsp},
     ChangePwd = {'a{ss}ay', '', TChangePwdReq, TChangePwdRsp},

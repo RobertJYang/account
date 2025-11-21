@@ -41,7 +41,8 @@
                     "LastLoginInterface",
                     "FirstLoginPolicy",
                     "LoginInterface",
-                    "Privileges"
+                    "Privileges",
+                    "IsOnline"
                 ],
                 "bmc.kepler.AccountService.ManagerAccount.SnmpUser": [
                     "AuthenticationProtocol",
