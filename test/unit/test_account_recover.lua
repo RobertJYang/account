@@ -255,3 +255,9 @@ function TestAccount:test_privilege_should_be_recovered_after_recover_account()
     -- 恢复环境
     teardown_account_data(self.ctx, self.test_account_collection, 2)
 end
+
+-- 验证恢复用户id不存在场景
+function TestAccount:test_invalid_account_id()
+    local ok = pcall(self.test_account_recover.recover_account, self.ctx, 18, 0)
+    assert(not ok)
+end

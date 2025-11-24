@@ -13,6 +13,7 @@ local base_msg = require 'messages.base'
 local json = require 'cjson'
 local enum = require 'class.types.types'
 local err = require 'account.errors'
+local trace = require 'telemetry.trace'
 
 local DETELE_USER_NAME = "delete_user"
 
@@ -109,9 +110,11 @@ end
 ---@param account_id 用户ID，只支持恢复本地用户（2-17）
 ---@param policy 恢复策略(0:强制恢复 ； 1：安全恢复）当前只支持强制恢复
 function account_recover:recover_account(ctx, account_id, policy)
+    local span = trace.start_span('account.account_recover.recover_account', {})
     -- 参数校验
     if account_id == nil or account_id < 2 or account_id > 17 then
         log:error('[Recover] User id %d is illegal', account_id)
+        span:finish()
         error(err.invalid_data_field())
     end
     if policy ~= 0 then
@@ -121,6 +124,7 @@ function account_recover:recover_account(ctx, account_id, policy)
     local backup_info = self.account_db:get_data(account_id)
     if backup_info == nil then
         log:error('[Recover] get account%d`s back-up data failed', account_id)
+        span:finish()
         error(base_msg.PropertyMissing('id'))
     end
     local ipmi_channel_data = nil
@@ -144,6 +148,7 @@ function account_recover:recover_account(ctx, account_id, policy)
         self:recover_account_while_id_exist(ctx, account_id, backup_data)
     end
     log:info('[Recover] recover user %d successfully', account_id)
+    span:finish()
 end
 
 function account_recover:cover_account_info(account_id, backup_data)
