@@ -249,11 +249,11 @@ end
 IpmiChannelConfig.PrivilegeLimit = TPrivilegeLimit
 
 IpmiChannelConfig.interface = mdb.register_interface('bmc.kepler.AccountService.ManagerAccount.IpmiChannelConfig', {
-    PrivilegeLimit = {'y', {}, true, nil, false},
-    IpmiMessagingEnabled = {'b', {}, true, 'true', false},
-    LinkAuthenticationEnabled = {'b', {}, true, 'true', false},
-    CallbackRestriction = {'y', {}, true, nil, false},
-    SessionLimit = {'y', {}, true, nil, false}
+    PrivilegeLimit = {'y', {}, true, nil},
+    IpmiMessagingEnabled = {'b', {}, true, 'true'},
+    LinkAuthenticationEnabled = {'b', {}, true, 'true'},
+    CallbackRestriction = {'y', {}, true, nil},
+    SessionLimit = {'y', {}, true, nil}
 }, {}, {})
 
 return IpmiChannelConfig

@@ -198,10 +198,10 @@ end
 Rule.Enabled = TEnabled
 
 Rule.interface = mdb.register_interface('bmc.kepler.AccountService.Rule', {
-    Enabled = {'b', nil, false, false, false},
-    IpRule = {'s', nil, false, nil, false},
-    MacRule = {'s', nil, false, nil, false},
-    TimeRule = {'s', nil, false, nil, false}
+    Enabled = {'b', nil, false, false},
+    IpRule = {'s', nil, false, nil},
+    MacRule = {'s', nil, false, nil},
+    TimeRule = {'s', nil, false, nil}
 }, {}, {})
 
 return Rule

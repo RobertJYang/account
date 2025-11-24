@@ -1,13 +1,13 @@
 {
     "name": "account",
-    "version": "1.100.7",
+    "version": "1.100.8",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",
     "license": "Mulan PSL v2",
     "description": "Identity and Access Management Module",
-    "codegen_policy": {
-        "version": "18"
+    "codeGenPolicy": {
+        "version": "19"
     },
     "dependencies": {
         "test": [

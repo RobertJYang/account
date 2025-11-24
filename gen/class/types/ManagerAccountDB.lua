@@ -383,8 +383,7 @@ TLoginInterfaceWritable.struct = {{name = 'LoginInterfaceWritable', is_array = f
 function TLoginInterfaceWritable:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'LoginInterfaceWritable', self.LoginInterfaceWritable, 'bool', false, errs,
-        need_convert)
+    validate.Optional(prefix .. 'LoginInterfaceWritable', self.LoginInterfaceWritable, 'bool', false, errs, need_convert)
 
     TLoginInterfaceWritable:remove_error_props(errs, self)
     validate.CheckUnknowProperty(self, TLoginInterfaceWritable.proto_property, errs, need_convert)
@@ -1269,8 +1268,7 @@ TPasswordChangeRequired.struct = {{name = 'PasswordChangeRequired', is_array = f
 function TPasswordChangeRequired:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'PasswordChangeRequired', self.PasswordChangeRequired, 'bool', false, errs,
-        need_convert)
+    validate.Optional(prefix .. 'PasswordChangeRequired', self.PasswordChangeRequired, 'bool', false, errs, need_convert)
 
     TPasswordChangeRequired:remove_error_props(errs, self)
     validate.CheckUnknowProperty(self, TPasswordChangeRequired.proto_property, errs, need_convert)

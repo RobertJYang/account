@@ -255,11 +255,11 @@ end
 AccountPolicy.NamePattern = TNamePattern
 
 AccountPolicy.interface = mdb.register_interface('bmc.kepler.AccountService.AccountPolicy', {
-    NamePattern = {'s', {}, false, '', false},
-    AllowedLoginInterfaces = {'as', {}, false, {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}, false},
-    Visible = {'b', {}, false, false, false},
-    Deletable = {'b', {}, false, false, false},
-    OnlineDeletable = {'b', {}, false, true, false}
+    NamePattern = {'s', {}, false, ''},
+    AllowedLoginInterfaces = {'as', {}, false, {'Web', 'SNMP', 'IPMI', 'SSH', 'SFTP', 'Local', 'Redfish'}},
+    Visible = {'b', {}, false, false},
+    Deletable = {'b', {}, false, false},
+    OnlineDeletable = {'b', {}, false, true}
 }, {}, {})
 
 return AccountPolicy

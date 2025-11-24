@@ -678,8 +678,7 @@ TPasswordChangeRequired.struct = {{name = 'PasswordChangeRequired', is_array = f
 function TPasswordChangeRequired:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'PasswordChangeRequired', self.PasswordChangeRequired, 'bool', false, errs,
-        need_convert)
+    validate.Optional(prefix .. 'PasswordChangeRequired', self.PasswordChangeRequired, 'bool', false, errs, need_convert)
 
     TPasswordChangeRequired:remove_error_props(errs, self)
     validate.CheckUnknowProperty(self, TPasswordChangeRequired.proto_property, errs, need_convert)
@@ -1561,26 +1560,26 @@ end
 ManagerAccount.DeleteReq = TDeleteReq
 
 ManagerAccount.interface = mdb.register_interface('bmc.kepler.AccountService.ManagerAccount', {
-    AccountExpiration = {'s', nil, true, nil, false},
-    Certificates = {'q', nil, true, nil, false},
-    Enabled = {'b', nil, false, nil, false},
-    Id = {'y', nil, true, nil, false},
-    Locked = {'b', nil, true, nil, false},
-    UserName = {'s', nil, false, nil, false},
-    Deletable = {'b', nil, true, nil, false},
-    PasswordChangeRequired = {'b', nil, false, true, false},
-    PasswordExpiration = {'u', nil, true, nil, false},
-    RoleId = {'y', nil, false, nil, false},
-    SshPublicKeyHash = {'s', nil, true, nil, false},
-    AccountType = {'s', nil, true, nil, false},
-    LoginRuleIds = {'as', nil, false, nil, false},
-    LastLoginTime = {'u', nil, true, nil, false},
-    LastLoginIP = {'s', nil, true, nil, false},
-    LastLoginInterface = {'s', nil, true, nil, false},
-    FirstLoginPolicy = {'y', nil, false, 2, false},
-    LoginInterface = {'as', nil, false, nil, false},
-    Privileges = {'as', nil, true, nil, false},
-    IsOnline = {'b', {}, false, false, false}
+    AccountExpiration = {'s', nil, true, nil},
+    Certificates = {'q', nil, true, nil},
+    Enabled = {'b', nil, false, nil},
+    Id = {'y', nil, true, nil},
+    Locked = {'b', nil, true, nil},
+    UserName = {'s', nil, false, nil},
+    Deletable = {'b', nil, true, nil},
+    PasswordChangeRequired = {'b', nil, false, true},
+    PasswordExpiration = {'u', nil, true, nil},
+    RoleId = {'y', nil, false, nil},
+    SshPublicKeyHash = {'s', nil, true, nil},
+    AccountType = {'s', nil, true, nil},
+    LoginRuleIds = {'as', nil, false, nil},
+    LastLoginTime = {'u', nil, true, nil},
+    LastLoginIP = {'s', nil, true, nil},
+    LastLoginInterface = {'s', nil, true, nil},
+    FirstLoginPolicy = {'y', nil, false, 2},
+    LoginInterface = {'as', nil, false, nil},
+    Privileges = {'as', nil, true, nil},
+    IsOnline = {'b', {}, false, false}
 }, {
     Delete = {'a{ss}', '', TDeleteReq, TDeleteRsp},
     ChangePwd = {'a{ss}ay', '', TChangePwdReq, TChangePwdRsp},

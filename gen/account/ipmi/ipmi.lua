@@ -186,8 +186,7 @@ AccountIpmiCmds.SetSNMPConfiguration = {
     restricted_channels = {},
     filters = [=[*,*,*,74]=],
     decode = [=[<<ManufactureId:3/unit:8, 0x74:1/unit:8, SNMPParam]=] ..
-        [=[eter:1/unit:8, BlockSelector:1/unit:8, SubBlockSel]=] ..
-        [=[ector:1/unit:8, Length:1/unit:8, Data/string>>]=],
+        [=[eter:1/unit:8, BlockSelector:1/unit:8, SubBlockSel]=] .. [=[ector:1/unit:8, Length:1/unit:8, Data/string>>]=],
     encode = [=[<<CompletionCode:1/unit:8, ManufactureId:3/unit:8>]=] .. [=[>]=],
     req = msg.SetSNMPConfigurationReq,
     rsp = msg.SetSNMPConfigurationRsp,

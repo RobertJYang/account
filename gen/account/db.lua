@@ -10,7 +10,6 @@
 local Databases = require 'database'
 local Col = require 'database.column'
 
-local Properties = require 'account.json_types.Properties'
 local def_types = require 'class.types.types'
 
 ---@class AccountServiceTable: Table

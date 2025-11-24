@@ -283,8 +283,8 @@ end
 Role.SetRolePrivilegeReq = TSetRolePrivilegeReq
 
 Role.interface = mdb.register_interface('bmc.kepler.AccountService.Role', {
-    RolePrivilege = {'as', {'CONST'}, true, {}, false},
-    Name = {'s', {'CONST'}, true, nil, false}
+    RolePrivilege = {'as', {'CONST'}, true, {}},
+    Name = {'s', {'CONST'}, true, nil}
 }, {
     SetRolePrivilege = {'a{ss}yb', '', TSetRolePrivilegeReq, TSetRolePrivilegeRsp},
     Delete = {'a{ss}', '', TDeleteReq, TDeleteRsp}

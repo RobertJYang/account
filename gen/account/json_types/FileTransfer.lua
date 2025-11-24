@@ -13,53 +13,6 @@ local mdb = require 'mc.mdb'
 
 local FileTransfer = {}
 
----@class FileTransfer.HttpsTransferCertVerification
----@field HttpsTransferCertVerification boolean
-local THttpsTransferCertVerification = {}
-THttpsTransferCertVerification.__index = THttpsTransferCertVerification
-THttpsTransferCertVerification.group = {}
-
-local function THttpsTransferCertVerification_from_obj(obj)
-    return setmetatable(obj, THttpsTransferCertVerification)
-end
-
-function THttpsTransferCertVerification.new(HttpsTransferCertVerification)
-    return THttpsTransferCertVerification_from_obj({HttpsTransferCertVerification = HttpsTransferCertVerification})
-end
----@param obj FileTransfer.HttpsTransferCertVerification
-function THttpsTransferCertVerification:init_from_obj(obj)
-    self.HttpsTransferCertVerification = obj.HttpsTransferCertVerification
-end
-
-function THttpsTransferCertVerification:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, THttpsTransferCertVerification.group)
-end
-
-THttpsTransferCertVerification.from_obj = THttpsTransferCertVerification_from_obj
-
-THttpsTransferCertVerification.proto_property = {'HttpsTransferCertVerification'}
-
-THttpsTransferCertVerification.default = {false}
-
-THttpsTransferCertVerification.struct = {{name = 'HttpsTransferCertVerification', is_array = false, struct = nil}}
-
-function THttpsTransferCertVerification:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'HttpsTransferCertVerification', self.HttpsTransferCertVerification, 'bool', false,
-        errs, need_convert)
-
-    THttpsTransferCertVerification:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, THttpsTransferCertVerification.proto_property, errs, need_convert)
-    return self
-end
-
-function THttpsTransferCertVerification:unpack(_)
-    return self.HttpsTransferCertVerification
-end
-
-FileTransfer.HttpsTransferCertVerification = THttpsTransferCertVerification
-
 ---@class FileTransfer.UmountRsp
 ---@field Result integer
 local TUmountRsp = {}
@@ -368,7 +321,7 @@ end
 FileTransfer.StartTransferReq = TStartTransferReq
 
 FileTransfer.interface = mdb.register_interface('bmc.kepler.Managers.FileTransfer',
-    {HttpsTransferCertVerification = {'b', nil, false, nil, false}}, {
+    {HttpsTransferCertVerification = {'b', nil, false, nil}}, {
         StartTransfer = {'a{ss}ssuuuu', 'u', TStartTransferReq, TStartTransferRsp},
         Mount = {'a{ss}ss', 'i', TMountReq, TMountRsp},
         Umount = {'a{ss}s', 'i', TUmountReq, TUmountRsp}
