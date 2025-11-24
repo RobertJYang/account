@@ -2182,12 +2182,12 @@ end
 CertificateService.GetCertPathReq = TGetCertPathReq
 
 CertificateService.interface = mdb.register_interface('bmc.kepler.CertificateService', {
-    CertOverdueWarnDays = {'u', nil, false, 90, false},
-    CRLOverdueWarnMode = {'s', nil, false, 'Customized', false},
-    CRLOverdueWarnDays = {'u', nil, false, 90, false},
-    CRLEnabled = {'b', nil, false, true, false},
-    IsDefaultSSLCert = {'b', nil, true, false, false},
-    SSLCertAlgorithm = {'y', nil, false, 0, false}
+    CertOverdueWarnDays = {'u', nil, false, 90},
+    CRLOverdueWarnMode = {'s', nil, false, 'Customized'},
+    CRLOverdueWarnDays = {'u', nil, false, 90},
+    CRLEnabled = {'b', nil, false, true},
+    IsDefaultSSLCert = {'b', nil, true, false},
+    SSLCertAlgorithm = {'y', nil, false, 0}
 }, {
     GetCertPath = {'a{ss}i', 's', TGetCertPathReq, TGetCertPathRsp},
     ImportCert = {'a{ss}issu', 'uu', TImportCertReq, TImportCertRsp},

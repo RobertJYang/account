@@ -158,6 +158,6 @@ end
 Roles.NewReq = TNewReq
 
 Roles.interface = mdb.register_interface('bmc.kepler.AccountService.Roles',
-    {ExtendedCustomRoleEnabled = {'b', {}, false, nil, false}}, {New = {'a{ss}yasas', '', TNewReq, TNewRsp}}, {})
+    {ExtendedCustomRoleEnabled = {'b', {}, false, nil}}, {New = {'a{ss}yasas', '', TNewReq, TNewRsp}}, {})
 
 return Roles

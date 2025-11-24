@@ -19,7 +19,7 @@ local foreach_non_virtual_interface_objects = mdb_service.foreach_non_virtual_in
 
 local CipherSuit = require 'account.json_types.CipherSuit'
 local FileTransfer = require 'account.json_types.FileTransfer'
-local Task = require 'account.json_types.Task'
+local Task = require 'mdb.bmc.kepler.TaskService.TaskInterface'
 local Ipv4 = require 'account.json_types.Ipv4'
 local Ipv6 = require 'account.json_types.Ipv6'
 local Events = require 'account.json_types.Events'

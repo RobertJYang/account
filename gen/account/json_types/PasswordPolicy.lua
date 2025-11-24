@@ -206,10 +206,10 @@ end
 PasswordPolicy.Policy = TPolicy
 
 PasswordPolicy.interface = mdb.register_interface('bmc.kepler.AccountService.PasswordPolicy', {
-    Policy = {'y', {}, false, 1, false},
-    Pattern = {'s', {}, false, nil, false},
-    AccountType = {'s', {}, true, nil, false},
-    MaxPasswordLength = {'u', {}, false, nil, false}
+    Policy = {'y', {}, false, 1},
+    Pattern = {'s', {}, false, nil},
+    AccountType = {'s', {}, true, nil},
+    MaxPasswordLength = {'u', {}, false, nil}
 }, {}, {})
 
 return PasswordPolicy

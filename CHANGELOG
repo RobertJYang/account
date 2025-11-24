@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.8] - 2025-11-24
+支持安全管理子系统使用最新模板生成代码
+
 ## [1.100.7] - 2025-11-20
 【修改描述】支持登录用户和最后一个用户不可删除
 

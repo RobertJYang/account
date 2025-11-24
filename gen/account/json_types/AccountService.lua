@@ -503,8 +503,7 @@ TInactiveDaysThreshold.struct = {{name = 'InactiveDaysThreshold', is_array = fal
 function TInactiveDaysThreshold:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'InactiveDaysThreshold', self.InactiveDaysThreshold, 'uint32', false, errs, 
-        need_convert)
+    validate.Optional(prefix .. 'InactiveDaysThreshold', self.InactiveDaysThreshold, 'uint32', false, errs, need_convert)
 
     if self.InactiveDaysThreshold ~= nil then
         validate.ranges(prefix .. 'InactiveDaysThreshold', self.InactiveDaysThreshold, 0, 365, errs, need_convert)
@@ -1587,30 +1586,30 @@ end
 AccountService.ImportWeakPasswordDictionaryReq = TImportWeakPasswordDictionaryReq
 
 AccountService.interface = mdb.register_interface('bmc.kepler.AccountService', {
-    AccountLockoutCounterResetAfter = {'i', {}, false, 0, false},
-    AccountLockoutCounterResetEnabled = {'b', {}, false, false, false},
-    AuthFailureLoggingThreshold = {'i', {}, false, 0, false},
-    MaxPasswordLength = {'i', {'CONST'}, true, 20, false},
-    MinPasswordLength = {'i', {'EMIT_CHANGE'}, false, 8, false},
-    ServiceEnabled = {'b', {}, false, true, false},
-    PasswordComplexityEnable = {'b', {'EMIT_CHANGE'}, false, true, false},
-    InitialPasswordPromptEnable = {'b', {}, false, true, false},
-    InitialPasswordNeedModify = {'b', {}, false, true, false},
-    InitialAccountPrivilegeRestrictEnabled = {'b', {'EMIT_CHANGE'}, false, false, false},
-    MinPasswordValidDays = {'u', {'EMIT_CHANGE'}, false, 0, false},
-    MaxPasswordValidDays = {'u', {'EMIT_CHANGE'}, false, 0, false},
-    EmergencyLoginAccountId = {'y', {'EMIT_CHANGE'}, false, 0, false},
-    SNMPv3TrapAccountId = {'y', {'EMIT_CHANGE'}, false, 2, false},
-    InactiveDaysThreshold = {'u', {'EMIT_CHANGE'}, false, 0, false},
-    WeakPasswordDictionaryEnabled = {'b', {}, false, true, false},
-    HistoryPasswordCount = {'y', {'EMIT_CHANGE'}, false, 5, false},
-    MaxHistoryPasswordCount = {'y', {}, false, 5, false},
-    HostUserManagementEnabled = {'b', {'EMIT_CHANGE'}, false, true, false},
-    OSAdministratorPrivilegeEnabled = {'b', {}, false, true, false},
-    SNMPv3TrapAccountLimitPolicy = {'y', {'EMIT_CHANGE'}, false, 2, false},
-    UserNamePasswordPrefixCompareEnabled = {'b', {'EMIT_CHANGE'}, false, false, false},
-    UserNamePasswordPrefixCompareLength = {'y', {'EMIT_CHANGE'}, false, 4, false},
-    SNMPv3TrapAccountChangePolicy = {'y', {'EMIT_CHANGE'}, false, 0, false}
+    AccountLockoutCounterResetAfter = {'i', {}, false, 0},
+    AccountLockoutCounterResetEnabled = {'b', {}, false, false},
+    AuthFailureLoggingThreshold = {'i', {}, false, 0},
+    MaxPasswordLength = {'i', {'CONST'}, true, 20},
+    MinPasswordLength = {'i', {'EMIT_CHANGE'}, false, 8},
+    ServiceEnabled = {'b', {}, false, true},
+    PasswordComplexityEnable = {'b', {'EMIT_CHANGE'}, false, true},
+    InitialPasswordPromptEnable = {'b', {}, false, true},
+    InitialPasswordNeedModify = {'b', {}, false, true},
+    InitialAccountPrivilegeRestrictEnabled = {'b', {'EMIT_CHANGE'}, false, false},
+    MinPasswordValidDays = {'u', {'EMIT_CHANGE'}, false, 0},
+    MaxPasswordValidDays = {'u', {'EMIT_CHANGE'}, false, 0},
+    EmergencyLoginAccountId = {'y', {'EMIT_CHANGE'}, false, 0},
+    SNMPv3TrapAccountId = {'y', {'EMIT_CHANGE'}, false, 2},
+    InactiveDaysThreshold = {'u', {'EMIT_CHANGE'}, false, 0},
+    WeakPasswordDictionaryEnabled = {'b', {}, false, true},
+    HistoryPasswordCount = {'y', {'EMIT_CHANGE'}, false, 5},
+    MaxHistoryPasswordCount = {'y', {}, false, 5},
+    HostUserManagementEnabled = {'b', {'EMIT_CHANGE'}, false, true},
+    OSAdministratorPrivilegeEnabled = {'b', {}, false, true},
+    SNMPv3TrapAccountLimitPolicy = {'y', {'EMIT_CHANGE'}, false, 2},
+    UserNamePasswordPrefixCompareEnabled = {'b', {'EMIT_CHANGE'}, false, false},
+    UserNamePasswordPrefixCompareLength = {'y', {'EMIT_CHANGE'}, false, 4},
+    SNMPv3TrapAccountChangePolicy = {'y', {'EMIT_CHANGE'}, false, 0}
 }, {
     ImportWeakPasswordDictionary = {'a{ss}s', 'u', TImportWeakPasswordDictionaryReq, TImportWeakPasswordDictionaryRsp},
     ExportWeakPasswordDictionary = {'a{ss}s', 'u', TExportWeakPasswordDictionaryReq, TExportWeakPasswordDictionaryRsp},

@@ -13,6 +13,105 @@ local mdb = require 'mc.mdb'
 
 local File = {}
 
+---@class File.AccessRsp
+---@field Result boolean
+local TAccessRsp = {}
+TAccessRsp.__index = TAccessRsp
+TAccessRsp.group = {}
+
+local function TAccessRsp_from_obj(obj)
+    return setmetatable(obj, TAccessRsp)
+end
+
+function TAccessRsp.new(Result)
+    return TAccessRsp_from_obj({Result = Result})
+end
+---@param obj File.AccessRsp
+function TAccessRsp:init_from_obj(obj)
+    self.Result = obj.Result
+end
+
+function TAccessRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TAccessRsp.group)
+end
+
+TAccessRsp.from_obj = TAccessRsp_from_obj
+
+TAccessRsp.proto_property = {'Result'}
+
+TAccessRsp.default = {false}
+
+TAccessRsp.struct = {{name = 'Result', is_array = false, struct = nil}}
+
+function TAccessRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Result', self.Result, 'bool', false, errs, need_convert)
+
+    TAccessRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TAccessRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TAccessRsp:unpack(_)
+    return self.Result
+end
+
+File.AccessRsp = TAccessRsp
+
+---@class File.AccessReq
+---@field Path string
+---@field Mode integer
+local TAccessReq = {}
+TAccessReq.__index = TAccessReq
+TAccessReq.group = {}
+
+local function TAccessReq_from_obj(obj)
+    return setmetatable(obj, TAccessReq)
+end
+
+function TAccessReq.new(Path, Mode)
+    return TAccessReq_from_obj({Path = Path, Mode = Mode})
+end
+---@param obj File.AccessReq
+function TAccessReq:init_from_obj(obj)
+    self.Path = obj.Path
+    self.Mode = obj.Mode
+end
+
+function TAccessReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TAccessReq.group)
+end
+
+TAccessReq.from_obj = TAccessReq_from_obj
+
+TAccessReq.proto_property = {'Path', 'Mode'}
+
+TAccessReq.default = {'', 0}
+
+TAccessReq.struct = {{name = 'Path', is_array = false, struct = nil}, {name = 'Mode', is_array = false, struct = nil}}
+
+function TAccessReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Path', self.Path, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'Mode', self.Mode, 'uint8', false, errs, need_convert)
+
+    if self.Mode ~= nil then
+        validate.ranges(prefix .. 'Mode', self.Mode, 0, 7, errs, need_convert)
+    end
+
+    TAccessReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TAccessReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TAccessReq:unpack(_)
+    return self.Path, self.Mode
+end
+
+File.AccessReq = TAccessReq
+
 ---@class File.IsPermittedRsp
 ---@field Result boolean
 local TIsPermittedRsp = {}

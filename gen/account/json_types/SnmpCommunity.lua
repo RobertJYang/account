@@ -516,8 +516,8 @@ end
 SnmpCommunity.SetRwCommunityReq = TSetRwCommunityReq
 
 SnmpCommunity.interface = mdb.register_interface('bmc.kepler.Managers.SnmpService.SnmpCommunity', {
-    LongCommunityEnabled = {'b', {'EMIT_CHANGE'}, false, true, false},
-    RwCommunityEnabled = {'b', {'EMIT_CHANGE'}, false, true, false}
+    LongCommunityEnabled = {'b', {'EMIT_CHANGE'}, false, true},
+    RwCommunityEnabled = {'b', {'EMIT_CHANGE'}, false, true}
 }, {
     SetRwCommunity = {'a{ss}s', '', TSetRwCommunityReq, TSetRwCommunityRsp},
     SetRoCommunity = {'a{ss}s', '', TSetRoCommunityReq, TSetRoCommunityRsp},

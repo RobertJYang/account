@@ -27,7 +27,7 @@ local password_policy_db_class_types = require 'class.types.PasswordPolicyDB'
 local account_policy_db_class_types = require 'class.types.AccountPolicyDB'
 local ipmi_channel_config_class_types = require 'class.types.IpmiChannelConfig'
 local account_service_intf_types = require 'account.json_types.AccountService'
-local properties_intf_types = require 'account.json_types.Properties'
+local properties_intf_types = require 'mdb.bmc.kepler.Object.PropertiesInterface'
 local manager_accounts_intf_types = require 'account.json_types.ManagerAccounts'
 local manager_account_intf_types = require 'account.json_types.ManagerAccount'
 local snmp_user_intf_types = require 'account.json_types.SnmpUser'
@@ -331,24 +331,7 @@ local AccountService = {
                 ['validator'] = account_service_intf_types.SNMPv3TrapAccountChangePolicy
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService'] = {
@@ -479,24 +462,7 @@ local AccountService = {
 local ManagerAccounts = {
     ['mdb_prop_configs'] = {
         ['bmc.kepler.AccountService.ManagerAccounts'] = {},
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService.ManagerAccounts'] = {
@@ -755,24 +721,7 @@ local ManagerAccount = {
                 ['validator'] = snmp_user_intf_types.SnmpEncryptionPasswordInitialStatus
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService.ManagerAccount'] = {
@@ -1510,24 +1459,7 @@ local Rule = {
                 ['validator'] = rule_intf_types.TimeRule
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_classes'] = mdb.get_class_obj('/bmc/kepler/AccountService/Rules/:RuleId'),
     ['new_mdb_objects'] = mdb.new_objects_builder({
@@ -1630,24 +1562,7 @@ local Roles = {
                 ['validator'] = roles_intf_types.ExtendedCustomRoleEnabled
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService.Roles'] = {
@@ -1792,24 +1707,7 @@ local Role = {
                 ['validator'] = role_intf_types.Name
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService.Role'] = {
@@ -1883,24 +1781,7 @@ local SnmpCommunity = {
                 ['validator'] = snmp_community_intf_types.RwCommunityEnabled
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.Managers.SnmpService.SnmpCommunity'] = {
@@ -1971,24 +1852,7 @@ local SnmpCommunity = {
 local LocalAccountAuthN = {
     ['mdb_prop_configs'] = {
         ['bmc.kepler.AccountService.LocalAccountAuthN'] = {},
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_method_configs'] = {
         ['bmc.kepler.AccountService.LocalAccountAuthN'] = {
@@ -2148,24 +2012,7 @@ local PasswordPolicy = {
                 ['validator'] = password_policy_intf_types.MaxPasswordLength
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_classes'] = mdb.get_class_obj('/bmc/kepler/AccountService/PasswordPolicys/:AccountType'),
     ['new_mdb_objects'] = mdb.new_objects_builder({
@@ -2282,24 +2129,7 @@ local AccountPolicy = {
                 ['validator'] = account_policy_intf_types.OnlineDeletable
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_classes'] = mdb.get_class_obj('/bmc/kepler/AccountService/AccountPolicies/:AccountType'),
     ['new_mdb_objects'] = mdb.new_objects_builder({
@@ -2450,24 +2280,7 @@ local IpmiChannelConfig = {
                 ['validator'] = ipmi_channel_config_intf_types.SessionLimit
             }
         },
-        ['bmc.kepler.Object.Properties'] = {
-            ['ClassName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ClassName
-            },
-            ['ObjectName'] = {
-                ['baseType'] = 'String',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectName
-            },
-            ['ObjectIdentifier'] = {
-                ['baseType'] = 'Struct',
-                ['$ref'] = '#/defs/StructIdentifier',
-                ['readOnly'] = true,
-                ['validator'] = properties_intf_types.ObjectIdentifier
-            }
-        }
+        ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
     },
     ['mdb_classes'] = mdb.get_class_obj('/bmc/kepler/AccountService/Accounts/:Id/Channels/:ChannelNumber'),
     ['new_mdb_objects'] = mdb.new_objects_builder({

@@ -178,8 +178,7 @@ TAuthenticationProtocol.struct = {{name = 'AuthenticationProtocol', is_array = f
 function TAuthenticationProtocol:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'AuthenticationProtocol', self.AuthenticationProtocol, 'uint8', true, errs,
-        need_convert)
+    validate.Optional(prefix .. 'AuthenticationProtocol', self.AuthenticationProtocol, 'uint8', true, errs, need_convert)
 
     TAuthenticationProtocol:remove_error_props(errs, self)
     validate.CheckUnknowProperty(self, TAuthenticationProtocol.proto_property, errs, need_convert)
@@ -485,9 +484,9 @@ end
 SnmpUser.SetAuthenticationProtocolReq = TSetAuthenticationProtocolReq
 
 SnmpUser.interface = mdb.register_interface('bmc.kepler.AccountService.ManagerAccount.SnmpUser', {
-    AuthenticationProtocol = {'y', nil, true, nil, false},
-    EncryptionProtocol = {'y', nil, true, nil, false},
-    SnmpEncryptionPasswordInitialStatus = {'b', nil, true, nil, false}
+    AuthenticationProtocol = {'y', nil, true, nil},
+    EncryptionProtocol = {'y', nil, true, nil},
+    SnmpEncryptionPasswordInitialStatus = {'b', nil, true, nil}
 }, {
     SetAuthenticationProtocol = {'a{ss}yss', '', TSetAuthenticationProtocolReq, TSetAuthenticationProtocolRsp},
     SetEncryptionProtocol = {'a{ss}y', '', TSetEncryptionProtocolReq, TSetEncryptionProtocolRsp},

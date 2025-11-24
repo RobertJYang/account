@@ -22,7 +22,7 @@ if not ok then
 end
 
 local AccountServiceTypes = require 'account.json_types.AccountService'
-local PropertiesTypes = require 'account.json_types.Properties'
+local PropertiesTypes = require 'mdb.bmc.kepler.Object.PropertiesInterface'
 local ManagerAccountsTypes = require 'account.json_types.ManagerAccounts'
 local ManagerAccountTypes = require 'account.json_types.ManagerAccount'
 local SnmpUserTypes = require 'account.json_types.SnmpUser'
