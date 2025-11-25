@@ -18,6 +18,7 @@ local file_utils = require 'utils.file'
 local vos_utils = require 'utils.vos'
 local utils_core = require 'utils.core'
 local file_proxy = require 'infrastructure.file_proxy'
+local trace = require 'telemetry.trace'
 
 -- 文件同步管理，将passwd/shadow/group/ipmi几个文件的同步和刷新机制放在此处处理
 local file_synchronization = class()
@@ -175,6 +176,7 @@ local function clean_abnormal_data(la, user_map)
 end
 
 function file_synchronization:flush_account()
+    local span = trace.start_span('account.file_synchronization.flush_account', {}, {kind = "Server"})
     local user_map = {}
     local la = account_linux.new(self.linux_files, false, true)
     la:ensure_system_base_user_exists()
@@ -193,6 +195,7 @@ function file_synchronization:flush_account()
     clean_abnormal_data(la, user_map)
     -- 手动写文件
     la:save(true)
+    span:finish()
 end
 
 -- 账号监控，保证账号被同步到linux系统

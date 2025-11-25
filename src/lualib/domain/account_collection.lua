@@ -38,6 +38,7 @@ local snmp_community = require 'domain.manager_account.snmp_community'
 local inter_chassis_account = require 'domain.manager_account.inter_chassis_account'
 local core = require 'account_core'
 local cert_service_enum = require 'account.json_types.CertificateService'
+local trace = require 'telemetry.trace'
 local account_policy_collection = require 'domain.account_policy_collection'
 
 local account_type_map = {
@@ -398,13 +399,16 @@ end
 ---@param is_ipmi_or_snmp boolean 是否通过IPMI或SNMP接口新建用户
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，以及是否为定制化用户等信息
 function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
+    local span = trace.start_span('account.AccountCollection.new_account', {})
     if not self.account_policy_collection:check_user_name(account_info.account_type, account_info.name) then
         log:error('Invalid name(%s) is not allowed', account_info.name)
+        span:finish()
         error(custom_msg.InvalidUserName())
     end
     local role_data = self.m_rc:get_role_data_by_id(account_info.role_id)
     if not role_data then
         log:error('new account failed, unknown role id')
+        span:finish()
         error(base_msg.PropertyValueNotInList(account_info.role_id, 'RoleId'))
     end
     -- account_info中包含oem值时意味着此时新建oem用户
@@ -414,10 +418,12 @@ function AccountCollection:new_account(ctx, account_info, is_ipmi_or_snmp)
     account_info.interface = account_info.interface and account_info.interface or {}
     -- 判断当前用户名是否被占用
     if self:check_username_exist(account_info.name) then
+        span:finish()
         error(base_msg.ResourceAlreadyExists())
     end
     account_info.id = account_id
     self:new_ccount_to_db_and_mdb(ctx, account_info, account_class, is_ipmi_or_snmp, true)
+    span:finish()
     return account_id
 end
 

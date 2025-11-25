@@ -21,6 +21,7 @@ local err_cfg = require 'error_config'
 local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local privilege = require 'domain.privilege'
+local trace = require 'telemetry.trace'
 local core = require 'account_core'
 
 -- AccountService
@@ -42,6 +43,7 @@ end
 ---@param account_info table
 --- account_info中包含用户名字、用户id、角色id、可登录的接口、首次登录策略，创建OEM用户时可能包含密码类型等信息
 function AccountService:new_account(ctx, account_info, is_ipmi_or_snmp)
+    local span = trace.start_span('account.AccountService.new_account', {})
     -- 如果机机接口新建用户开启所有登录接口且当前限制了用户允许开启的登录接口, 则限制新建用户登录接口为AllowedLoginInterfaces支持的范围
     local allowed_login_interfaces = self.account_policy_collection
         :get_allowed_login_interfaces(account_info.account_type)
@@ -60,6 +62,7 @@ function AccountService:new_account(ctx, account_info, is_ipmi_or_snmp)
     local account_id = self.m_account_collection:new_account(ctx, account_info, is_ipmi_or_snmp)
     ctx.operation_log.params.id = account_id
     self.m_account_collection:check_password_valid_days()
+    span:finish()
     return account_id
 end
 

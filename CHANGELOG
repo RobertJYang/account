@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.9] - 2025-11-24
+新增用户相关业务预置trace采样点
+
 ## [1.100.8] - 2025-11-24
 支持安全管理子系统使用最新模板生成代码
 
