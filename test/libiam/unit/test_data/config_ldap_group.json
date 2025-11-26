@@ -1,0 +1,48 @@
+{
+	"ConfigData": {
+		"LDAPGroup": [
+			{
+				"GroupName": {
+					"Value": "test1",
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"Id": {
+					"Value": "LDAP5_4",
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"GroupFolder": {
+					"Value": "OU=Role",
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"GroupUserRoleId": {
+					"Value": "Administrator",
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"GroupPermitRuleIds": {
+					"Value": [],
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"SID": {
+					"Value": "NA",
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				},
+				"GroupLoginInterface": {
+					"Value": [
+						"Redfish",
+						"SSH",
+						"Web"
+					],
+					"AttributeType": "ImportAndExport",
+					"Import": true
+				}
+			}					
+		]
+	},
+	"Description": "Configurations of Identity and Access Management"
+}

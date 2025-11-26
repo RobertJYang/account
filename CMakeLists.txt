@@ -10,9 +10,12 @@ if (EXISTS "${CMAKE_BINARY_DIR}/conanbuildinfo.cmake")
 endif()
 
 set(APP_INSTALL_DIR opt/bmc/apps/${PROJECT_NAME})
-set(LUACLIB_INSTALL_DIR ${APP_INSTALL_DIR}/luaclib)
+set(LUACLIB_INSTALL_DIR opt/bmc/apps/account/luaclib)
+set(LUACLIB_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libiam/lualib-src)
 set(CSR_INSTALL_DIR opt/bmc/csr)
 
+find_package(libmc4lua REQUIRED)
+find_package(openldap REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(GMODULE REQUIRED gmodule-2.0)
@@ -40,3 +43,7 @@ if(BUILD_MANUFACTURE OR ENABLE_TEST STREQUAL "ON")
 else()
     install(DIRECTORY gen/${PROJECT_NAME}/ DESTINATION ${APP_INSTALL_DIR})
 endif()
+
+add_subdirectory("libiam/lualib-src")
+
+install(DIRECTORY libiam/lualib/. DESTINATION opt/bmc/lualib/libiam)
