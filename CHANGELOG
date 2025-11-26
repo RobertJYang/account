@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.10] - 2025-11-26
+调整原3秒一次的不合理手动gc
+
 ## [1.100.9] - 2025-11-24
 新增用户相关业务预置trace采样点
 

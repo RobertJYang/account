@@ -6,9 +6,9 @@
 -- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
-local skynet  = require 'skynet'
-local class   = require 'mc.class'
-local log     = require 'mc.logging'
+local skynet = require 'skynet'
+local class = require 'mc.class'
+local log = require 'mc.logging'
 local mc_admin = require 'mc.mc_admin'
 local mdb_service = require 'mc.mdb.mdb_service'
 local orm_object_manage = require 'mc.orm.object_manage'
@@ -19,7 +19,7 @@ local base_msg = require 'messages.base'
 local service = require 'account.service'
 local enum = require 'class.types.types'
 local ipmi_cmds = require 'account.ipmi.ipmi'
-local config  = require 'common_config'
+local config = require 'common_config'
 local client = require 'account.client'
 local kmc_client = require 'infrastructure.kmc_client'
 local ipmi_running_record = require 'infrastructure.ipmi_running_record'
@@ -57,6 +57,8 @@ local account_service_snmp = require 'interface.snmp.account_service_snmp'
 local config_handle = require 'interface.config_mgmt.config_handle'
 local core    = require 'account_core'
 local queue = require 'skynet.queue'
+-- 保底碎片回收策略5分钟一次即可
+local INTERVAL = 5 * 60 * 100
 
 local app = class(service)
 
@@ -661,7 +663,7 @@ end
 function app:collection_garbage_init()
     skynet.fork_loop({ count = 0 }, function ()
         while true do
-            skynet.sleep(300)
+            skynet.sleep(INTERVAL)
             collectgarbage('collect')
         end
     end)
