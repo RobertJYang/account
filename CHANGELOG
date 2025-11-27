@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.11] - 2025-11-25
+支持基础安全能力
+
 ## [1.100.10] - 2025-11-26
 调整原3秒一次的不合理手动gc
 

@@ -1,0 +1,121 @@
+{
+    "GeneralInfo": {
+        "BMCVersion": "5.10.00.01",
+        "ProductName": "TaiShan 200 (Model 2280)",
+        "ProductUniqueID": "0x0207BE00",
+        "ProductSN": "",
+        "TimeStamp": "2025-07-13T07:28:09+00:00"
+    },
+    "Components": {
+        "iam": {
+            "ConfigData": {
+                "LDAPGroup": [
+                ],
+                "LDAPCommon": {
+                    "Enable": {
+                        "Value": true,
+                        "AttributeType": "ImportAndExport",
+                        "Import": true
+                    }
+                },
+                "LDAPServer": [
+                    {
+                        "BindDN": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Folder": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "UserDomain": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Port": {
+                            "Value": 636,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "HostAddr": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Enable": {
+                            "Value": true,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Id": {
+                            "Value": 1,
+                            "AttributeType": "ImportAndExport",
+                            "Import": false
+                        },
+                        "CertificateVerificationLevel": {
+                            "Value": 2,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "CertStatus": {
+                            "Value": false,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        }
+                    },
+                    {
+                        "BindDN": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Folder": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "UserDomain": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Port": {
+                            "Value": 636,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "HostAddr": {
+                            "Value": "",
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "Enable": {
+                            "Value": true,
+                            "AttributeType": "ImportAndExport",
+                            "Import": false
+                        },
+                        "Id": {
+                            "Value": 2,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "CertificateVerificationLevel": {
+                            "Value": 2,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        },
+                        "CertStatus": {
+                            "Value": false,
+                            "AttributeType": "ImportAndExport",
+                            "Import": true
+                        }
+                    }
+                ]
+            },
+            "Description": "Configurations of Identity and Access Management"
+        }
+    }
+}
