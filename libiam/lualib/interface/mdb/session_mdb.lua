@@ -38,6 +38,9 @@ function SessionMdb:regist_session_signals()
         session_service.m_delete_session:on(function(...)
             self:delete_session_from_mdb_tree(...)
         end)
+        session_service.m_update_session:on(function(...)
+            self:update_session_to_mdb_tree(...)
+        end)
     end
 
     self.m_role_collection.m_privilege_update_signal:on(function(...)
@@ -72,6 +75,19 @@ function SessionMdb:delete_session_from_mdb_tree(session_id)
             self.m_session_mdb_cls:remove(self.m_sessions[index])
             table.remove(self.m_sessions, index)
             return
+        end
+    end
+end
+
+function SessionMdb:update_session_to_mdb_tree(session_id, property, value)
+    for _, session in pairs(self.m_sessions) do
+        if session.SessionId == session_id then
+            if property == 'Role' then
+                value = self.m_role_collection:role_to_string_table(value)
+            elseif property == 'CreatedTime' then
+                value = iam_utils.convert_time_to_str(value)
+            end
+            session[INTERFACE_SESSION][property] = value
         end
     end
 end
