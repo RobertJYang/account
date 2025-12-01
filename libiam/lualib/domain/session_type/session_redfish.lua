@@ -36,7 +36,18 @@ end
 ---@return table
 function RedfishSession:create_inner_session(account, auth_type, ip, inner_session_type, role_id)
     if self.m_inner_session_collection[inner_session_type] then
-        return self.m_inner_session_collection[inner_session_type]
+        local cur_session = self.m_inner_session_collection[inner_session_type]
+        -- 增加重新赋值的动作，并emit刷新资源树
+        cur_session.m_auth_type = auth_type
+        cur_session.m_role_id = role_id
+        cur_session.m_privilege = session.get_session_privilege(role_id):to_array()
+        cur_session.m_created_time = os.time()
+
+        self.m_update_session:emit(cur_session.m_session_id, 'AuthType', cur_session.m_auth_type:value())
+        self.m_update_session:emit(cur_session.m_session_id, 'Role', cur_session.m_role_id)
+        self.m_update_session:emit(cur_session.m_session_id, 'Privileges', cur_session.m_privilege)
+        self.m_update_session:emit(cur_session.m_session_id, 'CreatedTime', cur_session.m_created_time)
+        return cur_session
     end
     local new_session = session.new(account, self.m_session_service_config.SessionType,
         auth_type, ip, inner_session_type)
