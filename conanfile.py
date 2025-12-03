@@ -15,7 +15,6 @@ required_conan_version = ">=1.60.0"
 class AccountConan(ConanBase):
     def package(self):
         super().package()
-        copy(self, "permissions.ini", src=os.path.join(self.source_folder, "dist"), dst=self.package_folder)
         copy(self, "pam_tally_ext.h", src=os.path.join(self.source_folder, "libiam/lualib-src"),
                 dst=os.path.join(self.package_folder, "include"), keep_path=False)
         copy(self, "comm_utils.h", src=os.path.join(self.source_folder, "libiam/lualib-src"),
