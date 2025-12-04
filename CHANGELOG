@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.13] - 2025-12-3
+支持基础安全能力
+
 ## [1.100.12] - 2025-12-01
 修复ipmi创建redfish无法变更权限的问题
 
