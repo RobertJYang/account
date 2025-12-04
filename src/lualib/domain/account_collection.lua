@@ -601,8 +601,6 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
         self.m_account_file_flush:emit()
         self.m_account_removed:emit(account_id, username)
         self:update_deletable()
-        -- 删除账户后的信息清理(直接清理文件)
-        file_proxy.proxy_delete(config.PAM_TALLY_LOG_DIR .. username)
         -- 删除客户端证书
         self:_delete_cert(ctx, account_id)
     end)
