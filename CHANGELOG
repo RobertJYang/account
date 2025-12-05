@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.15] - 2025-12-5
+更新openldap依赖版本号
+
 ## [1.100.14] - 2025-12-4
 修复删除tallylog文件失败的问题
 

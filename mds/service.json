@@ -1,6 +1,6 @@
 {
     "name": "account",
-    "version": "1.100.14",
+    "version": "1.100.15",
     "type": "application",
     "deployConfig": "security.service",
     "author": "Huawei",
@@ -71,7 +71,7 @@
                 "conan": "mdb_interface/[>=1.70.0]"
             },
             {
-                "conan": "openldap/2.6.6-htrunk1_003"
+                "conan": "openldap/[>=2.6.5, include_prerelease=True]"
             },
             {
                 "conan": "cyrus_sasl/2.1.28-h1.computing.ibmc.r1_001"
