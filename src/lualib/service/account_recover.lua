@@ -42,6 +42,12 @@ function account_recover:recover_account_while_id_not_exist(ctx, account_id, bac
     -- 判断是否有重名用户，有的话先改名
     local account = self.account_collection:get_account_by_name(account_data.UserName)
     if account then
+        -- 重名用户在最后会被删除,执行恢复前若重名用户时唯一的使能管理员,且被恢复用户不是管理员,则不支持恢复,否则无使能管理员可用
+        if account_data.RoleId ~= enum.RoleType.Administrator:value() and
+            self.account_collection:check_is_last_operate_admin(account:get_id()) then
+            log:notice("recover non-admin account has same name with last admin account")
+            error(base_msg.ActionNotSupported())
+        end
         self.account_collection:change_user_name(account:get_id(), DETELE_USER_NAME)
     end
 
@@ -83,6 +89,12 @@ function account_recover:recover_account_while_id_exist(ctx, account_id, backup_
     local account, id = self.account_collection:get_account_by_name(account_data.UserName)
     local is_dup_user = account and id ~= account_id
     if is_dup_user then
+        -- 重名用户在最后会被删除,执行恢复前若重名用户时唯一的使能管理员,且被恢复用户不是管理员,则不支持恢复,否则无使能管理员可用
+        if account_data.RoleId ~= enum.RoleType.Administrator:value() and
+            self.account_collection:check_is_last_operate_admin(id) then
+            log:notice("recover non-admin account has same name with last admin account")
+            error(base_msg.ActionNotSupported())
+        end
         self.account_collection:change_user_name(id, DETELE_USER_NAME)
     end
 
@@ -154,6 +166,7 @@ end
 function account_recover:cover_account_info(account_id, backup_data)
     local account = self.account_collection:get_account_by_account_id(account_id)
     local account_data = backup_data.account_data
+    -- 被还原账户不是管理员,被覆盖用户是最后一个使能的管理员,则不支持恢复
     if account:get_role_id() == enum.RoleType.Administrator:value() and
         account_data.RoleId ~= enum.RoleType.Administrator:value() and
         self.account_collection:check_is_last_operate_admin(account_id) then

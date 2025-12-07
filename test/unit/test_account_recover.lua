@@ -261,3 +261,61 @@ function TestAccount:test_invalid_account_id()
     local ok = pcall(self.test_account_recover.recover_account, self.ctx, 18, 0)
     assert(not ok)
 end
+
+-- 场景10：id存在，从非管理员恢复为非管理员，且存在同名管理员 -> 报错
+function TestAccount:test_backup_non_admin_to_no_admin_with_other_admin_name_conflict_then_recover_should_fail()
+    setup_account_data(self.ctx, self.test_account_collection, 1)
+    self.test_global_account_config:set_snmp_v3_trap_account(0)
+
+    -- 2-Administrator-Operator
+    -- 3-test3-Operator
+    -- 4-test4-Administrator
+    self.test_account_collection:set_role_id(self.ctx, 4, enum.RoleType.Administrator:value())
+    self.test_account_collection:set_role_id(self.ctx, 2, enum.RoleType.Operator:value())
+    self.test_account_collection:backup_account_info()
+
+    -- 2-Administrator-Operator
+    -- 3-test4-Operator
+    -- 4-test3-Administrator
+    self.test_account_collection:set_user_name(self.ctx, 3, "testtmp")
+    self.test_account_collection:set_user_name(self.ctx, 4, "test3")
+    self.test_account_collection:set_user_name(self.ctx, 3, "test4")
+
+    lu.assertEquals(self.test_account_collection:get_user_name(3), 'test4')
+    lu.assertEquals(self.test_account_collection:get_user_name(4), 'test3')
+    
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_account_recover:recover_account(self.ctx, 3, 0)
+    end)
+
+    -- 还原
+    self.test_account_collection:set_role_id(self.ctx, 2, enum.RoleType.Administrator:value())
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景11：id不存在，从非管理员恢复，且存在其他ID同名管理员 -> 报错
+function TestAccount:test_backup_non_admin_with_other_admin_name_conflict_then_recover_should_fail()
+    setup_account_data(self.ctx, self.test_account_collection, 1)
+    self.test_global_account_config:set_snmp_v3_trap_account(0)
+
+    -- 2-Administrator-Operator
+    -- 3-test3-Operator
+    -- 4-test4-Administrator
+    self.test_account_collection:set_role_id(self.ctx, 4, enum.RoleType.Administrator:value())
+    self.test_account_collection:set_role_id(self.ctx, 2, enum.RoleType.Operator:value())
+    self.test_account_collection:backup_account_info()
+
+    -- 2-Administrator-Operator
+    -- 4-test3-Administrator
+    self.test_account_recover:delete_user(self.ctx, 3)
+    self.test_account_collection:set_user_name(self.ctx, 4, "test3")
+    lu.assertEquals(self.test_account_collection:get_user_name(4), 'test3')
+    
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_account_recover:recover_account(self.ctx, 3, 0)
+    end)
+
+    -- 还原
+    self.test_account_collection:set_role_id(self.ctx, 2, enum.RoleType.Administrator:value())
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
