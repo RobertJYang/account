@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.16] - 2025-12-06
+修复busctl恢复2号用户时删除最后一个管理员问题
+
 ## [1.100.15] - 2025-12-5
 更新openldap依赖版本号
 
