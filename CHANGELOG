@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.100.17] - 2025-12-09
+修复无web接口权限的用户可以创建SSO会话的问题
+
 ## [1.100.16] - 2025-12-06
 修复busctl恢复2号用户时删除最后一个管理员问题
 
