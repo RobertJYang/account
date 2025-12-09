@@ -31,6 +31,10 @@ function SessionUtils.generate_session_id(token)
 end
 
 function SessionUtils.parse_login_interface(session_type, login_interface)
+    -- 对于创建SSO会话的请求，使用接口以及接口权限校验为Web
+    if session_type == iam_enum.SessionType.SSO then
+        return iam_enum.LoginInterface.Web:value()
+    end
     -- 针对基础认证，session_type为enum
     if type(session_type) == type(iam_enum) and
         session_type ~= iam_enum.SessionType.GUI and
