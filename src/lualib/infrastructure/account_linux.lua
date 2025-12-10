@@ -842,7 +842,9 @@ function LinuxUserMgr:remove_user(username, role, is_change_user)
         self.ipmi_file:save(true)
     end
 
-    remove_tallylog(username)
+    if not is_change_user then
+        remove_tallylog(username)
+    end
 end
 
 -- 单独ipmi配置文件
