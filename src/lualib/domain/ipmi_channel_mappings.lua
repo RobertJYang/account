@@ -42,10 +42,14 @@ function channel_number_mappings:channel_number_translation(ch_num)
     if not ch_num then
         return nil
     end
-    for external_channel_num, internal_channle_num in pairs(self.ch_num_maps) do
-        if external_channel_num == ch_num then
-            return internal_channle_num
-        elseif internal_channle_num == ch_num then
+    -- 与对外的通道号比较判断是否有被定制
+    if self.ch_num_maps[ch_num] then
+        return self.ch_num_maps[ch_num]
+    end
+
+    -- 通道号已经定制的场景，源通道号不能按照原含义使用
+    for _, in_ch_num in pairs(self.ch_num_maps) do
+        if in_ch_num == ch_num then
             return nil
         end
     end
