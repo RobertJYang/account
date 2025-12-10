@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.100.18] - 2025-12-10
+修复调整用户权限后锁定的用户被解锁问题
+
 ## [1.100.17] - 2025-12-09
 修复无web接口权限的用户可以创建SSO会话的问题
 
