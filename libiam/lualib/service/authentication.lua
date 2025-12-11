@@ -25,6 +25,7 @@ local account_service = require 'service.account_service'
 local cjson = require 'cjson'
 local mc_utils = require 'mc.utils'
 local event = require 'utils.event'
+local signal = require 'mc.signal'
 
 -- Authentication
 local Authentication = class()
@@ -36,6 +37,7 @@ function Authentication:ctor()
     self.m_account_cache = account_cache.get_instance()
     self.m_auth_config = authentication_config.get_instance()
     self.m_account_service = account_service.get_instance()
+    self.m_delete_username_session = signal.new()
 end
 
 -- 本地认证，通过linux shadow形式认证
@@ -158,6 +160,12 @@ function Authentication:foreach_check_user_lock_status()
     end)
 end
 
+function Authentication:kickout_session(lock_state, user_name)
+    if lock_state then
+        self.m_delete_username_session:emit(user_name, iam_enum.SessionLogoutType.SessionKickout)
+    end
+end
+
 function Authentication:check_user_lock_status()
     local is_locked
     local lock_state
@@ -173,7 +181,10 @@ function Authentication:check_user_lock_status()
                     iam_enum.UserLocked.USER_UNLOCK, lock_start_time)
                 -- 记录安全日志并上报系统事件
                 log:security("User (%s) %s", account.UserName, lock_state and "locked" or "unlocked")
+                -- 上报告警
                 event.set_account_lock_alarm(id, lock_state)
+                -- 踢出当前用户会话
+                self:kickout_session(lock_state, account.UserName)
             end
         end
     end
