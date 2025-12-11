@@ -227,6 +227,7 @@ os.execute_s = function(cmd)
     return true, 'exit', ret
 end
 
+require 'test_account_app'
 require 'test_account_db'
 require 'test_profile'
 require 'test_linux_account'
