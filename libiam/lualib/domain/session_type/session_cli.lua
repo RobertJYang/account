@@ -170,6 +170,8 @@ function CLISession:delete_remote_session(controller_id, inner_id)
             goto continue
         end
         local pid = vos.popen_s(string.format('ps -u %d -o pid | sed -n \'2p\'', uid))
+        -- 去除pid结果中的多余空格
+        pid = pid:gsub("%s+", "")
         if not pid or pid == '' then
             log:error('delete ldap(%s) cli session failed, process not found', uid)
             iam_core.uip_renew_ldap_user(uid)

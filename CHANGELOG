@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.20] - 2025-12-11
+修复ldap会话踢出失败的问题
+
 ## [1.100.19] - 2025-12-11
 支持二次鉴权场景用户锁定后踢出该用户会话
 
