@@ -135,19 +135,19 @@ function app:patch()
     snmp_patch.exec(self.persist, self.db)
 end
 
-function app:init()
-    log:notice("account class init start")
-    app.super.init(self)
-    -- 打补丁
-    self:patch()
-    self:check_dependencies()
-    self:register_rpc_methods()
+function app:bmcuptime()
+    local ret,uptime = pcall(utils_core.get_bmc_uptime)
+    if not ret then
+        return 0
+    end
+    if uptime < 90 then
+        skynet.sleep((90 - uptime) * 100) -- account错峰启动,加速组件启动速度
+    end
+    return uptime
+end
 
-    -- 注册用户管理IPMI接口, IPMI接口耗时较长，协程注册
-    skynet.fork_once(function()
-        self:register_ipmi_methods()
-    end)
-
+function app:skynet_service_init()
+    self:bmcuptime()
     self.key_mgmt_client = kmc_client.new(self.bus, function(domain_id, new_key_id)
         if not self.service_ready then
             log:info("service is not ready")
@@ -184,8 +184,27 @@ function app:init()
     config_handle.new()
 
     self:monitor_ipmi_channel_num()
+end
+
+function app:init()
+    log:notice("account class init start")
+    app.super.init(self)
+
+    -- 打补丁
+    self:patch()
+    self:check_dependencies()
+    self:register_rpc_methods()
+    -- 注册用户管理IPMI接口, IPMI接口耗时较长，协程注册
+    skynet.fork_once(function()
+        self:register_ipmi_methods()
+    end)
+
+    skynet.fork_once(function()
+        self:skynet_service_init()
+    end)
 
     log:notice("account class init end")
+    return 0
 end
 
 local linux_file_path = {
@@ -230,6 +249,7 @@ function app:service_init()
         self.account_policy_collection, self.ipmi_channel_config, linux_file_path, self.linux_account_queue)
     self.account_permanent_backup = account_permanent_backup.new(self.db, self.account_collection)
     log:notice("account manager init end, linux file manager init start")
+    self:bmcuptime()
     -- 文件管理
     self.file_synchronization = file_synchronization.new(self.db, self.account_collection, linux_file_path,
         self.linux_account_queue)
