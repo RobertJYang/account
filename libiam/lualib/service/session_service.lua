@@ -224,6 +224,7 @@ function SessionService:init()
     init_cert_auth_session(self)
     self:register_account_signals()
     self:register_mutual_auth_signals()
+    self:delete_username_session_signals()
 end
 
 -- 新增的独立方法：处理超时会话
@@ -1257,6 +1258,12 @@ function SessionService:delete_inner_session_due_to_env_changed(changed, extra_d
         self.m_session_service_collection[iam_enum.SessionType.Redfish:value()]:
             delete_high_priv_inner_session(extra_data)
     end
+end
+
+function SessionService:delete_username_session_signals()
+    self.m_authentication_service.m_delete_username_session:on(function(username, logout_type)
+        self:delete_session_by_username(username, logout_type)
+    end)
 end
 
 return singleton(SessionService)
