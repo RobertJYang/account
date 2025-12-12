@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2025 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -37,9 +37,7 @@ local def_types = require 'class.types.types'
 ---@field UserNamePasswordPrefixCompareEnabled FieldBase
 ---@field UserNamePasswordPrefixCompareLength FieldBase
 ---@field SNMPv3TrapAccountChangePolicy FieldBase
----@field ClassName FieldBase
----@field ObjectName FieldBase
----@field ObjectIdentifier FieldBase
+---@field RequireChangePasswordAction FieldBase
 ---@field PasswordExpirationDays FieldBase
 ---@field AccountLockoutDuration FieldBase
 ---@field AccountLockoutThreshold FieldBase
@@ -133,17 +131,11 @@ local def_types = require 'class.types.types'
 
 ---@class RolesTable: Table
 ---@field ExtendedCustomRoleEnabled FieldBase
----@field ClassName FieldBase
----@field ObjectName FieldBase
----@field ObjectIdentifier FieldBase
 ---@field Id FieldBase
 
 ---@class RoleTable: Table
 ---@field RolePrivilege FieldBase
 ---@field Name FieldBase
----@field ClassName FieldBase
----@field ObjectName FieldBase
----@field ObjectIdentifier FieldBase
 ---@field Id FieldBase
 ---@field RoleName FieldBase
 ---@field UserMgmt FieldBase
@@ -159,9 +151,6 @@ local def_types = require 'class.types.types'
 ---@class SnmpCommunityTable: Table
 ---@field LongCommunityEnabled FieldBase
 ---@field RwCommunityEnabled FieldBase
----@field ClassName FieldBase
----@field ObjectName FieldBase
----@field ObjectIdentifier FieldBase
 ---@field Id FieldBase
 
 ---@class AccountBackupTable: Table
@@ -193,9 +182,6 @@ local def_types = require 'class.types.types'
 ---@field LinkAuthenticationEnabled FieldBase
 ---@field CallbackRestriction FieldBase
 ---@field SessionLimit FieldBase
----@field ClassName FieldBase
----@field ObjectName FieldBase
----@field ObjectIdentifier FieldBase
 ---@field AccountId FieldBase
 ---@field ChannelNumber FieldBase
 
@@ -237,8 +223,7 @@ function AccountDBDatabase.new(path, datas)
         PasswordComplexityEnable = Col.BooleandField():cid(7):persistence_key('protect_power_off'):null():default(true),
         InitialPasswordPromptEnable = Col.BooleandField():cid(8):persistence_key('protect_power_off'):null():default(
             true),
-        InitialPasswordNeedModify = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null()
-            :default(true),
+        InitialPasswordNeedModify = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null():default(true),
         InitialAccountPrivilegeRestrictEnabled = Col.BooleandField():cid(10):persistence_key('protect_power_off'):null()
             :default(false),
         MinPasswordValidDays = Col.IntegerField():cid(11):persistence_key('protect_power_off'):null():max_length(32)
@@ -268,21 +253,20 @@ function AccountDBDatabase.new(path, datas)
             :max_length(8):default(4),
         SNMPv3TrapAccountChangePolicy = Col.IntegerField():cid(24):persistence_key('protect_power_off'):null()
             :max_length(8):default(0),
-        ClassName = Col.TextField():cid(25):null(),
-        ObjectName = Col.TextField():cid(26):null(),
-        ObjectIdentifier = Col.JsonField():cid(27):null(),
-        PasswordExpirationDays = Col.IntegerField():cid(28):persistence_key('protect_power_off'):null():max_length(32)
+        RequireChangePasswordAction = Col.BooleandField():cid(25):persistence_key('protect_power_off'):null():default(
+            false),
+        PasswordExpirationDays = Col.IntegerField():cid(26):persistence_key('protect_power_off'):null():max_length(32)
             :default(4294967295),
-        AccountLockoutDuration = Col.IntegerField():cid(29):null():max_length(32):default(300),
-        AccountLockoutThreshold = Col.IntegerField():cid(30):null():max_length(32):default(5),
-        UserMgmtEnable = Col.BooleandField():cid(31):persistence_key('protect_power_off'):null():default(true),
-        TimeSource = Col.EnumField(def_types.TimeSource):cid(32):persistence_key('protect_power_off'):null():default(
+        AccountLockoutDuration = Col.IntegerField():cid(27):null():max_length(32):default(300),
+        AccountLockoutThreshold = Col.IntegerField():cid(28):null():max_length(32):default(5),
+        UserMgmtEnable = Col.BooleandField():cid(29):persistence_key('protect_power_off'):null():default(true),
+        TimeSource = Col.EnumField(def_types.TimeSource):cid(30):persistence_key('protect_power_off'):null():default(
             def_types.TimeSource.TS_NOT_NTP),
-        PasswordComplexityIsLock = Col.BooleandField():cid(33):persistence_key('protect_power_off'):null()
+        PasswordComplexityIsLock = Col.BooleandField():cid(31):persistence_key('protect_power_off'):null()
             :default(false),
-        PreviousPasswordsDisallowed = Col.IntegerField():cid(34):persistence_key('protect_power_off'):null():max_length(
+        PreviousPasswordsDisallowed = Col.IntegerField():cid(32):persistence_key('protect_power_off'):null():max_length(
             8):default(5),
-        Id = Col.IntegerField():cid(35):primary_key():persistence_key('protect_power_off'):max_length(8)
+        Id = Col.IntegerField():cid(33):primary_key():persistence_key('protect_power_off'):max_length(8)
     }, 'protect_power_off'):create_if_not_exist(datas and datas['t_account_service'])
     obj.ManagerAccountDB = db:Table('t_manager_account', {
         AccountExpiration = Col.TextField():cid(1):persistence_key('protect_power_off'):null():critical(),
@@ -373,8 +357,7 @@ function AccountDBDatabase.new(path, datas)
             :default(1),
         IsCallin = Col.IntegerField():cid(3):persistence_key('protect_power_off'):null():max_length(8):default(0),
         IsEnableAuth = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8):default(1),
-        IsEnableIpmiMsg = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8)
-            :default(1),
+        IsEnableIpmiMsg = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8):default(1),
         IsEnableByPasswd = Col.EnumField(def_types.IpmiUserEnableByPassword):cid(6):persistence_key('protect_power_off')
             :null():default(def_types.IpmiUserEnableByPassword.Disable),
         Privilege0 = Col.EnumField(def_types.IpmiPrivilege):cid(7):persistence_key('protect_power_off'):null():default(
@@ -399,44 +382,34 @@ function AccountDBDatabase.new(path, datas)
     }):create_if_not_exist(datas and datas['t_login_rule'])
     obj.Roles = db:Table('t_roles', {
         ExtendedCustomRoleEnabled = Col.BooleandField():cid(1):persistence_key('protect_power_off'):null(),
-        ClassName = Col.TextField():cid(2):null(),
-        ObjectName = Col.TextField():cid(3):null(),
-        ObjectIdentifier = Col.JsonField():cid(4):null(),
-        Id = Col.IntegerField():cid(5):primary_key():persistence_key('protect_power_off'):max_length(8)
+        Id = Col.IntegerField():cid(2):primary_key():persistence_key('protect_power_off'):max_length(8)
     }):create_if_not_exist(datas and datas['t_roles'])
     obj.Role = db:Table('t_role', {
-        RolePrivilege = Col.JsonField():cid(1):null():default('\'[]\''),
+        RolePrivilege = Col.JsonField():cid(1):null():default([['[]']]),
         Name = Col.TextField():cid(2):null(),
-        ClassName = Col.TextField():cid(3):null(),
-        ObjectName = Col.TextField():cid(4):null(),
-        ObjectIdentifier = Col.JsonField():cid(5):null(),
-        Id = Col.EnumField(def_types.RoleType):cid(6):primary_key():persistence_key('protect_power_off'),
-        RoleName = Col.TextField():cid(7):persistence_key('protect_power_off'):unique():null(),
-        UserMgmt = Col.BooleandField():cid(8):persistence_key('protect_power_off'):null():default(false),
-        BasicSetting = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null():default(false),
-        KVMMgmt = Col.BooleandField():cid(10):persistence_key('protect_power_off'):null():default(false),
-        ReadOnly = Col.BooleandField():cid(11):persistence_key('protect_power_off'):null():default(false),
-        VMMMgmt = Col.BooleandField():cid(12):persistence_key('protect_power_off'):null():default(false),
-        SecurityMgmt = Col.BooleandField():cid(13):persistence_key('protect_power_off'):null():default(false),
-        PowerMgmt = Col.BooleandField():cid(14):persistence_key('protect_power_off'):null():default(false),
-        DiagnoseMgmt = Col.BooleandField():cid(15):persistence_key('protect_power_off'):null():default(false),
-        ConfigureSelf = Col.BooleandField():cid(16):persistence_key('protect_power_off'):null():default(false)
+        Id = Col.EnumField(def_types.RoleType):cid(3):primary_key():persistence_key('protect_power_off'),
+        RoleName = Col.TextField():cid(4):persistence_key('protect_power_off'):unique():null(),
+        UserMgmt = Col.BooleandField():cid(5):persistence_key('protect_power_off'):null():default(false),
+        BasicSetting = Col.BooleandField():cid(6):persistence_key('protect_power_off'):null():default(false),
+        KVMMgmt = Col.BooleandField():cid(7):persistence_key('protect_power_off'):null():default(false),
+        ReadOnly = Col.BooleandField():cid(8):persistence_key('protect_power_off'):null():default(false),
+        VMMMgmt = Col.BooleandField():cid(9):persistence_key('protect_power_off'):null():default(false),
+        SecurityMgmt = Col.BooleandField():cid(10):persistence_key('protect_power_off'):null():default(false),
+        PowerMgmt = Col.BooleandField():cid(11):persistence_key('protect_power_off'):null():default(false),
+        DiagnoseMgmt = Col.BooleandField():cid(12):persistence_key('protect_power_off'):null():default(false),
+        ConfigureSelf = Col.BooleandField():cid(13):persistence_key('protect_power_off'):null():default(false)
     }):create_if_not_exist(datas and datas['t_role'])
     obj.SnmpCommunity = db:Table('t_snmp_community', {
         LongCommunityEnabled = Col.BooleandField():cid(1):persistence_key('protect_power_off'):null():default(true),
         RwCommunityEnabled = Col.BooleandField():cid(2):persistence_key('protect_power_off'):null():default(true),
-        ClassName = Col.TextField():cid(3):null(),
-        ObjectName = Col.TextField():cid(4):null(),
-        ObjectIdentifier = Col.JsonField():cid(5):null(),
-        Id = Col.IntegerField():cid(6):primary_key():persistence_key('protect_power_off'):max_length(8)
+        Id = Col.IntegerField():cid(3):primary_key():persistence_key('protect_power_off'):max_length(8)
     }):create_if_not_exist(datas and datas['t_snmp_community'])
     obj.AccountBackup = db:Table('t_account_backup', {
         Id = Col.IntegerField():cid(1):primary_key():persistence_key('protect_permanent'):max_length(8),
         UserName = Col.TextField():cid(2):persistence_key('protect_permanent'):unique():null(),
         Password = Col.TextField():cid(3):persistence_key('protect_permanent'),
         RoleId = Col.IntegerField():cid(4):persistence_key('protect_permanent'):null():max_length(8):default(0),
-        LoginInterface = Col.IntegerField():cid(5):persistence_key('protect_permanent'):null():max_length(32)
-            :default(0),
+        LoginInterface = Col.IntegerField():cid(5):persistence_key('protect_permanent'):null():max_length(32):default(0),
         Enabled = Col.BooleandField():cid(6):persistence_key('protect_permanent'):null():default(false)
     }):create_if_not_exist(datas and datas['t_account_backup'])
     obj.PasswordPolicyDB = db:Table('t_password_policy', {
@@ -458,15 +431,11 @@ function AccountDBDatabase.new(path, datas)
     obj.IpmiChannelConfig = db:Table('t_ipmi_channel_config', {
         PrivilegeLimit = Col.IntegerField():cid(1):persistence_key('protect_power_off'):null():max_length(8),
         IpmiMessagingEnabled = Col.BooleandField():cid(2):persistence_key('protect_power_off'):null():default(true),
-        LinkAuthenticationEnabled = Col.BooleandField():cid(3):persistence_key('protect_power_off'):null()
-            :default(true),
+        LinkAuthenticationEnabled = Col.BooleandField():cid(3):persistence_key('protect_power_off'):null():default(true),
         CallbackRestriction = Col.IntegerField():cid(4):persistence_key('protect_power_off'):null():max_length(8),
         SessionLimit = Col.IntegerField():cid(5):persistence_key('protect_power_off'):null():max_length(8),
-        ClassName = Col.TextField():cid(6):null(),
-        ObjectName = Col.TextField():cid(7):null(),
-        ObjectIdentifier = Col.JsonField():cid(8):null(),
-        AccountId = Col.IntegerField():cid(9):primary_key():persistence_key('protect_power_off'):max_length(8),
-        ChannelNumber = Col.IntegerField():cid(10):primary_key():persistence_key('protect_power_off'):max_length(8)
+        AccountId = Col.IntegerField():cid(6):primary_key():persistence_key('protect_power_off'):max_length(8),
+        ChannelNumber = Col.IntegerField():cid(7):primary_key():persistence_key('protect_power_off'):max_length(8)
     }, 'protect_power_off'):create_if_not_exist(datas and datas['t_ipmi_channel_config'])
 
     obj.tables = db.tables

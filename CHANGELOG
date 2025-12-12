@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.23] - 2025-12-13
+新增属性代表是否仅可使用ManagerAcount.ChangePassword的方式来修改账户密码
+
 ## [1.100.22] - 2025-12-13
 修复ipmitool查询用户概要信息,Enabled User Count与实际不一致    
 

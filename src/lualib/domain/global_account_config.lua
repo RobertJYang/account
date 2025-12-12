@@ -364,6 +364,17 @@ function global_account_config:set_snmp_v3_trap_account_change_policy(ctx, polic
     self.m_account_service_config_changed:emit('SNMPv3TrapAccountChangePolicy', policy_value)
 end
 
+function global_account_config:get_require_change_password_action()
+    return self.m_db_account_service.RequireChangePasswordAction
+end
+
+function global_account_config:set_require_change_password_action(ctx, action_value)
+    ctx.operation_log.params = { action = action_value and 'Enable' or 'Disable'}
+    self.m_db_account_service.RequireChangePasswordAction = action_value
+    self.m_db_account_service:save()
+    self.m_account_service_config_changed:emit('RequireChangePasswordAction', action_value)
+end
+
 function global_account_config:get_inactive_time_threshold()
     return self.m_db_account_service.InactiveDaysThreshold
 end

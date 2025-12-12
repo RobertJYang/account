@@ -68,6 +68,7 @@ function account_service_mdb:init()
     config_mdb.MaxHistoryPasswordCount = global_config.m_db_account_service.MaxHistoryPasswordCount
     config_mdb.SNMPv3TrapAccountLimitPolicy = global_config.m_db_account_service.SNMPv3TrapAccountLimitPolicy
     config_mdb.SNMPv3TrapAccountChangePolicy = global_config.m_db_account_service.SNMPv3TrapAccountChangePolicy
+    config_mdb.RequireChangePasswordAction = global_config.m_db_account_service.RequireChangePasswordAction
     config_mdb.HostUserManagementEnabled = global_config.m_db_account_service.HostUserManagementEnabled
     config_mdb.OSAdministratorPrivilegeEnabled = global_config.m_db_account_service.OSAdministratorPrivilegeEnabled
     config_mdb.UserNamePasswordPrefixCompareEnabled =
@@ -161,6 +162,9 @@ account_service_mdb.watch_property_hook = {
         self.m_account_config:set_snmp_v3_trap_account_change_policy(ctx, value)
         self.m_account_service.m_account_collection:update_deletable()
     end, 'SNMPv3TrapAccountChangePolicy'),
+    RequireChangePasswordAction = operation_logger.proxy(function(self, ctx, value)        
+        self.m_account_config:set_require_change_password_action(ctx, value)
+    end, 'RequireChangePasswordAction')
 }
 
 function account_service_mdb:watch_service_property(service)
@@ -199,6 +203,7 @@ function account_service_mdb:new_config_to_mdb_tree(user_config)
         account_service.SNMPv3TrapAccountId = user_config.SNMPv3TrapAccountId
         account_service.SNMPv3TrapAccountLimitPolicy = user_config.SNMPv3TrapAccountLimitPolicy
         account_service.SNMPv3TrapAccountChangePolicy = user_config.SNMPv3TrapAccountChangePolicy
+        account_service.RequireChangePasswordAction = user_config.RequireChangePasswordAction
         account_service.HistoryPasswordCount = user_config.HistoryPasswordCount
         account_service.MaxHistoryPasswordCount = user_config.MaxHistoryPasswordCount
         account_service.HostUserManagementEnabled = user_config.HostUserManagementEnabled
