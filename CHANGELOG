@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.22] - 2025-12-13
+修复ipmitool查询用户概要信息,Enabled User Count与实际不一致    
+
 ## [1.100.21] - 2025-12-12
 修复account启动阶段串口打印失败
 

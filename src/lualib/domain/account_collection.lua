@@ -1151,7 +1151,15 @@ function AccountCollection:get_ipmi_user_access(user_id, chan_num)
     else
         rsp = self.collection[user_id]:get_ipmi_user_access(user_id, chan_num)
     end
-    rsp.EnabledUser = self.ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
+    local enable_num = 0
+    local enable_account_list = self.ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
+    for _, account_id in pairs(enable_account_list) do
+        if self.collection[account_id] and (self.collection[account_id]:get_enabled() == true and
+                self.collection[account_id]:get_locked() == false) then
+            enable_num = enable_num + 1
+        end
+    end
+    rsp.EnabledUser = enable_num
     return rsp
 end
 
