@@ -111,17 +111,15 @@ end
 function ipmi_channel_config:get_enabled_user_number_on_channel(channel_number)
     local ipmi_channel_config_list = self.db:select(self.db.IpmiChannelConfig)
         :where(self.db.IpmiChannelConfig.ChannelNumber:eq(channel_number)):all()
-    local enable_num = 0
+    local enable_account_list = {}
     if ipmi_channel_config_list and #ipmi_channel_config_list ~= 0 then
         for _, row in ipairs(ipmi_channel_config_list) do
             if row.IpmiMessagingEnabled == true then
-                enable_num = enable_num + 1
+                table.insert(enable_account_list, row.AccountId)
             end
         end
-    else
-        enable_num = 1
     end
-    return enable_num
+    return enable_account_list
 end
 
 --- 获取所有通道配置

@@ -356,7 +356,8 @@ function ManagerAccount:get_ipmi_user_access(user_id, chan_num)
     rsp.Reserved = 0
 
     -- 该通道上使能的用户数量EnabledUser
-    rsp.EnabledUser = self.m_ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
+    local enable_account_list = self.m_ipmi_channel_config:get_enabled_user_number_on_channel(chan_num)
+    rsp.EnabledUser = #enable_account_list
     rsp.EnableStatus = 0
     if self.m_ipmi_user_info_data.IsEnableByPasswd == enum.IpmiUserEnableByPassword.PasswordEnable then
         rsp.EnableStatus = 1
