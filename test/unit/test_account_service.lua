@@ -1376,6 +1376,15 @@ function TestAccount:test_set_invalid_snmp_v3_trap_account_change_policy_should_
     self.test_global_account_config:set_snmp_v3_trap_account_change_policy(self.ctx, 0)
 end
 
+--- 设置RequireChangePasswordAction合法值，应该设置成功
+function TestAccount:test_set_require_change_password_action_should_success()
+    self.test_global_account_config:set_require_change_password_action(self.ctx, true)
+    local origin = self.test_global_account_config:get_require_change_password_action()
+    lu.assertEquals(origin, true)
+    -- 恢复环境
+    self.test_global_account_config:set_require_change_password_action(self.ctx, false)
+end
+
 --- 默认情况下密码用户名策略关闭，新建与设置密码与用户名前n字节相同，应该成功
 function TestAccount:test_set_same_with_name_password_when_default_should_success()
     local default_user_name_password_compard_status =

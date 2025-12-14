@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2025 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -12,6 +12,53 @@ local utils = require 'mc.utils'
 local mdb = require 'mc.mdb'
 
 local AccountService = {}
+
+---@class AccountService.RequireChangePasswordAction
+---@field RequireChangePasswordAction boolean
+local TRequireChangePasswordAction = {}
+TRequireChangePasswordAction.__index = TRequireChangePasswordAction
+TRequireChangePasswordAction.group = {}
+
+local function TRequireChangePasswordAction_from_obj(obj)
+    return setmetatable(obj, TRequireChangePasswordAction)
+end
+
+function TRequireChangePasswordAction.new(RequireChangePasswordAction)
+    return TRequireChangePasswordAction_from_obj({RequireChangePasswordAction = RequireChangePasswordAction or false})
+end
+---@param obj AccountService.RequireChangePasswordAction
+function TRequireChangePasswordAction:init_from_obj(obj)
+    self.RequireChangePasswordAction = obj.RequireChangePasswordAction or false
+end
+
+function TRequireChangePasswordAction:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TRequireChangePasswordAction.group)
+end
+
+TRequireChangePasswordAction.from_obj = TRequireChangePasswordAction_from_obj
+
+TRequireChangePasswordAction.proto_property = {'RequireChangePasswordAction'}
+
+TRequireChangePasswordAction.default = {false}
+
+TRequireChangePasswordAction.struct = {{name = 'RequireChangePasswordAction', is_array = false, struct = nil}}
+
+function TRequireChangePasswordAction:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'RequireChangePasswordAction', self.RequireChangePasswordAction, 'bool', false, errs,
+        need_convert)
+
+    TRequireChangePasswordAction:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TRequireChangePasswordAction.proto_property, errs, need_convert)
+    return self
+end
+
+function TRequireChangePasswordAction:unpack(_)
+    return self.RequireChangePasswordAction
+end
+
+AccountService.RequireChangePasswordAction = TRequireChangePasswordAction
 
 ---@class AccountService.SNMPv3TrapAccountChangePolicy
 ---@field SNMPv3TrapAccountChangePolicy integer
@@ -1609,7 +1656,8 @@ AccountService.interface = mdb.register_interface('bmc.kepler.AccountService', {
     SNMPv3TrapAccountLimitPolicy = {'y', {'EMIT_CHANGE'}, false, 2},
     UserNamePasswordPrefixCompareEnabled = {'b', {'EMIT_CHANGE'}, false, false},
     UserNamePasswordPrefixCompareLength = {'y', {'EMIT_CHANGE'}, false, 4},
-    SNMPv3TrapAccountChangePolicy = {'y', {'EMIT_CHANGE'}, false, 0}
+    SNMPv3TrapAccountChangePolicy = {'y', {'EMIT_CHANGE'}, false, 0},
+    RequireChangePasswordAction = {'b', {'EMIT_CHANGE'}, false, false}
 }, {
     ImportWeakPasswordDictionary = {'a{ss}s', 'u', TImportWeakPasswordDictionaryReq, TImportWeakPasswordDictionaryRsp},
     ExportWeakPasswordDictionary = {'a{ss}s', 'u', TExportWeakPasswordDictionaryReq, TExportWeakPasswordDictionaryRsp},

@@ -215,6 +215,16 @@
                         "usage": [
                             "PoweroffPer"
                         ]
+                    },
+                    "RequireChangePasswordAction": {
+                        "default": false,
+                        "privilege": {
+                            "read": ["ReadOnly"],
+                            "write": ["UserMgmt"]
+                        },
+                        "usage": [
+                            "PoweroffPer"
+                        ]
                     }
                 },
                 "methods": {

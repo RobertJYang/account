@@ -264,6 +264,10 @@ local operation_log_map = {
             'and v3 trap account change policy controlled by SNMPv3TrapAccountLimitPolicy',
         fail = 'Set SNMP v3 trap account change policy failed'
     },
+    RequireChangePasswordAction = {
+        success = '{action} require change password action successfully',
+        fail = '{action} require change password action failed'
+    },
     InactiveDaysThreshold = {
         success = 'Set user inactive threshold to ({threshold}) days successfully',
         fail = 'Set inactive user timelimit time failed',

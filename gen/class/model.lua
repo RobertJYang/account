@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2025 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -329,6 +329,15 @@ local AccountService = {
                 ['usage'] = {'PoweroffPer'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'SecurityMgmt'}},
                 ['validator'] = account_service_intf_types.SNMPv3TrapAccountChangePolicy
+            },
+            ['RequireChangePasswordAction'] = {
+                ['baseType'] = 'Boolean',
+                ['readOnly'] = false,
+                ['default'] = false,
+                ['options'] = {['emitsChangedSignal'] = 'true'},
+                ['usage'] = {'PoweroffPer'},
+                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
+                ['validator'] = account_service_intf_types.RequireChangePasswordAction
             }
         },
         ['bmc.kepler.Object.Properties'] = mdb.OBJECT_PROPERTIES_INTERFACE_PROP_CONFIGS
@@ -391,7 +400,8 @@ local AccountService = {
                 ['SNMPv3TrapAccountLimitPolicy'] = 2,
                 ['UserNamePasswordPrefixCompareEnabled'] = false,
                 ['UserNamePasswordPrefixCompareLength'] = 4,
-                ['SNMPv3TrapAccountChangePolicy'] = 0
+                ['SNMPv3TrapAccountChangePolicy'] = 0,
+                ['RequireChangePasswordAction'] = false
             },
             ['privileges'] = {
                 ['path'] = privilege.ReadOnly,
@@ -436,7 +446,8 @@ local AccountService = {
                     ['SNMPv3TrapAccountChangePolicy'] = {
                         ['read'] = privilege.ReadOnly,
                         ['write'] = privilege.SecurityMgmt
-                    }
+                    },
+                    ['RequireChangePasswordAction'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt}
                 },
                 ['methods'] = {
                     ['ImportWeakPasswordDictionary'] = privilege.SecurityMgmt,
