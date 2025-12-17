@@ -11,7 +11,6 @@ local log = require 'mc.logging'
 local mc_utils = require 'mc.utils'
 local vos_utils = require 'utils.vos'
 local custom_msg = require 'messages.custom'
-local core = require 'account_core'
 local enum = require 'class.types.types'
 local error_config = require 'error_config'
 local config = require 'common_config'
@@ -46,7 +45,7 @@ function local_account:set_login_interface(interface)
 end
 
 --- 设置用户登录规则
----@param login_rule_ids number 
+---@param login_rule_ids number
 function local_account:set_login_rule_ids(login_rule_ids)
     self:property_writable_check('LoginRuleIds')
     self.m_account_data.LoginRuleIds = login_rule_ids

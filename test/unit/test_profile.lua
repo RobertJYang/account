@@ -243,3 +243,31 @@ function TestAccount:test_password_complexity_check_should_fail()
     --恢复环境
     self.test_global_account_config:set_password_complexity_lock(false)
 end
+
+function TestAccount:test_password_complexity_check_should_fail()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local object = {
+        PasswdSetting = {
+            LocalAccountPasswordRulePolicy = {
+                Value = "Hybrid",
+                AttributeType = "ImportAndExport",
+                Import = true
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    --恢复环境
+    object = {
+        PasswdSetting = {
+            LocalAccountPasswordRulePolicy = {
+                Value = "Default",
+                AttributeType = "ImportAndExport",
+                Import = true
+            }
+        }
+    }
+    config_service:on_import(ctx, object)
+end

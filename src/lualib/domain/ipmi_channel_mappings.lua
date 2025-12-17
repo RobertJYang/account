@@ -7,7 +7,6 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local class = require 'mc.class'
-local signal = require 'mc.signal'
 local log = require 'mc.logging'
 local client = require 'account.client'
 local singleton = require 'mc.singleton'
@@ -83,7 +82,7 @@ function channel_number_mappings:on_channel_number_mappings_interfaces_removed(s
     self.path_to_ch_num[path] = nil
     if not self.path_to_ch_num or next(self.path_to_ch_num) == nil then
         self.multi_channel_status = 0
-    end   
+    end
 end
 
 return singleton(channel_number_mappings)

@@ -12,6 +12,8 @@ local Singleton = require 'mc.singleton'
 local client = require 'account.client'
 local context = require 'mc.context'
 
+local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
+
 local file_proxy = class()
 
 function file_proxy:ctor()
@@ -20,8 +22,8 @@ end
 
 local function get_file_proxy_obj()
     local objs = client:GetFileObjects()
-    for _, v in pairs(objs) do
-        return v
+    if objs[FILE_OBJ_PATH] then
+        return objs[FILE_OBJ_PATH]
     end
     log:error("get file proxy object failed")
     return nil

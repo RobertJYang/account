@@ -7,7 +7,7 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local class = require 'mc.class'
-local log = require 'mc.logging'
+local logging = require 'mc.logging'
 local ipmi = require 'ipmi'
 local mc_utils = require 'mc.utils'
 
@@ -618,9 +618,9 @@ function OperationLogger.log(ctx, result)
         ipmi.ipmi_operation_log(ctx, 'account', format_log)
         return
     end
-    log:operation(ctx:get_initiator(), 'account', format_log)
+    logging:operation(ctx:get_initiator(), 'account', format_log)
     if operation_logs['security_log'] then
-        log:security(format_log)
+        logging:security(format_log)
     end
 end
 
@@ -637,7 +637,7 @@ function OperationLogger.safe_call(ctx, func)
         local err = result[1]
         ctx.operation_log.result = ctx.operation_log.result or err.name
         local err_detail = string.match(tostring(err), '([%w%:%s%.%_]-)$')
-        log:error(string.format('%s: %s %s', ctx.operation_log.operation, err.name, err_detail))
+        logging:error(string.format('%s: %s %s', ctx.operation_log.operation, err.name, err_detail))
         OperationLogger.log(ctx, 'fail')
         ctx.operation_log = nil
         error(err)

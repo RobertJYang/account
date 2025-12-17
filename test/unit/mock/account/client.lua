@@ -54,8 +54,10 @@ function FileObjects:IsPermitted(ctx, dst_path, permission)
     return true    
 end
 
+local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
+
 function MockClient:GetFileObjects()
-    return {FileObjects}
+    return {[FILE_OBJ_PATH] = FileObjects}
 end
 
 function MockClient:GetSecureBootObjects()

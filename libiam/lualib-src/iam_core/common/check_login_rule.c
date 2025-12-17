@@ -508,7 +508,7 @@ LOCAL gint32 verify_ip_with_rule(gchar *ip_rule, const gchar *ip_info)
     int mask_len = 0;
 
     // 取ip地址
-    gint32 ret = sscanf_s(ip_rule, "%46[^/]/%d$", subnet_ip, INET6_ADDRSTRLEN, &mask_len);
+    gint32 ret = sscanf_s(ip_rule, "%45[^/]/%d$", subnet_ip, INET6_ADDRSTRLEN, &mask_len);
     if (ret <= 0) {
         debug_log(DLOG_ERROR, "%s: sscanf_s failed.", __FUNCTION__);
         return RET_ERR;

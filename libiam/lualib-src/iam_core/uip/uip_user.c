@@ -38,7 +38,11 @@ LOCAL gint32 parse_line_token_to_user_name(const gchar *token, IPMI_USER_S *ipmi
     if (strlen(token) >= sizeof(ipmi_user->user_name)) {
         return TOKEN_TOO_LONG;
     } else {
-        (void)memcpy_s(ipmi_user->user_name, sizeof(ipmi_user->user_name), token, strlen(token));
+        gint32 ret = memcpy_s(ipmi_user->user_name, sizeof(ipmi_user->user_name), token, strlen(token));
+        if (ret != RET_OK) {
+            debug_log(DLOG_ERROR, "memcpy_s user name fail, ret:%d", ret);
+            return ret;
+        }
         return RET_OK;
     }
 }

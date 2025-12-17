@@ -12,7 +12,7 @@ local log = require 'mc.logging'
 local base_msg = require 'messages.base'
 local json = require 'cjson'
 local enum = require 'class.types.types'
-local err = require 'account.errors'
+local account_errs = require 'account.errors'
 local trace = require 'telemetry.trace'
 
 local DETELE_USER_NAME = "delete_user"
@@ -127,7 +127,7 @@ function account_recover:recover_account(ctx, account_id, policy)
     if account_id == nil or account_id < 2 or account_id > 17 then
         log:error('[Recover] User id %d is illegal', account_id)
         span:finish()
-        error(err.invalid_data_field())
+        error(account_errs.invalid_data_field())
     end
     if policy ~= 0 then
         log:notice('[Recover] only support force-recover')
@@ -144,7 +144,7 @@ function account_recover:recover_account(ctx, account_id, policy)
         ipmi_channel_data = json.decode(backup_info.IpmiChannelData)
     end
     -- 解析备份表中的json字符串
-    local backup_data = { 
+    local backup_data = {
         account_data = json.decode(backup_info.ManagerAccountData),
         ipmi_data = json.decode(backup_info.IpmiAccountData),
         snmp_data = json.decode(backup_info.SnmpAccountData),

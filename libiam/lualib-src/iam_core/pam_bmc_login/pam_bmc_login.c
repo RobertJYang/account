@@ -207,7 +207,7 @@ LOCAL gint32 get_user(pam_handle_t *pamh, gint32 uid, gchar *data, IMANA_OPTIONS
         tmp_line = strdup(line);
         line_bak = tmp_line;
         token = strsep(&tmp_line, ":");
-        
+
         // 转换为10进制数字
         id = strtol(token, &endptr, DECIMAL_NUM);
         if ((errno == ERANGE && (id == LONG_MAX || id == LONG_MIN)) || (errno != 0 && id == 0) ||

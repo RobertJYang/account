@@ -8,14 +8,6 @@
 -- See the Mulan PSL v2 for more details.
 local singleton = require 'mc.singleton'
 local class = require 'mc.class'
-local config = require 'common_config'
-local utils_core = require 'utils.core'
-local account_core = require 'account_core'
-local custom_msg = require 'messages.custom'
-local enum = require 'class.types.types'
-local base_msg = require 'messages.base'
-local log = require 'mc.logging'
-local utils = require 'infrastructure.utils'
 local account_policy = require 'domain.account_policies.account_policy'
 
 local LocalAccountPolicy = class(account_policy)

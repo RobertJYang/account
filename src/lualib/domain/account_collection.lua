@@ -39,7 +39,6 @@ local inter_chassis_account = require 'domain.manager_account.inter_chassis_acco
 local core = require 'account_core'
 local cert_service_enum = require 'account.json_types.CertificateService'
 local trace = require 'telemetry.trace'
-local account_policy_collection = require 'domain.account_policy_collection'
 
 local account_type_map = {
     [enum.AccountType.Local:value()] = local_account,
@@ -212,7 +211,7 @@ function AccountCollection:init_default_ipmi_channels()
             self.ipmi_channel_config.collection[account_id] = {}
         end
         local role_id = collection.m_account_data.RoleId
-        local new_channel_data = {}
+        local new_channel_data
         for _, channel_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
             if not self.ipmi_channel_config.collection[account_id][channel_num] then
                 new_channel_data = {
@@ -792,12 +791,12 @@ end
 
 function AccountCollection:set_user_name(ctx, account_id, user_name)
     ctx.operation_log.params = { id = account_id, name = user_name }
-    local ok, err = pcall(function ()
+    local ok, ret = pcall(function ()
         utils.check_ipmi_account_id(account_id)
     end)
     if not ok then
         ctx.operation_log.result = 'user_id_invalid'
-        error(err)
+        error(ret)
     end
     local old_user_name = ''
     if self:check_user_id_exist(account_id) then
@@ -861,7 +860,7 @@ function AccountCollection:change_user_name(account_id, user_name)
         -- 调整为信号量触发，将几个关键文件的读写操作解耦
         self.m_account_file_changed:emit(account_id, old_username)
     end
-    
+
     local home_path
     self.m_linux_account_queue(function ()
         local la = linux_account.new(self.linux_files, false)
@@ -1033,6 +1032,20 @@ function AccountCollection:check_is_last_operate_admin(account_id)
     return false
 end
 
+local function check_session_limit(req)
+    if #req.SessionLimit ~= 0 and #req.SessionLimit ~= 1 then
+        log:error("SessionLimit is length %s error", #req.SessionLimit)
+        error(custom_msg.IPMIRequestLengthInvalid())
+    end
+    if not req.SessionLimit or req.SessionLimit == "" then
+        req.SessionLimit = string.pack(">B", 0)
+    end
+    if #req.SessionLimit ~= 0 and string.unpack(">B", req.SessionLimit) > 15 then
+        log:error("sessionlimit is out of range")
+        error(custom_msg.IPMIOutOfRange())
+    end
+end
+
 function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
     local privilege = req.UserPrivilege
     local channel_number = (req.ChannelNumber == enum.IpmiChannel.PRSENT_CHAN_NUM:value() and
@@ -1048,10 +1061,10 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
         error(custom_msg.IPMIOutOfRange())
     end
     ctx.operation_log.params.privilege = role_privilege_map.privilege_to_string_map[privilege]
-    local ok, err = pcall(function() utils.check_ipmi_account_id(account_id) end)
+    local ok, ret = pcall(function() utils.check_ipmi_account_id(account_id) end)
     if not ok then
         ctx.operation_log.result = 'no_user'
-        error(err)
+        error(ret)
     end
     if not self.collection[account_id] then
         ctx.operation_log.result = 'no_user'
@@ -1083,17 +1096,7 @@ function AccountCollection:ipmi_set_user_access_input_check(req, ctx)
         log:error("channel number(%s) is invalid", channel_number)
         error(custom_msg.IPMICommandCannotExecute())
     end
-    if #req.SessionLimit ~= 0 and #req.SessionLimit ~= 1 then
-        log:error("SessionLimit is length %s error", #req.SessionLimit)
-        error(custom_msg.IPMIRequestLengthInvalid())
-    end
-    if not req.SessionLimit or req.SessionLimit == "" then
-        req.SessionLimit = string.pack(">B", 0)
-    end
-    if #req.SessionLimit ~= 0 and string.unpack(">B", req.SessionLimit) > 15 then
-        log:error("sessionlimit is out of range")
-        error(custom_msg.IPMIOutOfRange())
-    end
+    check_session_limit(req)
 end
 
 function AccountCollection:check_ipmi_host_user_mgnt_enabled(ctx)
@@ -1145,7 +1148,7 @@ function AccountCollection:get_enabled_user()
 end
 
 function AccountCollection:get_ipmi_user_access(user_id, chan_num)
-    local rsp = nil
+    local rsp
     if self.collection[user_id] == nil then
         rsp = self:get_ipmi_empty_user_access()
     else
@@ -1334,11 +1337,11 @@ local custom_msg_code_map = {
 }
 
 function AccountCollection:enable_user_operation(account_id, enable)
-    local ok, err = pcall(function()
+    local ok, ret = pcall(function()
         self:set_enabled(account_id, enable)
     end)
     if not ok then
-        return custom_msg_code_map[err.name] or err_cfg.UNKNOWN
+        return custom_msg_code_map[ret.name] or err_cfg.UNKNOWN
     end
 
     self.m_account_changed:emit(account_id, "Enabled", enable)
@@ -1562,10 +1565,8 @@ function AccountCollection:get_account_property_writable(account_id)
         EncryptionProtocolWritable = false,
         SNMPPasswordWritable = false
     }
-    local writable = false
     for property, _ in pairs(properties_writable) do
-        writable = account:get_property_writable(property)
-        properties_writable[property] = writable
+        properties_writable[property] = account:get_property_writable(property)
     end
     return properties_writable
 end
@@ -1593,7 +1594,7 @@ function AccountCollection:_delete_cert(ctx, account_id)
     -- 执行时间过长，采用协程执行
     skynet.fork_once(function()
         -- 资源树上树延迟，采取重试机制
-        for i = 1,3 do
+        for _ = 1, 3 do
             is_exist = mdb_service.is_valid_path(client:get_bus(), path).Result
             if is_exist then
                 break
@@ -1674,7 +1675,7 @@ function AccountCollection:sync_and_update_ipmi_channel_config()
 
     local query = self.db:select(old_tbl):where(old_tbl.IsSynced:eq(false))
 
-    if not query or query == {} then
+    if not query or not next(query) then
         return
     end
 
@@ -1688,7 +1689,7 @@ function AccountCollection:sync_and_update_ipmi_channel_config()
             PrivilegeLimit = old_record.Privilege1:value()
         }
 
-        local ok, err = pcall(function()
+        local ok, ret = pcall(function()
             self.db:update(new_tbl)
                 :value(data_to_update)
                 :where(new_tbl.AccountId:eq(old_record.AccountId),
@@ -1703,7 +1704,7 @@ function AccountCollection:sync_and_update_ipmi_channel_config()
         end)
 
         if not ok then
-            log:error("Failed to sync for AccountId: %s. Error: %s", old_record.AccountId, tostring(err))
+            log:error("Failed to sync for AccountId: %s. Error: %s", old_record.AccountId, tostring(ret))
         end
     end)
 

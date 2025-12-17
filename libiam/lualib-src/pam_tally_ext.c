@@ -110,7 +110,7 @@ LOCAL gint32 read_tally(FILE *fp, TallyData *tallies)
         debug_log(DLOG_ERROR, "get tally log size failed.");
         return RET_ERR;
     }
-    guint32 unsigned_size = (guint32)size;
+    size_t unsigned_size = (size_t)size;
     if (unsigned_size > MAX_RECORDS * sizeof(TallyRecord)) {
         unsigned_size = MAX_RECORDS * sizeof(TallyRecord);
     }
@@ -123,7 +123,7 @@ LOCAL gint32 read_tally(FILE *fp, TallyData *tallies)
         rewind(fp);
         return RET_ERR;
     }
-    guint32      count = unsigned_size / sizeof(TallyRecord);
+    size_t      count = unsigned_size / sizeof(TallyRecord);
     TallyRecord *data  = g_malloc0(unsigned_size);
     (void)fseek(fp, 0, SEEK_SET);
     if (fread(data, sizeof(TallyRecord), count, fp) != count) {
@@ -254,14 +254,13 @@ LOCAL gint32 update_tally(guint64 now, TallyData *tallies)
             }
         }
     } else {
-        guint32      buf_size = tallies->count * sizeof(TallyRecord);
+        size_t      buf_size = tallies->count * sizeof(TallyRecord);
         TallyRecord *newdata  = g_malloc0(buf_size + sizeof(TallyRecord));
         if (tallies->records != NULL) {
             ret = memcpy_s(newdata, buf_size + sizeof(TallyRecord), tallies->records, buf_size);
             if (ret != RET_OK) {
                 debug_log(DLOG_ERROR, "memcpy_s fail, ret = %d", ret);
                 g_free(newdata);
-                g_free(tallies->records);
                 return RET_ERR;
             }
             g_free(tallies->records);

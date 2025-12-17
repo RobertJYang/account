@@ -33,7 +33,7 @@ local DAY_SECOND_COUNT = 24 * 60 * 60
 
 local ManagerAccount = class()
 function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_config)
-    local kmc_client = kmc_client.get_instance()
+    self.kmc_client = kmc_client.get_instance()
     local account_svc_cfg = global_account_cfg.get_instance()
     local rc = login_rule_collection.get_instance()
     local ipmi_test_passwd_lock = {}
@@ -45,7 +45,6 @@ function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_confi
         ipmi_test_passwd_lock[i].test_fail_cnt = 0
     end
     self.m_account_data = account
-    self.kmc_client = kmc_client
     self.m_user_status = enum.UserLocked.USER_UNLOCK
     self.m_ipmi_test_passwd_lock = ipmi_test_passwd_lock
     self.m_user_lock_start_time = 0
@@ -297,7 +296,7 @@ end
 function ManagerAccount:get_is_online()
     return self.m_account_data.IsOnline
 end
- 
+
 function ManagerAccount:set_is_online(required)
     self.m_account_data.IsOnline = required
     self.m_account_data:save()

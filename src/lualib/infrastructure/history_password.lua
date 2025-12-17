@@ -68,20 +68,20 @@ function history_password:get()
 end
 
 --- 根据历史密码盐值加密密码
----@param history_password string
+---@param old_password string
 ---@param new_password string
 ---@param pattern string
 ---@return boolean
-function history_password:check_password_same(history_password, new_password, pattern)
-    if not (history_password and new_password)then
+function history_password:check_password_same(old_password, new_password, pattern)
+    if not (old_password and new_password)then
         return false
     end
-    local salt = string.match(history_password, pattern)
+    local salt = string.match(old_password, pattern)
     if not salt then
-        return new_password == history_password
+        return new_password == old_password
     end
     local crypt_password = crypt.crypt(new_password, salt)
-    return crypt_password == history_password
+    return crypt_password == old_password
 end
 
 --- 检查指定用户是否历史密码包含当前密码

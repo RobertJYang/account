@@ -48,16 +48,16 @@ function LoginRuleManager:get_enabled()
 end
 
 --- 设置IP规则
----@param ip_rule string
-function LoginRuleManager:set_ip_rule(ip_rule)
-    self.m_ip_rule:set_rule(ip_rule)
+---@param rule string
+function LoginRuleManager:set_ip_rule(rule)
+    self.m_ip_rule:set_rule(rule)
     local ip_type = self.m_ip_rule:get_rule_type()
     if ip_type == IpRuleType.MASK or ip_type == IpRuleType.NO_MASK then
-        self.m_login_rule.IpRule = ip_rule
+        self.m_login_rule.IpRule = rule
         self.m_login_rule.Ipv6Rule = ""
     elseif ip_type == IpRuleType.IPV6_MASK or ip_type == IpRuleType.IPV6_NO_MASK then
         self.m_login_rule.IpRule = ""
-        self.m_login_rule.Ipv6Rule = ip_rule
+        self.m_login_rule.Ipv6Rule = rule
     else
         self.m_login_rule.IpRule = ""
         self.m_login_rule.Ipv6Rule = ""
@@ -75,10 +75,10 @@ function LoginRuleManager:get_ip_rule()
 end
 
 --- 设置MAC规则
----@param mac_rule string
-function LoginRuleManager:set_mac_rule(mac_rule)
-    self.m_mac_rule:set_rule(mac_rule)
-    self.m_login_rule.MacRule = mac_rule
+---@param rule string
+function LoginRuleManager:set_mac_rule(rule)
+    self.m_mac_rule:set_rule(rule)
+    self.m_login_rule.MacRule = rule
     self.m_login_rule:save()
 end
 
@@ -87,10 +87,10 @@ function LoginRuleManager:get_mac_rule()
 end
 
 --- 设置时间规则
----@param time_rule string
-function LoginRuleManager:set_time_rule(time_rule)
-    self.m_time_rule:set_rule(time_rule)
-    self.m_login_rule.TimeRule = time_rule
+---@param rule string
+function LoginRuleManager:set_time_rule(rule)
+    self.m_time_rule:set_rule(rule)
+    self.m_login_rule.TimeRule = rule
     self.m_login_rule:save()
 end
 

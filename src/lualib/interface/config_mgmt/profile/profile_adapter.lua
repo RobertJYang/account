@@ -436,7 +436,7 @@ function ProfileAdapter:import_handle(ctx, class_name, class_data)
     else
         for property_name, property_value in pairs(class_data) do
             if property_value.Import ~= false then
-                self:import_property(ctx, class_name, property_name, property_value.Value) 
+                self:import_property(ctx, class_name, property_name, property_value.Value)
             end
         end
     end

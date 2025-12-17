@@ -172,7 +172,7 @@ function OEMAccount:set_account_password(password, is_config_self)
     end
     self.m_account_data.Password, self.m_account_data.KDFPassword =
         self:crypt_password_by_random_salt(password)
-    
+
     local ipmi_pwd = password
     if #password > 20 then
         ipmi_pwd = string.sub(password, 1 ,20)

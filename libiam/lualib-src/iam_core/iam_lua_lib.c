@@ -254,7 +254,7 @@ LOCAL gboolean is_notty_sshd_session(gint pid)
 {
     gchar path[SMALL_BUFFER_SIZE] = {0};
     gchar cmdline[BUFFER_SIZE] = {0};
-    
+
     // 检查 cmdline 内容
     (void)snprintf_s(path, sizeof(path), sizeof(path) - 1, "/proc/%d/cmdline", pid);
     FILE *fp = fopen_s(path, "r", path);

@@ -67,10 +67,10 @@ LOCAL gint32 user_strcmp_s(const gchar *old_str, const gchar *new_str)
  */
 LOCAL gint32 isstrrev(const gchar *new_str, const gchar *old_str)
 {
-    guint32 i;
+    size_t i;
     guint32 ret;
-    guint32 new_len;
-    guint32 old_len;
+    size_t new_len;
+    size_t old_len;
 
     /* 参数校验 */
     if ((new_str == NULL) || (old_str == NULL)) {
@@ -82,7 +82,7 @@ LOCAL gint32 isstrrev(const gchar *new_str, const gchar *old_str)
         return FALSE;
     }
     // 检测两个字符串长度
-    ret = new_len ^ old_len;
+    ret = (guint32)new_len ^ old_len;
 
     /*
       检测其中一个字符串是
@@ -481,7 +481,7 @@ gint32 decrypt_with_private_key(const gchar *priv_key, gint32 priv_kev_len, cons
 LOCAL gint32 pattern_validator(const gchar *pattern)
 {
     // 不可使用空正则
-    gsize len = strlen(pattern);
+    size_t len = strlen(pattern);
     if (len == 0) {
         debug_log(DLOG_ERROR, "invalid data length");
         return RET_ERR;
