@@ -23,7 +23,7 @@ local kmc_client = require 'infrastructure.kmc_client'
 local history_password = require 'infrastructure.history_password'
 local global_account_cfg = require 'domain.global_account_config'
 local login_rule_collection = require 'domain.login_rule.login_rule_collection'
-local privilege = require 'domain.privilege'
+local privilege_class = require 'domain.privilege'
 
 -- 盐值生成16位长度
 local LINUX_PASSWD_CRYPT_SALT_LENGTH = 16
@@ -515,7 +515,7 @@ function ManagerAccount:update_privileges(priv_input)
     local requied = self:get_password_change_required()
     local policy = self:get_first_login_policy()
     local role_id = self:get_role_id()
-    local privileges = privilege.new_from_role_ids({ role_id }):to_array()
+    local privileges = privilege_class.new_from_role_ids({ role_id }):to_array()
     if priv_input ~= nil and role_id ~= enum.RoleType.NoAccess:value() then
         privileges = priv_input
     end
