@@ -9,7 +9,7 @@
 
 local class = require 'mc.class'
 local singleton = require 'mc.singleton'
-local cjson = require 'cjson'
+local json = require 'cjson'
 local file_utils = require 'utils.file'
 local crypt = require 'utils.crypt'
 local common_config = require 'common_config'
@@ -93,11 +93,11 @@ local ConfigAdapter = {
 }
 
 local function json_sort(json_obj)
-    local sort_keys = cjson.json_object_get_keys(json_obj)
+    local sort_keys = json.json_object_get_keys(json_obj)
     table.sort(sort_keys, function(a, b)
         return a < b
     end)
-    local json_result = cjson.json_object_new_object()
+    local json_result = json.json_object_new_object()
     for _, value in ipairs(sort_keys) do
         json_result[value] = json_obj[value]
     end
@@ -106,22 +106,22 @@ local function json_sort(json_obj)
 end
 
 function ConfigDump:dump_instance(class_name, instance_ids, config)
-    local result = cjson.json_object_new_object()
+    local result = json.json_object_new_object()
     local v_type, value, instance_name
     for _, id in pairs(instance_ids) do
         if not config.Id(self, id) then
             goto continue
         end
         instance_name = class_name .. id
-        local tmp = cjson.json_object_new_object()
-        for name, class in pairs(config) do
-            v_type = type(class)
+        local tmp = json.json_object_new_object()
+        for name, config_class in pairs(config) do
+            v_type = type(config_class)
             if v_type == "function" then
-                value = class(self, id)
-            elseif v_type == "table" and class.isObjectArray then
-                value = self:dump_instance(name, class.instance_ids, class.Fields)
-            elseif v_type == "table" and not class.isObjectArray then
-                value = self:handle_config(class)
+                value = config_class(self, id)
+            elseif v_type == "table" and config_class.isObjectArray then
+                value = self:dump_instance(name, config_class.instance_ids, config_class.Fields)
+            elseif v_type == "table" and not config_class.isObjectArray then
+                value = self:handle_config(config_class)
             else
                 value = value
             end
@@ -134,7 +134,7 @@ function ConfigDump:dump_instance(class_name, instance_ids, config)
 end
 
 function ConfigDump:handle_config(config)
-    local result = cjson.json_object_new_object()
+    local result = json.json_object_new_object()
     local v_type, value
     for name, config_class in pairs(config) do
         v_type = type(config_class)

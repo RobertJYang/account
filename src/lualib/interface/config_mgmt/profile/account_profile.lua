@@ -39,8 +39,8 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
         if profile_adapter.m_account_collection:get_account_data_by_id(instance_id) == nil then
             -- 新建用户，第三个参数为true代表当前新建用户走ipmi流程，不创建密码
             local ok, err = pcall(function()
-                operation_logger.proxy(function(_, ctx)
-                    AccountProfile.set_user_name(profile_adapter, ctx, instance_id, instance.UserName.Value)
+                operation_logger.proxy(function(_, dbus_ctx)
+                    AccountProfile.set_user_name(profile_adapter, dbus_ctx, instance_id, instance.UserName.Value)
                 end, 'IpmiNewAccount')(nil, ctx)
             end)
             if not ok then
@@ -52,8 +52,8 @@ function AccountProfile.import_precheck(profile_adapter, ctx, accounts)
         -- 配置导入时用户名为空，设备存在此用户，需要删除用户；删除用户后，需要移除待配置用户
         if instance_name == '' and profile_adapter.m_account_collection:get_account_data_by_id(instance_id) ~= nil then
             local ok, ret = pcall(function()
-                operation_logger.proxy(function(_, ctx)
-                    AccountProfile.set_user_name(profile_adapter, ctx, instance_id, '')
+                operation_logger.proxy(function(_, dbus_ctx)
+                    AccountProfile.set_user_name(profile_adapter, dbus_ctx, instance_id, '')
                 end, 'IpmiDeleteAccount')(nil, ctx)
             end)
             if not ok then
