@@ -14,7 +14,6 @@ local mdb_service = require 'mc.mdb.mdb_service'
 local orm_object_manage = require 'mc.orm.object_manage'
 local reboot = require 'mc.mdb.micro_component.reboot'
 local utils_core = require 'utils.core'
-local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 local service = require 'account.service'
 local enum = require 'class.types.types'
@@ -315,7 +314,6 @@ function app:on_reboot_prepare()
             -- 继承v2，重启时密钥更新未完成，延时10ms
             skynet.sleep(1)
         end
-        break
     end
     log:info('account has no extra preparation for reboot.')
     return 0

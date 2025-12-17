@@ -10,7 +10,6 @@
 local class = require 'mc.class'
 local singleton = require 'mc.singleton'
 local log = require 'mc.logging'
-local cls_mng = require 'mc.class_mgnt'
 local context = require 'mc.context'
 local mc_utils = require 'mc.utils'
 local utils_core = require 'utils.core'
@@ -162,13 +161,13 @@ account_service_mdb.watch_property_hook = {
         self.m_account_config:set_snmp_v3_trap_account_change_policy(ctx, value)
         self.m_account_service.m_account_collection:update_deletable()
     end, 'SNMPv3TrapAccountChangePolicy'),
-    RequireChangePasswordAction = operation_logger.proxy(function(self, ctx, value)        
+    RequireChangePasswordAction = operation_logger.proxy(function(self, ctx, value)
         self.m_account_config:set_require_change_password_action(ctx, value)
     end, 'RequireChangePasswordAction')
 }
 
-function account_service_mdb:watch_service_property(service)
-    service[INTERFACE_ACCOUNT_SERVICE].property_before_change:on(function(name, value, sender)
+function account_service_mdb:watch_service_property(account_service_obj)
+    account_service_obj[INTERFACE_ACCOUNT_SERVICE].property_before_change:on(function(name, value, sender)
         if not sender then
             log:info('change the account service property(%s) to value(%s), sender is nil', name, tostring(value))
             return true

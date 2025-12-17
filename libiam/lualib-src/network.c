@@ -147,7 +147,7 @@ gint32 is_ip_in_subnet(const gchar *ip_str, const gchar *subnet_str)
     }
 
     // 没有设置掩码时等同于掩码长为32
-    gint32 ret = sscanf_s(subnet_str, "%16[^/]/%d$", subnet_ip, INET_ADDRSTRLEN, &mask_len);
+    gint32 ret = sscanf_s(subnet_str, "%15[^/]/%d$", subnet_ip, INET_ADDRSTRLEN, &mask_len);
     if (ret <= 0) {
         debug_log(DLOG_ERROR, "%s: sscanf_s failed.", __FUNCTION__);
         return RET_ERR;
@@ -184,7 +184,7 @@ gint32 is_ipv6_in_subnet(const gchar *ip_str, const gchar *subnet_str)
     }
 
     // 没有设置掩码时等同于掩码长为128
-    gint32 ret = sscanf_s(subnet_str, "%46[^/]/%d$", subnet_ip, INET6_ADDRSTRLEN, &mask_len);
+    gint32 ret = sscanf_s(subnet_str, "%45[^/]/%d$", subnet_ip, INET6_ADDRSTRLEN, &mask_len);
     if (ret <= 0) {
         debug_log(DLOG_ERROR, "%s: sscanf_s failed.", __FUNCTION__);
         return RET_ERR;

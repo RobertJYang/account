@@ -229,7 +229,6 @@ function global_account_config:check_password_in_weak_passwd_dictionary(ctx, pas
             else
                 error(custom_msg.PasswordInWeakPWDDict("Password"))
             end
-           
         end
     end
 end
@@ -369,7 +368,7 @@ function global_account_config:get_require_change_password_action()
 end
 
 function global_account_config:set_require_change_password_action(ctx, action_value)
-    ctx.operation_log.params = { action = action_value and 'Enable' or 'Disable'}
+    ctx.operation_log.params = { action = action_value and 'Enable' or 'Disable' }
     self.m_db_account_service.RequireChangePasswordAction = action_value
     self.m_db_account_service:save()
     self.m_account_service_config_changed:emit('RequireChangePasswordAction', action_value)
@@ -402,7 +401,7 @@ function global_account_config:set_history_password_count(count)
     local max_count = self.m_db_account_service.MaxHistoryPasswordCount
     -- 历史密码数范围由最大范围控制
     if count < 0 or count > max_count then
-        log:error('Set history password count failed, count(%d) is out of range, max history password count is(%d)', 
+        log:error('Set history password count failed, count(%d) is out of range, max history password count is(%d)',
         count, max_count)
         error(custom_msg.PropertyValueOutOfRange(count, 'HistoryPasswordCount'))
     end
@@ -414,7 +413,7 @@ function global_account_config:set_max_history_password_count(count)
     local password_count = self.m_db_account_service.HistoryPasswordCount
     -- 历史密码数范围5-100
     if count < 5 or count > 100 or count < password_count then
-        log:error('Set max history password count failed, count(%d) is out of range, history password count is (%d)', 
+        log:error('Set max history password count failed, count(%d) is out of range, history password count is (%d)',
         password_count ,count)
         error(custom_msg.PropertyValueOutOfRange(count, 'MaxHistoryPasswordCount'))
     end

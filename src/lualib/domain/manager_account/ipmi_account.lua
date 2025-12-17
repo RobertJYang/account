@@ -23,27 +23,22 @@ function ipmi_account:get_password_change_required()
     return false
 end
 
+local hmm_account = {}
+hmm_account.m_account_data = {
+    UserName = config.USER_NAME_FOR_HMM,
+    Id = config.USER_NAME_FOR_HMM_ID,
+    LastLoginIP = '',
+    LastLoginTime = 0,
+    RoleId = 0,
+}
+
 -- 获取hmm内部账户
 function ipmi_account:get_hmm_user()
     -- ipmi内部账户根据场景涉及不同内部账户
     -- OS内为<host sms>账户
     -- 框内计算板(计算节点),涉及<hmm>账户
-    self.hmm_account = {
-        m_account_data = {
-            UserName = config.USER_NAME_FOR_HMM,
-            Id = config.USER_NAME_FOR_HMM_ID,
-            LastLoginIP = '',
-            LastLoginTime = 0,
-            RoleId = 0,
-        }
-    }
-    function self.hmm_account:set_role_id(role_id)
-        self.m_account_data.RoleId = role_id
-    end
-    function self.hmm_account:get_account_data()
-        return self.m_account_data
-    end
-    return self.hmm_account
+
+    return hmm_account
 end
 
 return ipmi_account

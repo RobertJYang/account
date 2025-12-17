@@ -1129,7 +1129,7 @@ LOCAL gint32 do_search_by_username(PAM_LDAP_SESSION_S *session, gint8 *username,
     if (ret != RET_OK) {
         return LDAP_AUTH_UNKNOWN;
     }
-    
+
     for (guint8 j = 0; j < MAX_USER_GROUP; j++) {
         if (session->conf->groupdn[j] == NULL) {
             continue;
@@ -1150,7 +1150,7 @@ LOCAL gint32 do_search_by_username(PAM_LDAP_SESSION_S *session, gint8 *username,
             group[j] = j;
             continue;
         }
-        
+
         ret = do_search_user_group(session, username, session->conf->groupdn[j], filter, tree_level, find_grp_hash);
         if (ret == LDAP_AUTH_SUCCESS) {
             group[j] = j;

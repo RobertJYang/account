@@ -12,7 +12,7 @@ local singleton = require 'mc.singleton'
 local cjson = require 'cjson'
 local file_utils = require 'utils.file'
 local crypt = require 'utils.crypt'
-local config = require 'common_config'
+local common_config = require 'common_config'
 local config_mgmt = require 'interface.config_mgmt.config_mgmt'
 
 local AccountProfile = require 'interface.config_mgmt.profile.account_profile'
@@ -45,7 +45,7 @@ local function get_host_user_management_enabled(self)
 end
 
 local function get_weak_pwd(self)
-    local file = file_utils.open_s(config.WEAK_PWDDICT_FILE_PATH, 'r')
+    local file = file_utils.open_s(common_config.WEAK_PWDDICT_FILE_PATH, 'r')
     local data = ""
     if file then
         data = file:read('*a')
@@ -136,14 +136,14 @@ end
 function ConfigDump:handle_config(config)
     local result = cjson.json_object_new_object()
     local v_type, value
-    for name, class in pairs(config) do
-        v_type = type(class)
+    for name, config_class in pairs(config) do
+        v_type = type(config_class)
         if v_type == "function" then
-            value = class(self)
-        elseif v_type == "table" and class.isObjectArray then
-            value = self:dump_instance(name, class.instance_ids, class.Fields)
-        elseif v_type == "table" and not class.isObjectArray then
-            value = self:handle_config(class)
+            value = config_class(self)
+        elseif v_type == "table" and config_class.isObjectArray then
+            value = self:dump_instance(name, config_class.instance_ids, config_class.Fields)
+        elseif v_type == "table" and not config_class.isObjectArray then
+            value = self:handle_config(config_class)
         else
             value = value
         end

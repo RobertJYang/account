@@ -12,19 +12,18 @@ local Singleton = require 'mc.singleton'
 local utils_core = require 'utils.core'
 local file_utils = require 'utils.file'
 local crypt = require 'utils.crypt'
-local queue = require 'skynet.queue'
+local skynet_queue = require 'skynet.queue'
 local snmp = require 'lsnmp.core'
 local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
-local err = require 'account.errors'
 local config = require 'common_config'
 local bs = require 'mc.bitstring'
 local s_pack = string.pack
 local vos = require 'utils.vos'
 
 local utils = class()
-utils.queue = queue()
+utils.queue = skynet_queue()
 
 local MIN_USER_NUM = 2
 local MAX_USER_NUM = 17
@@ -236,7 +235,7 @@ local function get_time_zone_str()
     local HOUR_SECOND = 3600
     local MINUTE_SECOND = 60
     local time_zone_second = os.difftime(os.time(), os.time(os.date('!*t', os.time())))
-    local time_zone_str = ""
+    local time_zone_str
     if time_zone_second < 0 then
         time_zone_str = string.format(
             '-%.2d:%.2d', -time_zone_second // HOUR_SECOND, -time_zone_second % HOUR_SECOND / MINUTE_SECOND)

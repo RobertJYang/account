@@ -9,7 +9,6 @@
 
 local class = require 'mc.class'
 local singleton = require 'mc.singleton'
-local log = require 'mc.logging'
 local cls_mng = require 'mc.class_mgnt'
 local c_object = require 'mc.orm.object'
 local service = require 'account.service'
@@ -45,7 +44,7 @@ end
 function ipmi_channel_config_mdb:init()
     -- 实现从IpmiChannelConfig表加载数据并上树
     local ipmi_channel_config_list = self.m_ipmi_channel_config:get_all_channel_config()
-    if not ipmi_channel_config_list or ipmi_channel_config_list == {} then
+    if not ipmi_channel_config_list or not next(ipmi_channel_config_list) then
         return
     end
     for _, ipmi_channel_config in ipairs(ipmi_channel_config_list) do
@@ -64,7 +63,7 @@ end
 
 function ipmi_channel_config_mdb:new_channel_config_to_mdb_tree(ipmi_channel_config_info)
     local account_id = ipmi_channel_config_info.AccountId
-    local channel_num = ipmi_channel_config_info.ChannelNumber 
+    local channel_num = ipmi_channel_config_info.ChannelNumber
     local channel_config = service:CreateIpmiChannelConfig(tostring(account_id), tostring(channel_num), function(obj)
         obj.PrivilegeLimit = ipmi_channel_config_info.PrivilegeLimit
         obj.IpmiMessagingEnabled = ipmi_channel_config_info.IpmiMessagingEnabled

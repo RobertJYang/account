@@ -27,7 +27,7 @@ function VncPasswordValidator:basic_validate(info)
         log:error("The password is too long")
         error(custom_msg.StringValueTooLong('Password', password_max_length))
     end
-    
+
     if not self.m_account_config:get_password_complexity_enable() then
         return
     end

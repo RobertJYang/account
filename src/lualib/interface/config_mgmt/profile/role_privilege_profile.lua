@@ -13,7 +13,6 @@ local error = require 'mc.error'
 local account_enum = require 'class.types.types'
 local custom_msg = require 'messages.custom'
 local enum = require 'class.types.types'
-local base_msg = require 'messages.base'
 local operation_logger = require 'interface.operation_logger'
 
 local RolePrivilegeProfile = {}
@@ -162,19 +161,20 @@ function RolePrivilegeProfile.import_precheck(profile_adapter, ctx, roles)
         if instance.EnabledStatus.Value == false then
             -- 删除自定义角色
             log:debug('process config delete, Role %s', instance_name)
-            operation_logger.proxy(function(obj, ctx)
+            operation_logger.proxy(function(_, ctx)
                 ctx.operation_log.params = {id = instance_name}
                 profile_adapter.m_role_collection:delete_role(ctx, role_id)
             end, 'DeleteRole')(nil, ctx)
         else
             -- 配置导入存在角色，但是环境不存在，需要新建角色
             log:debug('process config add, Role %s', instance_name)
-            if profile_adapter.m_role_collection:get_role_data_by_id(role_id) == nil then
-                operation_logger.proxy(function(obj, ctx)
-                    ctx.operation_log.params = {id = instance_name}
-                    profile_adapter.m_role_collection:new_role(ctx, role_id, {'ReadOnly', 'ConfigureSelf'}, {})
-                end, 'NewRole')(nil, ctx)
+            if profile_adapter.m_role_collection:get_role_data_by_id(role_id) ~= nil then
+                goto continue
             end
+            operation_logger.proxy(function(_, ctx)
+                ctx.operation_log.params = {id = instance_name}
+                profile_adapter.m_role_collection:new_role(ctx, role_id, {'ReadOnly', 'ConfigureSelf'}, {})
+            end, 'NewRole')(nil, ctx)
         end
         ::continue::
     end

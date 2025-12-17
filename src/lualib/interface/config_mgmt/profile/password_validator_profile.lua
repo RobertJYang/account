@@ -7,7 +7,6 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 -- Description: 配置导入导出时密码校验相关项
-local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 
 local POLICY_TO_NUM_MAP = {
@@ -25,7 +24,7 @@ local NUM_TO_POLICY_MAP = {
 local PasswordValidatorProfile = {}
 
 function PasswordValidatorProfile.set_policy(self, ctx, account_type, value)
-    value_num = POLICY_TO_NUM_MAP[value]
+    local value_num = POLICY_TO_NUM_MAP[value]
     if not value_num then
         error(base_msg.PropertyValueNotInList(value, "PasswordRulePolicy"))
     end

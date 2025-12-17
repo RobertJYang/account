@@ -17,7 +17,6 @@ local err_cfg = require 'error_config'
 local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local account_core = require 'account_core'
-local acount_error = require 'account.errors'
 
 local local_authentication = class()
 

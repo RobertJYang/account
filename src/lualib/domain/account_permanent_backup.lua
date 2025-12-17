@@ -86,12 +86,11 @@ function AccountPermanentBackup:backup_permanent_account_info()
 end
 
 function AccountPermanentBackup:recover_permanent_account_info()
-    local account_data = {}
     local account
     for id, account_info in pairs(self.m_account_backup_collection) do
         account = self.m_account_collection.collection[id]
         if account then
-            account_data = account:get_account_data()
+            local account_data = account:get_account_data()
             account_data.UserName       = account_info.UserName
             account_data.Password       = account_info.Password
             account_data.RoleId         = account_info.RoleId

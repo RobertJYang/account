@@ -83,7 +83,7 @@ function AccountService:get_id_by_user_name(ctx, user_name)
     end
     -- 上下文为：telnet的root用户、HOST、有UserMgm权限的用户，才允许获取user_name的account_id
     -- telnet协议下，操作用户为linux中内置的root用户，名字已被北向接口层包装成<su>
-    local priv_ok = false
+    local priv_ok
     if ctx.UserName == config.TELNET_USER or ctx.ClientAddr == config.HOST_CHAN_IP then
         priv_ok = true
     elseif ctx.Privilege then
@@ -431,7 +431,7 @@ function AccountService:__ipmi_set_account_password_precheck(req, ctx)
     if operation == enum.IpmiUserOperater.OPERATION_SET_PASSWD:value() then
         local user_password_size_1_5 = 16 -- IPMI1.5密码16位
         local user_password_size_2 = 20 -- IPMI2.0密码20位
-        if ((req.PasswordSize == 0) and (string.len(req.PasswordData) ~= user_password_size_1_5)) or 
+        if ((req.PasswordSize == 0) and (string.len(req.PasswordData) ~= user_password_size_1_5)) or
         ((req.PasswordSize == 1) and (string.len(req.PasswordData) ~= user_password_size_2)) then
             error(custom_msg.IPMIRequestLengthInvalid())
         end
@@ -529,7 +529,7 @@ end
 function AccountService:get_password_len(password_size, password_data)
     local user_password_size_1_5 = 16 -- IPMI1.5密码16位
     local user_password_size_2 = 20 -- IPMI2.0密码20位
-    local password_len = 0
+    local password_len
     if (password_size == 1) and ((string.len(password_data) - 2) > user_password_size_2) then
         password_len = user_password_size_2
     elseif (password_size == 0) and ((string.len(password_data) - 2) > user_password_size_1_5) then

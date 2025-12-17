@@ -104,7 +104,7 @@ function file_synchronization:set_file_owner()
 
         la:recover_file_owner(config.DATA_HOME_PATH, file_name, uid, gid)
         ::continue::
-    end  
+    end
 end
 
 function file_synchronization:add_user(account_id)
