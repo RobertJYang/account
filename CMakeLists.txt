@@ -46,4 +46,4 @@ endif()
 
 add_subdirectory("libiam/lualib-src")
 
-install(DIRECTORY libiam/lualib/. DESTINATION opt/bmc/lualib/libiam)
+install(DIRECTORY libiam/lualib/. DESTINATION opt/bmc/lualib/account)
