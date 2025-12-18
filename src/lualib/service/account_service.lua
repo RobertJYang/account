@@ -285,12 +285,12 @@ function AccountService:get_ipmi_user_access(req, ctx)
     if self.m_account_collection.ipmi_channel_mappings.multi_channel_status == 0 and
         channel_number ~= enum.IpmiChannel.LAN1_CHAN_NUM:value() then
         log:error("channel number(%s) is invalid", channel_number)
-        error(custom_msg.IPMICommandCannotExecute())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
     channel_number = self.m_account_collection.ipmi_channel_mappings:channel_number_translation(channel_number)
     if not channel_number then
         log:error("channel number(%s) is invalid", channel_number)
-        error(custom_msg.IPMICommandCannotExecute())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
     local flag = 0
     for _, chan_num in ipairs(config.DEFAULT_CHANNELS_MAP) do
@@ -301,7 +301,7 @@ function AccountService:get_ipmi_user_access(req, ctx)
     end
     if flag == 0 then
         log:error("channel number(%s) is invalid", channel_number)
-        error(custom_msg.IPMICommandCannotExecute())
+        error(custom_msg.IPMIInvalidFieldRequest())
     end
 
     self.m_account_collection:check_ipmi_host_user_mgnt_enabled(ctx)

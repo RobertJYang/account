@@ -1185,6 +1185,32 @@ function TestAccount:test_ipmi_get_invalid_channel_config_should_fail()
     lu.assertIsFalse(ret)
 end
 
+-- 设置单通道下，通道号非法
+function TestAccount:test_ipmi_get_invalid_channel_config_when_singel_channel_status()
+    local req = {}
+    local ctx = {}
+    local tmp = self.test_account_collection.ipmi_channel_mappings.multi_channel_status
+    local tmp_translation = self.test_account_collection.ipmi_channel_mappings.channel_number_translation
+    req.UserId = 4
+    req.ChannelNumber = 3
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    self.test_account_collection.ipmi_channel_mappings.multi_channel_status = 0
+    local ret = pcall(function()
+        self.test_account_service:get_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+    self.test_account_collection.ipmi_channel_mappings.multi_channel_status = 1
+    self.test_account_collection.ipmi_channel_mappings.channel_number_translation = function()
+        return nil
+    end
+    ret = pcall(function()
+        self.test_account_service:get_ipmi_user_access(req, ctx)
+    end)
+    lu.assertIsFalse(ret)
+    self.test_account_collection.ipmi_channel_mappings.multi_channel_status = tmp
+    self.test_account_collection.ipmi_channel_mappings.channel_number_translation = tmp_translation
+end
+
 -- 设置权限异常值失败测试
 function TestAccount:test_ipmi_set_user_access_when_privilege_invalid_should_fail()
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
