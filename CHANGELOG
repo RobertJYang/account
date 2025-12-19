@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.28] - 2025-12-18
+修复libuip权限不对的问题
+
 ## [1.100.27] - 2025-12-18
 修改Get User Access设置channel超出报错
 
