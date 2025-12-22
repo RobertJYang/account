@@ -162,7 +162,7 @@ function RolePrivilegeProfile.import_precheck(profile_adapter, ctx, roles)
             -- 删除自定义角色
             log:debug('process config delete, Role %s', instance_name)
             operation_logger.proxy(function(_, dbus_ctx)
-                ctx.operation_log.params = {id = instance_name}
+                dbus_ctx.operation_log.params = {id = instance_name}
                 profile_adapter.m_role_collection:delete_role(dbus_ctx, role_id)
             end, 'DeleteRole')(nil, ctx)
         else
@@ -172,7 +172,7 @@ function RolePrivilegeProfile.import_precheck(profile_adapter, ctx, roles)
                 goto continue
             end
             operation_logger.proxy(function(_, dbus_ctx)
-                ctx.operation_log.params = {id = instance_name}
+                dbus_ctx.operation_log.params = {id = instance_name}
                 profile_adapter.m_role_collection:new_role(dbus_ctx, role_id, {'ReadOnly', 'ConfigureSelf'}, {})
             end, 'NewRole')(nil, ctx)
         end
