@@ -1,4 +1,4 @@
---[[-- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+--[[-- Copyright (c) 2025 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -236,8 +236,8 @@ AccountIpmiCmds.SetVncPassword = {
     prio = types.Priority.Default,
     netfn = 0x30,
     cmd = 0x94,
-    role = types.Role.User,
-    privilege = privilege.KVMMgmt,
+    role = types.Role.Administrator,
+    privilege = privilege.UserMgmt,
     sensitive = true,
     restricted_channels = {},
     filters = [=[*,*,*,67,00,01]=],

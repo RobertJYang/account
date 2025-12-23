@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.33] - 2025-12-23
+调整修改VNC密码接口权限为用户管理
+
 ## [1.100.32] - 2025-12-23
 修复bmc重启后sso会话无权限的问题
 

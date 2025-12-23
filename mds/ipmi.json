@@ -611,8 +611,8 @@
             "netfn": "0x30",
             "cmd": "0x94",
             "priority": "Default",
-            "role": "User",
-            "privilege": ["KVMMgmt"],
+            "role": "Administrator",
+            "privilege": ["UserMgmt"],
             "sensitive": true,
             "sysLockedPolicy": "Forbidden",
             "req": [
