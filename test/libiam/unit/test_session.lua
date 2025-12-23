@@ -26,7 +26,7 @@ function TestIam:test_session_new()
         LastLoginIP = "",
         LastLoginTime = 0,
         RoleId = 4,
-        current_privileges = 0
+        current_privileges = {"ConfigureSelf"}
     }
     local session = test_target.new(account_data, iam_enum.SessionType.Redfish, 'LocaliBMC', '192.168.2.2', 4, 0)
     local time = os.time()

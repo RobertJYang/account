@@ -49,6 +49,9 @@ function account_cache:edit_account_cache(account_id, property_name, property_va
     if account_data ~= nil then
         account_data[property_name] = property_value
     end
+    if property_name == 'Privileges' then
+        account_data['current_privileges'] = property_value
+    end
 end
 
 -- 刷新用户的缓存信息
@@ -125,7 +128,7 @@ function account_cache:get_ipmi_account(user_name)
             AccountType              = "",
             LastLoginIP              = "",
             LastLoginTime            = 0,
-            current_privileges       = 0
+            current_privileges       = {}
         }
     else
         return nil
