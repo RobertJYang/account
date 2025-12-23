@@ -674,11 +674,11 @@ function SessionService:new_session_by_sso(ctx, sso_token, session_type, create_
 
     ctx.UserName = session.m_username
     ctx.operation_log.params.username = session.m_username
-    local id, account = self.m_account_cache:get_account_by_name(session.m_username)
+    local id, _ = self.m_account_cache:get_account_by_name(session.m_username)
     if not id then
         error(custom_msg.UserNotExist(session.m_username))
     end
-    local account_data = package_session_create_account_info(account, nil)
+    local account_data = package_session_create_account_info(nil, session)
     -- 远程会话和本地会话参数不同
     local new_session
     if session_type == iam_enum.SessionType.GUI then

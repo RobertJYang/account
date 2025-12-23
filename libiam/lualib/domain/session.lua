@@ -31,7 +31,11 @@ function Session:ctor(account_data, session_type, auth_type, ip, browser_type, s
     self.m_last_active_time = 0
     self.m_role_id = account_data.RoleId
     -- 缓存session对应9大权限信息
-    self.m_privilege = account_data.current_privileges or Session.get_session_privilege(self.m_role_id):to_array()
+    if account_data.current_privileges and next(account_data.current_privileges) then
+        self.m_privilege = account_data.current_privileges
+    else
+        self.m_privilege = Session.get_session_privilege(self.m_role_id):to_array()
+    end
 
     self.m_sso_token = sso_token
 end
