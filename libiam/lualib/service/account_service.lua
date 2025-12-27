@@ -140,7 +140,8 @@ function AccountService:ipmi_test_account_password(req, ctx)
 end
 
 function AccountService:clean_all_user_lock_state()
-    for _, account in pairs(self.m_account_cache.cache_collection) do
+    for id, account in pairs(self.m_account_cache.cache_collection) do
+        self.m_account_lock:clean_account_all_ipmi_test_password_failures(id)
         core.reset_pam_tally(account.UserName, user_config.PAM_TALLY_LOG_DIR)
     end
 end
@@ -148,6 +149,7 @@ end
 function AccountService:clean_unlock_user_lock_state()
     for id, account in pairs(self.m_account_cache.cache_collection) do
         if self.m_account_lock:get_account_lock_state(id) == iam_enum.UserLocked.USER_UNLOCK then
+            self.m_account_lock:clean_account_unlock_ipmi_test_password_failures(id)
             core.reset_pam_tally(account.UserName, user_config.PAM_TALLY_LOG_DIR)
         end
     end
