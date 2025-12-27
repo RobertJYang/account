@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.100.34] - 2025-12-27
+修复修改失败锁定次数后打印用户密码测试锁定日志的问题
+
 ## [1.100.33] - 2025-12-23
 调整修改VNC密码接口权限为用户管理
 
