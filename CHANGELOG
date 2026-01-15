@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.100.35] - 2026-01-15
+fix:优化锁定判断延时，解决满用户场景下锁定判断较长的问题
+
 ## [1.100.34] - 2025-12-27
 修复修改失败锁定次数后打印用户密码测试锁定日志的问题
 

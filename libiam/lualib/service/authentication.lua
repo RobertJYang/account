@@ -208,7 +208,8 @@ local NOT_TEST_ACCOUNT_ID = {
     [18] = '<vnc>',
     [20] = '<ro_community>',
     [21] = '<rw_community>',
-    [22] = '<host sms>'
+    [22] = '<host sms>',
+    [23] = '<inter chassis>'
 }
 
 function Authentication:check_ipmi_user_test_lock_states_task()
@@ -217,18 +218,19 @@ function Authentication:check_ipmi_user_test_lock_states_task()
     local status
     -- 继承v2, 加入微小延时防止CPU间歇性飚高，由于lua性能问题，延时至40ms
     for id, _ in pairs(account_collection) do
+        if NOT_TEST_ACCOUNT_ID[id] then
+            goto continue
+        end
         for i = MIN_USER_NUM, MAX_USER_NUM do
-            if NOT_TEST_ACCOUNT_ID[id] then
-                break
-            end
             if not account_collection[i] then
                 self.m_account_lock:set_ipmi_test_password_lock_status(id, i, iam_enum.UserLocked.USER_UNLOCK)
             end
             status = self.m_account_lock:check_ipmi_user_test_state(id, i)
             self.m_account_lock:set_ipmi_test_password_lock_status(id, i, status)
-            skynet.sleep(4)
+            skynet.sleep(1)
         end
         skynet.sleep(4)
+        ::continue::
     end
 end
 
