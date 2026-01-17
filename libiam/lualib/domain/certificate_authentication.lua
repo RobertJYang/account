@@ -35,8 +35,7 @@ function CertificateAuthentication:set_certificate_authentication_state(ctx, Ena
     self.m_db_config.Enabled = Enabled
     self.m_db_config:save()
     -- 更改ca证书状态
-    local ca_enabled = self.m_db_config.InterChassisAuthEnabled or self.m_db_config.Enabled
-    self:_modify_ca_privilege(ca_enabled)
+    self:_modify_ca_privilege(Enabled)
     -- 双因素使能变动，踢出所有WEB会话
     self.mutual_auth_state_changed:emit(ctx)
 end
@@ -103,9 +102,6 @@ function CertificateAuthentication:set_inter_chassis_auth_enabled(enabled)
     end
     self.m_db_config.InterChassisAuthEnabled = enabled
     self.m_db_config:save()
-    -- 更改ca证书状态
-    local ca_enabled = self.m_db_config.InterChassisAuthEnabled or self.m_db_config.Enabled
-    self:_modify_ca_privilege(ca_enabled)
 end
 
 function CertificateAuthentication:get_inter_chassis_auth_enabled()
