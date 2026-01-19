@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.3] - 2026-1-19
+修复snmp概率性认证失败的问题
+
 
 ## [1.110.2] - 2026-01-16
 feat:支持框内通信账户扩展管理

@@ -736,13 +736,24 @@ local TALLY_LOG_PATH = '/dev/shm/tallylog/'
 
 local function process_tallylog(account, uid)
     -- 支持snmp用户登录失败锁定功能
+    -- 初始化tallylog
+    local ok, file_stat = pcall(utils_core.stat, TALLY_LOG_PATH)
+    if not ok then
+        utils_core.mkdir(TALLY_LOG_PATH,  mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
+        file_proxy.proxy_chmod(TALLY_LOG_PATH, mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
+        file_proxy.proxy_chown(TALLY_LOG_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
+    elseif file_stat.st_gid ~= config.SNMPD_USER_GID or
+        file_stat.st_mode ~= mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP then
+        file_proxy.proxy_chmod(TALLY_LOG_PATH, mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
+        file_proxy.proxy_chown(TALLY_LOG_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
+    end
+
     local file_path = TALLY_LOG_PATH .. account.user_name
     if file_utils.check_realpath_before_open_s(file_path, TALLY_LOG_PATH) ~= 0 then
         return
     end
     local mode = mc_utils.S_IRUSR| mc_utils.S_IWUSR | mc_utils.S_IRGRP| mc_utils.S_IWGRP
-    local ok, file_stat = pcall(utils_core.stat, file_path)
-
+    ok, file_stat = pcall(utils_core.stat, file_path)
     if not ok then
         -- 文件不存在，创建文件
         local tmp_file_path = TALLY_LOG_PATH .. account.user_name
