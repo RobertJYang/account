@@ -198,9 +198,13 @@ function app:init()
         self:register_ipmi_methods()
     end)
 
-    skynet.fork_once(function()
+    if skynet.getenv('TEST_DATA_DIR') then
         self:skynet_service_init()
-    end)
+    else
+        skynet.fork_once(function()
+            self:skynet_service_init()
+        end)
+    end
 
     log:notice("account class init end")
     return 0

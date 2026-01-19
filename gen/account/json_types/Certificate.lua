@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -10,8 +10,22 @@
 local validate = require 'mc.validate'
 local utils = require 'mc.utils'
 local mdb = require 'mc.mdb'
+local create_enum_type = require 'mc.enum'
 
 local Certificate = {}
+
+---@class Certificate.CertificateUsageType: Enum
+local ECertificateUsageType = create_enum_type('CertificateUsageType')
+ECertificateUsageType.default = ECertificateUsageType.new(2147483647)
+ECertificateUsageType.struct = nil
+ECertificateUsageType.ManagerCACertificate = ECertificateUsageType.new(0)
+ECertificateUsageType.ManagerSSLCertificate = ECertificateUsageType.new(1)
+ECertificateUsageType.ManagerAccountCertificate = ECertificateUsageType.new(2)
+ECertificateUsageType.ManagerCMPCertificate = ECertificateUsageType.new(3)
+ECertificateUsageType.ManagerFirmwareCertificate = ECertificateUsageType.new(4)
+ECertificateUsageType.TrustedComponentCertificate = ECertificateUsageType.new(5)
+
+Certificate.CertificateUsageType = ECertificateUsageType
 
 ---@class Certificate.GetCertificateStringRsp
 ---@field CertificateString string

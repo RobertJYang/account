@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -13,6 +13,98 @@ local utils = require 'mc.utils'
 local def_types = require 'class.types.types'
 
 local MManagerAccountDB = {}
+
+---@class MManagerAccountDB.DefaultLoginInterface
+---@field DefaultLoginInterface integer
+local TDefaultLoginInterface = {}
+TDefaultLoginInterface.__index = TDefaultLoginInterface
+TDefaultLoginInterface.group = {}
+
+local function TDefaultLoginInterface_from_obj(obj)
+    return setmetatable(obj, TDefaultLoginInterface)
+end
+
+function TDefaultLoginInterface.new(DefaultLoginInterface)
+    return TDefaultLoginInterface_from_obj({DefaultLoginInterface = DefaultLoginInterface or 2147483647})
+end
+---@param obj MManagerAccountDB.DefaultLoginInterface
+function TDefaultLoginInterface:init_from_obj(obj)
+    self.DefaultLoginInterface = obj.DefaultLoginInterface or 2147483647
+end
+
+function TDefaultLoginInterface:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TDefaultLoginInterface.group)
+end
+
+TDefaultLoginInterface.from_obj = TDefaultLoginInterface_from_obj
+
+TDefaultLoginInterface.proto_property = {'DefaultLoginInterface'}
+
+TDefaultLoginInterface.default = {0}
+
+TDefaultLoginInterface.struct = {{name = 'DefaultLoginInterface', is_array = false, struct = nil}}
+
+function TDefaultLoginInterface:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'DefaultLoginInterface', self.DefaultLoginInterface, 'uint32', false, errs, need_convert)
+
+    TDefaultLoginInterface:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TDefaultLoginInterface.proto_property, errs, need_convert)
+    return self
+end
+
+function TDefaultLoginInterface:unpack(_)
+    return self.DefaultLoginInterface
+end
+
+MManagerAccountDB.DefaultLoginInterface = TDefaultLoginInterface
+
+---@class MManagerAccountDB.DefaultRoleId
+---@field DefaultRoleId integer
+local TDefaultRoleId = {}
+TDefaultRoleId.__index = TDefaultRoleId
+TDefaultRoleId.group = {}
+
+local function TDefaultRoleId_from_obj(obj)
+    return setmetatable(obj, TDefaultRoleId)
+end
+
+function TDefaultRoleId.new(DefaultRoleId)
+    return TDefaultRoleId_from_obj({DefaultRoleId = DefaultRoleId or 255})
+end
+---@param obj MManagerAccountDB.DefaultRoleId
+function TDefaultRoleId:init_from_obj(obj)
+    self.DefaultRoleId = obj.DefaultRoleId or 255
+end
+
+function TDefaultRoleId:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TDefaultRoleId.group)
+end
+
+TDefaultRoleId.from_obj = TDefaultRoleId_from_obj
+
+TDefaultRoleId.proto_property = {'DefaultRoleId'}
+
+TDefaultRoleId.default = {0}
+
+TDefaultRoleId.struct = {{name = 'DefaultRoleId', is_array = false, struct = nil}}
+
+function TDefaultRoleId:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'DefaultRoleId', self.DefaultRoleId, 'uint8', false, errs, need_convert)
+
+    TDefaultRoleId:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TDefaultRoleId.proto_property, errs, need_convert)
+    return self
+end
+
+function TDefaultRoleId:unpack(_)
+    return self.DefaultRoleId
+end
+
+MManagerAccountDB.DefaultRoleId = TDefaultRoleId
 
 ---@class MManagerAccountDB.IsOnline
 ---@field IsOnline boolean

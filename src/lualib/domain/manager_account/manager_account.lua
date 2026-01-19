@@ -32,7 +32,7 @@ local SaltCharset = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstu
 local DAY_SECOND_COUNT = 24 * 60 * 60
 
 local ManagerAccount = class()
-function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_config)
+function ManagerAccount:ctor(db, account, account_policy, password_validator, ipmi_channel_config)
     self.kmc_client = kmc_client.get_instance()
     local account_svc_cfg = global_account_cfg.get_instance()
     local rc = login_rule_collection.get_instance()
@@ -44,6 +44,7 @@ function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_confi
         ipmi_test_passwd_lock[i].last_fail_time = 0
         ipmi_test_passwd_lock[i].test_fail_cnt = 0
     end
+    self.m_db = db
     self.m_account_data = account
     self.m_user_status = enum.UserLocked.USER_UNLOCK
     self.m_ipmi_test_passwd_lock = ipmi_test_passwd_lock
@@ -55,6 +56,7 @@ function ManagerAccount:ctor(db, account, password_validator, ipmi_channel_confi
     self.m_snmp_update_signal = signal.new()
     self.current_privileges = nil
     self.login_record_flush_flag = false
+    self.account_policy_obj = account_policy
     self.password_validator_obj = password_validator
     self.m_ipmi_channel_config = ipmi_channel_config
 end

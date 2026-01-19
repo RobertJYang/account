@@ -70,7 +70,8 @@ function file_synchronization:get_account_file_line(account_id, is_change_user, 
         id = account_id,
         role = account:get_role_id(),
         is_local_user = account:get_account_type():value() == enum.AccountType.Local:value() or
-            account:get_account_type():value() == enum.AccountType.OEM:value(),
+            account:get_account_type():value() == enum.AccountType.OEM:value() or
+            account:get_account_type():value() == enum.AccountType.InterChassis:value(),
         user_enabled = account:get_enabled() and 1 or 0,
         privilege_num = role_privilege_map.role_to_privilege_map[account:get_role_id()],
         is_locked = account:get_locked() and 1 or 0,
@@ -183,7 +184,7 @@ function file_synchronization:flush_account()
     local account_type, cur_account
     for _, account in pairs(self.m_account_collection.collection) do
         account_type = account.m_account_data.AccountType:value()
-        if not self.m_account_collection.operation_type_check.LOCAL_AND_OEM[account_type] then
+        if not self.m_account_collection.operation_type_check.LOCAL_OEM_INTERCHASSIS[account_type] then
             goto continue
         end
         cur_account = self:get_account_file_line(account.m_account_data.Id, false)

@@ -209,7 +209,7 @@ local NOT_TEST_ACCOUNT_ID = {
     [20] = '<ro_community>',
     [21] = '<rw_community>',
     [22] = '<host sms>',
-    [23] = '<inter chassis>'
+    [23] = 'inter_chassis'
 }
 
 function Authentication:check_ipmi_user_test_lock_states_task()

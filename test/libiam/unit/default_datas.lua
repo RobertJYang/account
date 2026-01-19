@@ -94,6 +94,20 @@ M.t_manager_account = {
         LoginInterface = 128,
         LoginRuleIds = 0,
         IpmiPasswordBak = ''
+    }, {
+        Id = 23,
+        RoleId = 4,
+        UserName = [=[inter_chassis]=],
+        Password = [=[]=],
+        IpmiPassword = [=[]=],
+        FirstLoginPolicy = [=[PromptPasswordReset]=],
+        AccountType = 9,
+        Enabled = true,
+        LoginInterface = 153,
+        LoginRuleIds = 0,
+        Deletable = false,
+        DefaultRoleId = 4,
+        DefaultLoginInterface = 153
     }
 }
 M.t_snmp_user_info = {

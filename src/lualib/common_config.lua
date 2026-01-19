@@ -121,6 +121,7 @@ local LINUX_USER_ID_MAX = 520 -- Linux用户ID最大值
 local RMCP_SESSION_MAX_NUM = 5
 local IPMI_ACCOUNT_ID = 19
 local VNC_ACCOUNT_ID = 18 -- id18对应用户用于vnc管理
+local INTER_CHASSIS_ACCOUNT_ID = 23 -- id23用户用户框内通信
 local LDAP_USER_UID = LDAP_USER_GID
 local MAX_USER_NAME_LEN = 16
 local MIN_PASSWORD_DEFAULT_LEN = 1 -- 密码默认最小长度
@@ -215,6 +216,9 @@ return {
 
   -- VNC账号id
   VNC_ACCOUNT_ID = VNC_ACCOUNT_ID,
+
+  -- 框内通信账户id
+  INTER_CHASSIS_ACCOUNT_ID = INTER_CHASSIS_ACCOUNT_ID,
 
   -- IPMI相关长度
   MAX_IPMI_DATA_LEN = MAX_IPMI_DATA_LEN,

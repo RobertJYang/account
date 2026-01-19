@@ -842,6 +842,24 @@
                 "usage": [
                     "TemporaryPer"
                 ]
+            },
+            "DefaultRoleId": {
+                "baseType": "U8",
+                "description": "",
+                "default": 255,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "DefaultLoginInterface": {
+                "baseType": "U32",
+                "description": "",
+                "default": 2147483647,
+                "critical": true,
+                "usage": [
+                    "PoweroffPer"
+                ]
             }
         }
     },

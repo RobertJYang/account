@@ -68,6 +68,10 @@ function account_mdb:ctor(account_service, role_collection, task_manager, file_t
         config.SHM_TMP_PATH .. '/.{1,251})$'
 end
 
+function account_mdb:init()
+    self:new_accounts_to_mdb_tree()
+end
+
 function account_mdb:regist_account_signals()
     self.m_new_unregist_handle = self.m_account_collection.m_account_added:on(function(...)
         self:new_account_to_mdb_tree(...)
@@ -88,6 +92,10 @@ function account_mdb:regist_account_signals()
     self.m_role_collection.m_role_removed:on(function(...)
         self.m_account_collection:update_role_after_removed(...)
     end)
+end
+
+function account_mdb:new_accounts_to_mdb_tree()
+    service:CreateManagerAccounts(function() end)
 end
 
 -- 属性监听钩子
@@ -132,6 +140,17 @@ account_mdb.watch_property_hook = {
     end, 'IsOnline')
 }
 
+local inter_chassis_excluded_prop = {
+    ['LoginInterface'] = true,
+    ['LoginRuleIds'] = false,
+    ['RoleId'] = true,
+    ['UserName'] = false,
+    ['Enabled'] = false,
+    ['PasswordChangeRequired'] = false,
+    ['FirstLoginPolicy'] = false,
+    ['IsOnline'] = true,
+}
+
 function account_mdb:watch_account_property(account)
     -- 防止安全风险，此处不记录字段值
     account[INTERFACE_MANAGER_ACCOUNT].property_before_change:on(function(name, value, sender)
@@ -144,6 +163,13 @@ function account_mdb:watch_account_property(account)
             log:error('change the property(%s), invalid', name)
             error(base_msg.InternalError())
         end
+
+        -- 框内通信账户当前拦截其余属性，仅登录接口和权限可设置
+        if account.Id == config.INTER_CHASSIS_ACCOUNT_ID and not inter_chassis_excluded_prop[name] then
+            log:error("inter chassis account cannot change the property(%s)", name)
+            error(base_msg.ActionNotSupported(string.format("change property %s for inter chassis account", name)))
+        end
+
         log:info('change the property(%s)', name)
         local ctx = context.get_context() or context.new('WEB', 'NA', 'NA')
         self.watch_property_hook[name](self, ctx, account.Id, value)
@@ -250,6 +276,9 @@ local function _privilege_check(ctx, account_id, collection)
 end
 
 function account_mdb:change_password(ctx, account_id, password)
+    if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        error(base_msg.ActionNotSupported(string.format("change password for inter chassis account")))
+    end
     local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
     if not privilege_ok then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
@@ -261,6 +290,9 @@ function account_mdb:change_password(ctx, account_id, password)
 end
 
 function account_mdb:change_snmp_password(ctx, account_id, password)
+    if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        error(base_msg.ActionNotSupported(string.format("change snmp password for inter chassis account")))
+    end
     if not _privilege_check(ctx, account_id, self.m_account_collection) then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
         ctx.operation_log.params.operation = 'change snmp password'
@@ -406,6 +438,9 @@ function account_mdb:delete_ssh_public_key(ctx, account_id)
 end
 
 function account_mdb:set_authentication_protocol(ctx, account_id, protocol, auth_password, encry_password)
+    if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        error(base_msg.ActionNotSupported(string.format("set snmp authentication protocol for inter chassis account")))
+    end
     local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
     if not privilege_ok then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
@@ -420,6 +455,9 @@ function account_mdb:set_authentication_protocol(ctx, account_id, protocol, auth
 end
 
 function account_mdb:set_encryption_protocol(ctx, account_id, protocol)
+    if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        error(base_msg.ActionNotSupported(string.format("set snmp encryption protocol for inter chassis account")))
+    end
     if not _privilege_check(ctx, account_id, self.m_account_collection) then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
         ctx.operation_log.params.operation = 'set encryption protocol'

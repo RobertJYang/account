@@ -82,14 +82,17 @@ M.t_manager_account = {
     }, {
         Id = 23,
         RoleId = 4,
-        UserName = [=[<inter chassis>]=],
+        UserName = [=[inter_chassis]=],
         Password = [=[]=],
         IpmiPassword = [=[]=],
         FirstLoginPolicy = [=[PromptPasswordReset]=],
         AccountType = 9,
-        LoginInterface = 128,
+        Enabled = true,
+        LoginInterface = 153,
         LoginRuleIds = 0,
-        Deletable = false
+        Deletable = false,
+        DefaultRoleId = 4,
+        DefaultLoginInterface = 153
     }
 }
 M.t_snmp_user_info = {
@@ -150,7 +153,8 @@ M.t_password_policy = {
 }
 M.t_account_policy = {
     {AccountType = 0, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = true, Deletable = true, OnlineDeletable = true},
-    {AccountType = 8, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = false, Deletable = false, OnlineDeletable = true}
+    {AccountType = 8, NamePattern = [=[]=], AllowedLoginInterfaces = 223, Visible = false, Deletable = false, OnlineDeletable = true},
+    {AccountType = 9, NamePattern = [=[]=], AllowedLoginInterfaces = 153, Visible = true, Deletable = false, OnlineDeletable = true}
 }
 
 return M

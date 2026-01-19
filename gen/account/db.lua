@@ -1,4 +1,4 @@
--- Copyright (c) 2025 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -84,6 +84,8 @@ local def_types = require 'class.types.types'
 ---@field EncryptionProtocolWritable FieldBase
 ---@field SNMPPasswordWritable FieldBase
 ---@field IsOnline FieldBase
+---@field DefaultRoleId FieldBase
+---@field DefaultLoginInterface FieldBase
 
 ---@class ManagerAccountBackupTable: Table
 ---@field Id FieldBase
@@ -327,7 +329,11 @@ function AccountDBDatabase.new(path, datas)
             true):critical(),
         SNMPPasswordWritable = Col.BooleandField():cid(35):persistence_key('protect_power_off'):null():default(true)
             :critical(),
-        IsOnline = Col.BooleandField():cid(36):persistence_key('protect_temporary'):null():default(false)
+        IsOnline = Col.BooleandField():cid(36):persistence_key('protect_temporary'):null():default(false),
+        DefaultRoleId = Col.IntegerField():cid(37):persistence_key('protect_power_off'):null():max_length(8)
+            :default(255):critical(),
+        DefaultLoginInterface = Col.IntegerField():cid(38):persistence_key('protect_power_off'):null():max_length(32)
+            :default(2147483647):critical()
     }):create_if_not_exist(datas and datas['t_manager_account'])
     obj.ManagerAccountBackup = db:Table('t_manager_account_backup', {
         Id = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),

@@ -143,14 +143,17 @@ t_manager_account:
     Deletable: false
   - Id: 23
     RoleId: 4
-    UserName: <inter chassis>
+    UserName: inter_chassis
     Password: ''
     IpmiPassword: ''
     FirstLoginPolicy: PromptPasswordReset
     AccountType: 9
-    LoginInterface: 128
+    Enabled: true
+    LoginInterface: 153
     LoginRuleIds: 0
     Deletable: false
+    DefaultRoleId: 4
+    DefaultLoginInterface: 153
 
 t_snmp_user_info:
   - AccountId: 2
@@ -198,6 +201,12 @@ t_account_policy:
   NamePattern: ''
   AllowedLoginInterfaces: 223
   Visible: false
+  Deletable: false
+  OnlineDeletable: true
+- AccountType: 9
+  NamePattern: ''
+  AllowedLoginInterfaces: 153
+  Visible: true
   Deletable: false
   OnlineDeletable: true
 
