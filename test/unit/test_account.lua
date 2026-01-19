@@ -257,5 +257,6 @@ require 'test_account_policy'
 require 'test_ipmi_channel_mappings'
 -- OEM测试文件，裁剪时请注意
 require 'test_oem_account'
+require 'test_inter_chassis_account'
 
 lu.LuaUnit.run()

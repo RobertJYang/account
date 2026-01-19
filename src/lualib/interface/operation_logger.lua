@@ -33,6 +33,7 @@ local operation_log_map = {
     DeleteAccount = {
         success = 'Delete user({name}|user{id}) successfully',
         fail = 'Delete user({name}|user{id}) failed',
+        recover = 'Recover InterChassis account to default successfully',
         ['kepler.account.InvalidAccountId'] = 'Delete user(user{id}) failed, account id is invalid'
     },
     ChangeAccountPwd = {

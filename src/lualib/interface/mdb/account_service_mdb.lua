@@ -48,6 +48,11 @@ function account_service_mdb:regist_account_signals()
 end
 
 function account_service_mdb:init()
+    self:init_account_service()
+    self:init_authentication()
+end
+
+function account_service_mdb:init_account_service()
     local config_mdb = {}
     local global_config = self.m_account_config
     config_mdb.MaxPasswordLength = global_config.m_db_account_service.MaxPasswordLength
@@ -75,6 +80,10 @@ function account_service_mdb:init()
     config_mdb.UserNamePasswordPrefixCompareLength =
         global_config.m_db_account_service.UserNamePasswordPrefixCompareLength
     self:new_config_to_mdb_tree(config_mdb)
+end
+
+function account_service_mdb:init_authentication()
+    service:CreateLocalAccountAuthN(function() end)
 end
 
 -- 属性监听钩子

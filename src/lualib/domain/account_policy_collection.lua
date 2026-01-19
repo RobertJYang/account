@@ -14,6 +14,7 @@ local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
 local local_account_policy = require 'domain.account_policies.local_account_policy'
 local oem_account_policy = require 'domain.account_policies.oem_account_policy'
+local inter_chassis_account_policy = require 'domain.account_policies.inter_chassis_account_policy'
 local core = require 'account_core'
 local utils = require 'infrastructure.utils'
 
@@ -27,6 +28,10 @@ local account_type_map = {
     [enum.AccountType.OEM:value()] = {
         name = 'OEMAccount',
         obj  = oem_account_policy
+    },
+    [enum.AccountType.InterChassis:value()] = {
+        name = 'InterChassis',
+        obj  = inter_chassis_account_policy
     }
 }
 
@@ -46,6 +51,10 @@ function AccountPolicyCollection:ctor(db, global_account_config)
     end, {})
     self.collection = policy_collection
     self.m_config_changed = signal.new()
+end
+
+function AccountPolicyCollection:get_policy(account_type)
+    return self.collection[account_type]
 end
 
 function AccountPolicyCollection:get_allowed_login_interfaces(account_type)

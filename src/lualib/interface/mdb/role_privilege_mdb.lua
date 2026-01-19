@@ -53,9 +53,10 @@ end
 
 function role_privilege_mdb:new_roles_to_mdb_tree()
     local ex_role_enabled = self.m_role_collection:get_extended_custom_role_enabled()
-    local cls_config = cls_mng('Roles'):get("/bmc/kepler/AccountService/Roles")
-    cls_config[INTERFACE_ROLES].ExtendedCustomRoleEnabled = ex_role_enabled
-    self:watch_roles_property(cls_config)
+    local config = service:CreateRoles(function(config)
+        config.ExtendedCustomRoleEnabled = ex_role_enabled
+        self:watch_roles_property(config)
+    end)
 end
 
 function role_privilege_mdb:new_role_to_mdb_tree(role_data)

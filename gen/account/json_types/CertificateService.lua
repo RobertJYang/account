@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -195,281 +195,98 @@ end
 
 CertificateService.CSRProperty = TCSRProperty
 
----@class CertificateService.SSLCertAlgorithm
----@field SSLCertAlgorithm integer
-local TSSLCertAlgorithm = {}
-TSSLCertAlgorithm.__index = TSSLCertAlgorithm
-TSSLCertAlgorithm.group = {}
+---@class CertificateService.BackupCertificateRsp
+local TBackupCertificateRsp = {}
+TBackupCertificateRsp.__index = TBackupCertificateRsp
+TBackupCertificateRsp.group = {}
 
-local function TSSLCertAlgorithm_from_obj(obj)
-    return setmetatable(obj, TSSLCertAlgorithm)
+local function TBackupCertificateRsp_from_obj(obj)
+    return setmetatable(obj, TBackupCertificateRsp)
 end
 
-function TSSLCertAlgorithm.new(SSLCertAlgorithm)
-    return TSSLCertAlgorithm_from_obj({SSLCertAlgorithm = SSLCertAlgorithm or 0})
+function TBackupCertificateRsp.new()
+    return TBackupCertificateRsp_from_obj({})
 end
----@param obj CertificateService.SSLCertAlgorithm
-function TSSLCertAlgorithm:init_from_obj(obj)
-    self.SSLCertAlgorithm = obj.SSLCertAlgorithm or 0
-end
+---@param obj CertificateService.BackupCertificateRsp
+function TBackupCertificateRsp:init_from_obj(obj)
 
-function TSSLCertAlgorithm:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TSSLCertAlgorithm.group)
 end
 
-TSSLCertAlgorithm.from_obj = TSSLCertAlgorithm_from_obj
+function TBackupCertificateRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TBackupCertificateRsp.group)
+end
 
-TSSLCertAlgorithm.proto_property = {'SSLCertAlgorithm'}
+TBackupCertificateRsp.from_obj = TBackupCertificateRsp_from_obj
 
-TSSLCertAlgorithm.default = {0}
+TBackupCertificateRsp.proto_property = {}
 
-TSSLCertAlgorithm.struct = {{name = 'SSLCertAlgorithm', is_array = false, struct = nil}}
+TBackupCertificateRsp.default = {}
 
-function TSSLCertAlgorithm:validate(prefix, errs, need_convert)
+TBackupCertificateRsp.struct = {}
+
+function TBackupCertificateRsp:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'SSLCertAlgorithm', self.SSLCertAlgorithm, 'uint8', false, errs, need_convert)
-
-    TSSLCertAlgorithm:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TSSLCertAlgorithm.proto_property, errs, need_convert)
+    TBackupCertificateRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TBackupCertificateRsp.proto_property, errs, need_convert)
     return self
 end
 
-function TSSLCertAlgorithm:unpack(_)
-    return self.SSLCertAlgorithm
+function TBackupCertificateRsp:unpack(_)
 end
 
-CertificateService.SSLCertAlgorithm = TSSLCertAlgorithm
+CertificateService.BackupCertificateRsp = TBackupCertificateRsp
 
----@class CertificateService.IsDefaultSSLCert
----@field IsDefaultSSLCert boolean
-local TIsDefaultSSLCert = {}
-TIsDefaultSSLCert.__index = TIsDefaultSSLCert
-TIsDefaultSSLCert.group = {}
+---@class CertificateService.BackupCertificateReq
+---@field Usage string
+---@field Certificates string[]
+local TBackupCertificateReq = {}
+TBackupCertificateReq.__index = TBackupCertificateReq
+TBackupCertificateReq.group = {}
 
-local function TIsDefaultSSLCert_from_obj(obj)
-    return setmetatable(obj, TIsDefaultSSLCert)
+local function TBackupCertificateReq_from_obj(obj)
+    return setmetatable(obj, TBackupCertificateReq)
 end
 
-function TIsDefaultSSLCert.new(IsDefaultSSLCert)
-    return TIsDefaultSSLCert_from_obj({IsDefaultSSLCert = IsDefaultSSLCert or false})
+function TBackupCertificateReq.new(Usage, Certificates)
+    return TBackupCertificateReq_from_obj({Usage = Usage, Certificates = Certificates})
 end
----@param obj CertificateService.IsDefaultSSLCert
-function TIsDefaultSSLCert:init_from_obj(obj)
-    self.IsDefaultSSLCert = obj.IsDefaultSSLCert or false
-end
-
-function TIsDefaultSSLCert:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TIsDefaultSSLCert.group)
+---@param obj CertificateService.BackupCertificateReq
+function TBackupCertificateReq:init_from_obj(obj)
+    self.Usage = obj.Usage
+    self.Certificates = obj.Certificates
 end
 
-TIsDefaultSSLCert.from_obj = TIsDefaultSSLCert_from_obj
+function TBackupCertificateReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TBackupCertificateReq.group)
+end
 
-TIsDefaultSSLCert.proto_property = {'IsDefaultSSLCert'}
+TBackupCertificateReq.from_obj = TBackupCertificateReq_from_obj
 
-TIsDefaultSSLCert.default = {false}
+TBackupCertificateReq.proto_property = {'Usage', 'Certificates'}
 
-TIsDefaultSSLCert.struct = {{name = 'IsDefaultSSLCert', is_array = false, struct = nil}}
+TBackupCertificateReq.default = {'', {}}
 
-function TIsDefaultSSLCert:validate(prefix, errs, need_convert)
+TBackupCertificateReq.struct = {
+    {name = 'Usage', is_array = false, struct = nil}, {name = 'Certificates', is_array = true, struct = nil}
+}
+
+function TBackupCertificateReq:validate(prefix, errs, need_convert)
     prefix = prefix or ''
 
-    validate.Optional(prefix .. 'IsDefaultSSLCert', self.IsDefaultSSLCert, 'bool', true, errs, need_convert)
+    validate.Optional(prefix .. 'Usage', self.Usage, 'string', false, errs, need_convert)
+    validate.OptionalArray(prefix .. 'Certificates', self.Certificates, 'string', false, errs, need_convert)
 
-    TIsDefaultSSLCert:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TIsDefaultSSLCert.proto_property, errs, need_convert)
+    TBackupCertificateReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TBackupCertificateReq.proto_property, errs, need_convert)
     return self
 end
 
-function TIsDefaultSSLCert:unpack(_)
-    return self.IsDefaultSSLCert
+function TBackupCertificateReq:unpack(_)
+    return self.Usage, self.Certificates
 end
 
-CertificateService.IsDefaultSSLCert = TIsDefaultSSLCert
-
----@class CertificateService.CRLEnabled
----@field CRLEnabled boolean
-local TCRLEnabled = {}
-TCRLEnabled.__index = TCRLEnabled
-TCRLEnabled.group = {}
-
-local function TCRLEnabled_from_obj(obj)
-    return setmetatable(obj, TCRLEnabled)
-end
-
-function TCRLEnabled.new(CRLEnabled)
-    return TCRLEnabled_from_obj({CRLEnabled = CRLEnabled == nil and true or CRLEnabled})
-end
----@param obj CertificateService.CRLEnabled
-function TCRLEnabled:init_from_obj(obj)
-    self.CRLEnabled = obj.CRLEnabled == nil and true or obj.CRLEnabled
-end
-
-function TCRLEnabled:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TCRLEnabled.group)
-end
-
-TCRLEnabled.from_obj = TCRLEnabled_from_obj
-
-TCRLEnabled.proto_property = {'CRLEnabled'}
-
-TCRLEnabled.default = {false}
-
-TCRLEnabled.struct = {{name = 'CRLEnabled', is_array = false, struct = nil}}
-
-function TCRLEnabled:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'CRLEnabled', self.CRLEnabled, 'bool', false, errs, need_convert)
-
-    TCRLEnabled:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TCRLEnabled.proto_property, errs, need_convert)
-    return self
-end
-
-function TCRLEnabled:unpack(_)
-    return self.CRLEnabled
-end
-
-CertificateService.CRLEnabled = TCRLEnabled
-
----@class CertificateService.CRLOverdueWarnDays
----@field CRLOverdueWarnDays integer
-local TCRLOverdueWarnDays = {}
-TCRLOverdueWarnDays.__index = TCRLOverdueWarnDays
-TCRLOverdueWarnDays.group = {}
-
-local function TCRLOverdueWarnDays_from_obj(obj)
-    return setmetatable(obj, TCRLOverdueWarnDays)
-end
-
-function TCRLOverdueWarnDays.new(CRLOverdueWarnDays)
-    return TCRLOverdueWarnDays_from_obj({CRLOverdueWarnDays = CRLOverdueWarnDays or 90})
-end
----@param obj CertificateService.CRLOverdueWarnDays
-function TCRLOverdueWarnDays:init_from_obj(obj)
-    self.CRLOverdueWarnDays = obj.CRLOverdueWarnDays or 90
-end
-
-function TCRLOverdueWarnDays:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TCRLOverdueWarnDays.group)
-end
-
-TCRLOverdueWarnDays.from_obj = TCRLOverdueWarnDays_from_obj
-
-TCRLOverdueWarnDays.proto_property = {'CRLOverdueWarnDays'}
-
-TCRLOverdueWarnDays.default = {0}
-
-TCRLOverdueWarnDays.struct = {{name = 'CRLOverdueWarnDays', is_array = false, struct = nil}}
-
-function TCRLOverdueWarnDays:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'CRLOverdueWarnDays', self.CRLOverdueWarnDays, 'uint32', false, errs, need_convert)
-
-    TCRLOverdueWarnDays:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TCRLOverdueWarnDays.proto_property, errs, need_convert)
-    return self
-end
-
-function TCRLOverdueWarnDays:unpack(_)
-    return self.CRLOverdueWarnDays
-end
-
-CertificateService.CRLOverdueWarnDays = TCRLOverdueWarnDays
-
----@class CertificateService.CRLOverdueWarnMode
----@field CRLOverdueWarnMode string
-local TCRLOverdueWarnMode = {}
-TCRLOverdueWarnMode.__index = TCRLOverdueWarnMode
-TCRLOverdueWarnMode.group = {}
-
-local function TCRLOverdueWarnMode_from_obj(obj)
-    return setmetatable(obj, TCRLOverdueWarnMode)
-end
-
-function TCRLOverdueWarnMode.new(CRLOverdueWarnMode)
-    return TCRLOverdueWarnMode_from_obj({CRLOverdueWarnMode = CRLOverdueWarnMode or [=[Customized]=]})
-end
----@param obj CertificateService.CRLOverdueWarnMode
-function TCRLOverdueWarnMode:init_from_obj(obj)
-    self.CRLOverdueWarnMode = obj.CRLOverdueWarnMode or [=[Customized]=]
-end
-
-function TCRLOverdueWarnMode:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TCRLOverdueWarnMode.group)
-end
-
-TCRLOverdueWarnMode.from_obj = TCRLOverdueWarnMode_from_obj
-
-TCRLOverdueWarnMode.proto_property = {'CRLOverdueWarnMode'}
-
-TCRLOverdueWarnMode.default = {''}
-
-TCRLOverdueWarnMode.struct = {{name = 'CRLOverdueWarnMode', is_array = false, struct = nil}}
-
-function TCRLOverdueWarnMode:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'CRLOverdueWarnMode', self.CRLOverdueWarnMode, 'string', false, errs, need_convert)
-
-    TCRLOverdueWarnMode:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TCRLOverdueWarnMode.proto_property, errs, need_convert)
-    return self
-end
-
-function TCRLOverdueWarnMode:unpack(_)
-    return self.CRLOverdueWarnMode
-end
-
-CertificateService.CRLOverdueWarnMode = TCRLOverdueWarnMode
-
----@class CertificateService.CertOverdueWarnDays
----@field CertOverdueWarnDays integer
-local TCertOverdueWarnDays = {}
-TCertOverdueWarnDays.__index = TCertOverdueWarnDays
-TCertOverdueWarnDays.group = {}
-
-local function TCertOverdueWarnDays_from_obj(obj)
-    return setmetatable(obj, TCertOverdueWarnDays)
-end
-
-function TCertOverdueWarnDays.new(CertOverdueWarnDays)
-    return TCertOverdueWarnDays_from_obj({CertOverdueWarnDays = CertOverdueWarnDays or 90})
-end
----@param obj CertificateService.CertOverdueWarnDays
-function TCertOverdueWarnDays:init_from_obj(obj)
-    self.CertOverdueWarnDays = obj.CertOverdueWarnDays or 90
-end
-
-function TCertOverdueWarnDays:remove_error_props(errs, obj)
-    utils.remove_obj_error_property(obj, errs, TCertOverdueWarnDays.group)
-end
-
-TCertOverdueWarnDays.from_obj = TCertOverdueWarnDays_from_obj
-
-TCertOverdueWarnDays.proto_property = {'CertOverdueWarnDays'}
-
-TCertOverdueWarnDays.default = {0}
-
-TCertOverdueWarnDays.struct = {{name = 'CertOverdueWarnDays', is_array = false, struct = nil}}
-
-function TCertOverdueWarnDays:validate(prefix, errs, need_convert)
-    prefix = prefix or ''
-
-    validate.Optional(prefix .. 'CertOverdueWarnDays', self.CertOverdueWarnDays, 'uint32', false, errs, need_convert)
-
-    TCertOverdueWarnDays:remove_error_props(errs, self)
-    validate.CheckUnknowProperty(self, TCertOverdueWarnDays.proto_property, errs, need_convert)
-    return self
-end
-
-function TCertOverdueWarnDays:unpack(_)
-    return self.CertOverdueWarnDays
-end
-
-CertificateService.CertOverdueWarnDays = TCertOverdueWarnDays
+CertificateService.BackupCertificateReq = TBackupCertificateReq
 
 ---@class CertificateService.SetCSRPropertyRsp
 local TSetCSRPropertyRsp = {}
@@ -2203,7 +2020,8 @@ CertificateService.interface = mdb.register_interface('bmc.kepler.CertificateSer
     ImportCRL = {'a{ss}ssu', 'u', TImportCRLReq, TImportCRLRsp},
     GetCSRContent = {'a{ss}', 'is', TGetCSRContentReq, TGetCSRContentRsp},
     GetCSRProperty = {'a{ss}s', 's', TGetCSRPropertyReq, TGetCSRPropertyRsp},
-    SetCSRProperty = {'a{ss}a{ss}', '', TSetCSRPropertyReq, TSetCSRPropertyRsp}
+    SetCSRProperty = {'a{ss}a{ss}', '', TSetCSRPropertyReq, TSetCSRPropertyRsp},
+    BackupCertificate = {'a{ss}sas', '', TBackupCertificateReq, TBackupCertificateRsp}
 }, {})
 
 return CertificateService

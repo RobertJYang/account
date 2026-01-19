@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -101,6 +101,94 @@ function TPort:unpack(_)
 end
 
 EthernetInterfaces.Port = TPort
+
+---@class EthernetInterfaces.SetChassisLanSubNetRsp
+local TSetChassisLanSubNetRsp = {}
+TSetChassisLanSubNetRsp.__index = TSetChassisLanSubNetRsp
+TSetChassisLanSubNetRsp.group = {}
+
+local function TSetChassisLanSubNetRsp_from_obj(obj)
+    return setmetatable(obj, TSetChassisLanSubNetRsp)
+end
+
+function TSetChassisLanSubNetRsp.new()
+    return TSetChassisLanSubNetRsp_from_obj({})
+end
+---@param obj EthernetInterfaces.SetChassisLanSubNetRsp
+function TSetChassisLanSubNetRsp:init_from_obj(obj)
+
+end
+
+function TSetChassisLanSubNetRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TSetChassisLanSubNetRsp.group)
+end
+
+TSetChassisLanSubNetRsp.from_obj = TSetChassisLanSubNetRsp_from_obj
+
+TSetChassisLanSubNetRsp.proto_property = {}
+
+TSetChassisLanSubNetRsp.default = {}
+
+TSetChassisLanSubNetRsp.struct = {}
+
+function TSetChassisLanSubNetRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    TSetChassisLanSubNetRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TSetChassisLanSubNetRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TSetChassisLanSubNetRsp:unpack(_)
+end
+
+EthernetInterfaces.SetChassisLanSubNetRsp = TSetChassisLanSubNetRsp
+
+---@class EthernetInterfaces.SetChassisLanSubNetReq
+---@field ChassisLanSubNet string
+local TSetChassisLanSubNetReq = {}
+TSetChassisLanSubNetReq.__index = TSetChassisLanSubNetReq
+TSetChassisLanSubNetReq.group = {}
+
+local function TSetChassisLanSubNetReq_from_obj(obj)
+    return setmetatable(obj, TSetChassisLanSubNetReq)
+end
+
+function TSetChassisLanSubNetReq.new(ChassisLanSubNet)
+    return TSetChassisLanSubNetReq_from_obj({ChassisLanSubNet = ChassisLanSubNet})
+end
+---@param obj EthernetInterfaces.SetChassisLanSubNetReq
+function TSetChassisLanSubNetReq:init_from_obj(obj)
+    self.ChassisLanSubNet = obj.ChassisLanSubNet
+end
+
+function TSetChassisLanSubNetReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TSetChassisLanSubNetReq.group)
+end
+
+TSetChassisLanSubNetReq.from_obj = TSetChassisLanSubNetReq_from_obj
+
+TSetChassisLanSubNetReq.proto_property = {'ChassisLanSubNet'}
+
+TSetChassisLanSubNetReq.default = {''}
+
+TSetChassisLanSubNetReq.struct = {{name = 'ChassisLanSubNet', is_array = false, struct = nil}}
+
+function TSetChassisLanSubNetReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'ChassisLanSubNet', self.ChassisLanSubNet, 'string', false, errs, need_convert)
+
+    TSetChassisLanSubNetReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TSetChassisLanSubNetReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TSetChassisLanSubNetReq:unpack(_)
+    return self.ChassisLanSubNet
+end
+
+EthernetInterfaces.SetChassisLanSubNetReq = TSetChassisLanSubNetReq
 
 ---@class EthernetInterfaces.NetworkFailoverRsp
 ---@field Result boolean
@@ -996,6 +1084,8 @@ EthernetInterfaces.interface = mdb.register_interface('bmc.kepler.Managers.Ether
     IpVersion = {'s', nil, false, nil},
     NcsiEnable = {'b', {['emitsChangedSignal'] = 'false'}, true, nil},
     PortId = {'y', {['emitsChangedSignal'] = 'false'}, true, nil},
+    Status = {'b', {['emitsChangedSignal'] = 'true'}, true, nil},
+    Channel = {'y', {['emitsChangedSignal'] = 'false'}, false, nil},
     VLANEnable = {'b', nil, true, nil},
     VLANId = {'q', nil, true, nil},
     MinVLANId = {'q', {['emitsChangedSignal'] = 'false'}, true, nil},
@@ -1007,7 +1097,9 @@ EthernetInterfaces.interface = mdb.register_interface('bmc.kepler.Managers.Ether
     DefaultFactoryIpAddr = {'s', nil, true, nil},
     DefaultFactoryIpv6Mode = {'s', nil, true, 'DHCPv6'},
     DefaultFactoryIpv6Addr = {'s', nil, true, nil},
-    DefaultFactoryIpVersion = {'s', nil, true, 'IPv4AndIPv6'}
+    DefaultFactoryIpVersion = {'s', nil, true, 'IPv4AndIPv6'},
+    Ipv6DynamicRouteRAPreferred = {'b', {['emitsChangedSignal'] = 'false'}, false, false},
+    MTUSize = {'q', {['emitsChangedSignal'] = 'false'}, false, 1500}
 }, {
     GetAllPort = {'a{ss}', 'a(yyyyssbss)', TGetAllPortReq, TGetAllPortRsp},
     SetNetworkConfig = {'a{ss}sybq', '', TSetNetworkConfigReq, TSetNetworkConfigRsp},
@@ -1017,7 +1109,8 @@ EthernetInterfaces.interface = mdb.register_interface('bmc.kepler.Managers.Ether
     AddIp6tablesRule = {'a{ss}ss', 'b', TAddIp6tablesRuleReq, TAddIp6tablesRuleRsp},
     SetVLANConfig = {'a{ss}bqy', 'b', TSetVLANConfigReq, TSetVLANConfigRsp},
     SetEthState = {'a{ss}sb', 'b', TSetEthStateReq, TSetEthStateRsp},
-    NetworkFailover = {'a{ss}ss', 'b', TNetworkFailoverReq, TNetworkFailoverRsp}
+    NetworkFailover = {'a{ss}ss', 'b', TNetworkFailoverReq, TNetworkFailoverRsp},
+    SetChassisLanSubNet = {'a{ss}s', '', TSetChassisLanSubNetReq, TSetChassisLanSubNetRsp}
 }, {ActivePortChangedSignal = 'a{ss}yy', NCSIInfoChangedSignal = 'a{ss}a(ss)', EthMacChangedSignal = 'a{ss}ss'})
 
 return EthernetInterfaces

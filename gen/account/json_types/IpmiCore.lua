@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -12,6 +12,153 @@ local utils = require 'mc.utils'
 local mdb = require 'mc.mdb'
 
 local IpmiCore = {}
+
+---@class IpmiCore.ChannelInfo
+---@field key string
+---@field value integer
+local TChannelInfo = {}
+TChannelInfo.__index = TChannelInfo
+TChannelInfo.group = {}
+
+local function TChannelInfo_from_obj(obj)
+    return setmetatable(obj, TChannelInfo)
+end
+
+function TChannelInfo.new(dict)
+    return TChannelInfo_from_obj(dict)
+end
+
+---@param obj IpmiCore.ChannelInfo
+function TChannelInfo:init_from_obj(obj)
+    self = obj
+end
+
+function TChannelInfo:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TChannelInfo.group)
+end
+
+TChannelInfo.from_obj = TChannelInfo_from_obj
+
+TChannelInfo.proto_property = {}
+
+TChannelInfo.default = {}
+
+TChannelInfo.struct = {}
+
+function TChannelInfo:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    for k, v in pairs(self) do
+
+        validate.Optional(prefix .. 'key', k, 'string', false, errs, need_convert)
+
+        validate.Optional(prefix .. 'value', v, 'uint8', false, errs, need_convert)
+
+    end
+
+    TChannelInfo:remove_error_props(errs, self)
+    return self
+end
+
+function TChannelInfo:unpack(_)
+    return self
+end
+
+IpmiCore.ChannelInfo = TChannelInfo
+
+---@class IpmiCore.GetIPMIChannelRsp
+---@field Channels IpmiCore.ChannelInfo[]
+local TGetIPMIChannelRsp = {}
+TGetIPMIChannelRsp.__index = TGetIPMIChannelRsp
+TGetIPMIChannelRsp.group = {}
+
+local function TGetIPMIChannelRsp_from_obj(obj)
+    return setmetatable(obj, TGetIPMIChannelRsp)
+end
+
+function TGetIPMIChannelRsp.new(Channels)
+    return TGetIPMIChannelRsp_from_obj({Channels = Channels})
+end
+---@param obj IpmiCore.GetIPMIChannelRsp
+function TGetIPMIChannelRsp:init_from_obj(obj)
+    self.Channels = obj.Channels
+end
+
+function TGetIPMIChannelRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetIPMIChannelRsp.group)
+end
+
+TGetIPMIChannelRsp.from_obj = TGetIPMIChannelRsp_from_obj
+
+TGetIPMIChannelRsp.proto_property = {'Channels'}
+
+TGetIPMIChannelRsp.default = {{}}
+
+TGetIPMIChannelRsp.struct = {{name = 'Channels', is_array = true, struct = IpmiCore.ChannelInfo.struct}}
+
+function TGetIPMIChannelRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    for _, v in pairs(self.Channels) do
+        IpmiCore.ChannelInfo.new(v):validate(prefix, errs, need_convert)
+    end
+
+    TGetIPMIChannelRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetIPMIChannelRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TGetIPMIChannelRsp:unpack(_)
+    return self.Channels
+end
+
+IpmiCore.GetIPMIChannelRsp = TGetIPMIChannelRsp
+
+---@class IpmiCore.GetIPMIChannelReq
+---@field ChannelNumber integer
+local TGetIPMIChannelReq = {}
+TGetIPMIChannelReq.__index = TGetIPMIChannelReq
+TGetIPMIChannelReq.group = {}
+
+local function TGetIPMIChannelReq_from_obj(obj)
+    return setmetatable(obj, TGetIPMIChannelReq)
+end
+
+function TGetIPMIChannelReq.new(ChannelNumber)
+    return TGetIPMIChannelReq_from_obj({ChannelNumber = ChannelNumber})
+end
+---@param obj IpmiCore.GetIPMIChannelReq
+function TGetIPMIChannelReq:init_from_obj(obj)
+    self.ChannelNumber = obj.ChannelNumber
+end
+
+function TGetIPMIChannelReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TGetIPMIChannelReq.group)
+end
+
+TGetIPMIChannelReq.from_obj = TGetIPMIChannelReq_from_obj
+
+TGetIPMIChannelReq.proto_property = {'ChannelNumber'}
+
+TGetIPMIChannelReq.default = {0}
+
+TGetIPMIChannelReq.struct = {{name = 'ChannelNumber', is_array = false, struct = nil}}
+
+function TGetIPMIChannelReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'ChannelNumber', self.ChannelNumber, 'uint8', false, errs, need_convert)
+
+    TGetIPMIChannelReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TGetIPMIChannelReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TGetIPMIChannelReq:unpack(_)
+    return self.ChannelNumber
+end
+
+IpmiCore.GetIPMIChannelReq = TGetIPMIChannelReq
 
 ---@class IpmiCore.SetChannelAccessesRsp
 local TSetChannelAccessesRsp = {}
@@ -435,7 +582,8 @@ IpmiCore.interface = mdb.register_interface('bmc.kepler.IpmiCore', {
     Request = {'a{ss}yyyyyay', 'yay', TRequestReq, TRequestRsp},
     Route = {'a{ss}ayay', 'ay', TRouteReq, TRouteRsp},
     SetHostPrivilegeLimited = {'a{ss}sas', 'bs', TSetHostPrivilegeLimitedReq, TSetHostPrivilegeLimitedRsp},
-    SetChannelAccesses = {'a{ss}ss', '', TSetChannelAccessesReq, TSetChannelAccessesRsp}
+    SetChannelAccesses = {'a{ss}ss', '', TSetChannelAccessesReq, TSetChannelAccessesRsp},
+    GetIPMIChannel = {'a{ss}y', 'aa{sy}', TGetIPMIChannelReq, TGetIPMIChannelRsp}
 }, {})
 
 return IpmiCore

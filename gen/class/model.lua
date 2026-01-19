@@ -1,4 +1,4 @@
--- Copyright (c) 2025 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -1157,6 +1157,20 @@ local ManagerAccountDB = {
             ['default'] = false,
             ['usage'] = {'TemporaryPer'},
             ['validator'] = manager_account_db_class_types.IsOnline
+        },
+        ['DefaultRoleId'] = {
+            ['baseType'] = 'U8',
+            ['default'] = 255,
+            ['critical'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = manager_account_db_class_types.DefaultRoleId
+        },
+        ['DefaultLoginInterface'] = {
+            ['baseType'] = 'U32',
+            ['default'] = 2147483647,
+            ['critical'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = manager_account_db_class_types.DefaultLoginInterface
         }
     },
     ['default_props'] = {
@@ -1195,7 +1209,9 @@ local ManagerAccountDB = {
         ['AuthenticationProtocolWritable'] = true,
         ['EncryptionProtocolWritable'] = true,
         ['SNMPPasswordWritable'] = true,
-        ['IsOnline'] = false
+        ['IsOnline'] = false,
+        ['DefaultRoleId'] = 255,
+        ['DefaultLoginInterface'] = 2147483647
     }
 }
 

@@ -31,7 +31,8 @@ local AccountPolicyMdb = class()
 
 local account_type_name_map = {
     [enum.AccountType.Local:value()] = 'Local',
-    [enum.AccountType.OEM:value()] = 'OemAccount'
+    [enum.AccountType.OEM:value()] = 'OemAccount',
+    [enum.AccountType.InterChassis:value()] = 'InterChassis'
 }
 
 function AccountPolicyMdb:ctor(account_policy_collection)

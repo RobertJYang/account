@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -891,7 +891,8 @@ File.interface = mdb.register_interface('bmc.kepler.Managers.Security.File', {},
     Delete = {'a{ss}s', '', TDeleteReq, TDeleteRsp},
     Create = {'a{ss}ssuuu', '', TCreateReq, TCreateRsp},
     ChangeOwner = {'a{ss}s', 'b', TChangeOwnerReq, TChangeOwnerRsp},
-    IsPermitted = {'a{ss}ss', 'b', TIsPermittedReq, TIsPermittedRsp}
+    IsPermitted = {'a{ss}ss', 'b', TIsPermittedReq, TIsPermittedRsp},
+    Access = {'a{ss}sy', 'b', TAccessReq, TAccessRsp}
 }, {})
 
 return File

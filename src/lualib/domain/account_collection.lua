@@ -87,6 +87,11 @@ AccountCollection.operation_type_check = {
     LOCAL_OR_VNC = {
         [enum.AccountType.Local:value()] = true,
         [enum.AccountType.VNC:value()] = true
+    },
+    LOCAL_OEM_INTERCHASSIS = {
+        [enum.AccountType.Local:value()] = true,
+        [enum.AccountType.OEM:value()] = true,
+        [enum.AccountType.InterChassis:value()] = true
     }
 }
 
@@ -118,7 +123,9 @@ function AccountCollection:init_account_collection(db)
             return acc
         end
         local suc, ret = pcall(account_type_map[account.AccountType:value()].new,
-            db, account, self.password_validator_collection:get_validator(account.AccountType:value()),
+            db, account,
+            self.account_policy_collection:get_policy(account.AccountType:value()),
+            self.password_validator_collection:get_validator(account.AccountType:value()),
             self.ipmi_channel_config)
         if suc == true then
             acc[account.Id] = ret
@@ -434,6 +441,7 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     local account_in_db = self.m_table_account({ Id = account_info.id, UserName = account_info.name,
         RoleId = account_info.role_id })
     local account_in_server = account_class.new(self.db, account_in_db,
+        self.account_policy_collection:get_policy(account_type),
         self.password_validator_collection:get_validator(account_type), self.ipmi_channel_config)
     if not is_ipmi_or_snmp and is_password_validator then
         local ok, ret = pcall(function()
@@ -487,7 +495,9 @@ function AccountCollection:new_ccount_to_db_and_mdb(ctx, account_info, account_c
     self:new_account_channel_config_to_db_and_mdb(account_info.id, account_info.role_id)
 
     -- 用户名或者密码为空的情形不允许设置到Linux系统-- ipmi增加用户时不带密码
-    if not utils.str_is_empty(account_info.name) and not utils.str_is_empty(account_data.Password) then
+    -- 框内通信账户默认无密码
+    if (not utils.str_is_empty(account_info.name) and not utils.str_is_empty(account_data.Password)) or
+        account_info.id == config.INTER_CHASSIS_ACCOUNT_ID then
         -- 将用户设置到linux系统
         -- 调整为信号量触发，将几个关键文件的读写操作解耦
         self.m_account_file_added:emit(account_info.id)
@@ -536,12 +546,25 @@ function AccountCollection:change_snmp_v3_trap_account(delete_id)
     self.m_global_account_config:set_snmp_v3_trap_account(change_id)
 end
 
+function AccountCollection:recover_inter_chassis_account_to_default()
+    local account = self.collection[config.INTER_CHASSIS_ACCOUNT_ID]
+    account:recover_default()
+
+    if account.m_account_data.SshPublicKeyHash ~= '' then
+        self:delete_ssh_public_key({}, config.INTER_CHASSIS_ACCOUNT_ID)
+    end
+end
+
 --- 删除用户
 ---@param ctx table 上下文信息
 ---@param account_id number 用户ID
 ---@param validation_skipped boolean 是否是空定制化删除用户，若是，需要跳过部分校验来达到清除用户的效果
 function AccountCollection:delete_account(ctx, account_id, validation_skipped)
     utils.queue(function()
+        if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+            ctx.operation_log.result = 'recover'
+            return self:recover_inter_chassis_account_to_default()
+        end
         ctx.operation_log.params.id = account_id
         local account = self.collection[account_id]
         if not account then
@@ -653,6 +676,7 @@ function AccountCollection:set_login_interface(ctx, account_id, interface)
         account.m_account_data.IpmiPassword = ""
         account.m_account_data:save()
     end
+
     account:set_login_interface(interface_num)
     self.m_account_ipmi_changed:emit(account_id)
     self.m_account_security_changed:emit(account_id, user_name)

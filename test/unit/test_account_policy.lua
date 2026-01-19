@@ -11,6 +11,7 @@ local lu = require 'luaunit'
 local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 local enum = require 'class.types.types'
+local config = require 'common_config'
 local account_policy_collection = require 'domain.account_policy_collection'
 local account_policy = require 'domain.account_policies.account_policy'
 local manager_account = require 'domain.manager_account.manager_account'
@@ -213,7 +214,7 @@ function TestAccount:test_account_policy_set_online_deletable()
     end)
     lu.assertEquals(ok, true)
 
-    local ok, _ = pcall(function ()
+    ok, _ = pcall(function ()
         account_policy:set_online_deletable(1)
     end)
     lu.assertEquals(ok, true)
@@ -230,7 +231,7 @@ function TestAccount:test_manager_account_get_is_online()
     end)
     lu.assertEquals(ok, true)
 
-    local ok, _ = pcall(function ()
+    ok, _ = pcall(function ()
         manager_account:set_is_online(1)
     end)
     lu.assertEquals(ok, true)
@@ -250,8 +251,87 @@ function TestAccount:test_account_collection_set_is_online_change_required()
             end
         }
     }
-    local ok, _ = pcall(function ()
+    ok, _ = pcall(function ()
         account_collection:set_is_online_change_required(1, 1)
     end)
     lu.assertEquals(ok, true)
+end
+
+function TestAccount:test_inter_chassis_account_policy_set_forbid()
+    local account_type = enum.AccountType.InterChassis:value()
+    -- set_name_pattern 不允许
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_account_policy_collection:set_name_pattern(account_type, "^[a-zA-Z0-9]{8,20}")
+    end)
+
+    -- get_name_pattern 默认值
+    lu.assertEquals(self.test_account_policy_collection:get_name_pattern(account_type), "")
+
+    -- set_deletable 不允许
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_account_policy_collection:set_deletable(self.ctx, account_type, true)
+    end)
+
+    -- get_deletable 默认值
+    lu.assertIsFalse(self.test_account_policy_collection:get_deletable(account_type))
+
+    -- set_visible 不允许
+    lu.assertErrorMsgContains(base_msg.ActionNotSupportedMessage.Name, function()
+        self.test_account_policy_collection:set_visible(self.ctx, account_type, true)
+    end)
+
+    -- get_visible 默认值
+    lu.assertIsTrue(self.test_account_policy_collection:get_visible(account_type))
+
+    -- set_online_deletable 不允许，但是不抛错，避免上游处理失败
+    -- mock emit行为
+    local func = self.test_account_policy_collection.m_config_changed.emit
+    self.test_account_policy_collection.m_config_changed.emit = function(...) end
+
+    local ok = pcall(function()
+        self.test_account_policy_collection:set_online_deletable(account_type, true)
+    end)
+    lu.assertIsTrue(ok)
+
+    -- 恢复emit行为
+    self.test_account_policy_collection.m_config_changed.emit = func
+
+    -- get_online_deletable 未登录默认为false
+    lu.assertIsTrue(self.test_account_policy_collection:get_online_deletable(account_type))
+end
+
+function TestAccount:test_inter_chassis_account_logininterface_forbid_by_policy()
+    local default_interface = enum.LoginInterface.Web:value() + enum.LoginInterface.Redfish:value() +
+        enum.LoginInterface.SSH:value() + enum.LoginInterface.SFTP:value()
+
+    -- 确认默认登陆接口
+    local inter_chassis_account = self.test_account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
+    lu.assertEquals(inter_chassis_account:get_login_interface(), default_interface)
+
+    local interface_allowed_table = {
+        ['Web'] = true,
+        ['SNMP'] = false,
+        ['IPMI'] = false,
+        ['SSH'] = true,
+        ['SFTP'] = true,
+        ['Local'] = false,
+        ['Redfish'] = true
+    }
+
+    local ok
+    for interface, allowed in pairs(interface_allowed_table) do
+        if allowed then
+            ok = pcall(function()
+                self.test_account_collection:set_login_interface(self.ctx, config.INTER_CHASSIS_ACCOUNT_ID, {interface})
+            end)
+            lu.assertIsTrue(ok)
+        else
+            lu.assertErrorMsgContains(custom_msg.PropertyItemNotInListMessage.Name, function()
+                self.test_account_collection:set_login_interface(self.ctx, config.INTER_CHASSIS_ACCOUNT_ID, {interface})
+            end)
+        end
+    end
+
+    -- 恢复环境
+    self.test_account_collection:set_login_interface(self.ctx, config.INTER_CHASSIS_ACCOUNT_ID, {'Web', 'SSH', 'SFTP', 'Redfish'})
 end

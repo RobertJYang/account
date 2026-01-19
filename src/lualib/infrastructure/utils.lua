@@ -345,6 +345,23 @@ function utils:frequency_limit_log(level, interval_s, fmt, ...)
     end
 end
 
+function utils.interface_num_to_string(interface_num)
+    local str_table = {}
+    for key, value in pairs(enum.LoginInterface) do
+        if type(value) ~= 'table' then
+            goto continue
+        end
+        if value == enum.LoginInterface.default or value == enum.LoginInterface.Invalid then
+            goto continue
+        end
+        if value:value() & interface_num == value:value() then
+            table.insert(str_table, key)
+        end
+        ::continue::
+    end
+    return table.concat(str_table, ', ')
+end
+
 -- 将接口枚举类整合为string
 function utils.interface_enum_table_to_string(interface)
     local interface_str_table = {}

@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -378,18 +378,6 @@ end
 
 function account_service:init()
     account_service.super.init(self)
-    object_manage.create_object('ManagerAccounts', '/bmc/kepler/AccountService/Accounts',
-        '/bmc/kepler/AccountService/Accounts', function(obj)
-            obj.ObjectName = 'ManagerAccounts_0'
-        end)
-    object_manage.create_object('Roles', '/bmc/kepler/AccountService/Roles', '/bmc/kepler/AccountService/Roles',
-        function(obj)
-            obj.ObjectName = 'Roles_0'
-        end)
-    object_manage.create_object('LocalAccountAuthN', '/bmc/kepler/AccountService/LocalAccountAuthN',
-        '/bmc/kepler/AccountService/LocalAccountAuthN', function(obj)
-            obj.ObjectName = 'LocalAccountAuthN_0'
-        end)
 end
 
 return account_service
