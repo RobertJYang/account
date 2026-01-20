@@ -19,6 +19,10 @@
             "SilkText": "EXU",
             "IdentifyMode": 2            
         },
-        "IpmiCore_1":{}
+        "IpmiCore_1":{},
+        "InterChassisAuthConfig": {
+            "AccessRoleId": 4,
+            "LoginInterface": 153
+        }
     }
 }

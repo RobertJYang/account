@@ -86,6 +86,8 @@ local def_types = require 'class.types.types'
 ---@field IsOnline FieldBase
 ---@field DefaultRoleId FieldBase
 ---@field DefaultLoginInterface FieldBase
+---@field IsRoleChanged FieldBase
+---@field IsLoginInterfaceChanged FieldBase
 
 ---@class ManagerAccountBackupTable: Table
 ---@field Id FieldBase
@@ -331,9 +333,11 @@ function AccountDBDatabase.new(path, datas)
             :critical(),
         IsOnline = Col.BooleandField():cid(36):persistence_key('protect_temporary'):null():default(false),
         DefaultRoleId = Col.IntegerField():cid(37):persistence_key('protect_power_off'):null():max_length(8)
-            :default(255):critical(),
+            :default(255),
         DefaultLoginInterface = Col.IntegerField():cid(38):persistence_key('protect_power_off'):null():max_length(32)
-            :default(2147483647):critical()
+            :default(2147483647),
+        IsRoleChanged = Col.BooleandField():cid(39):persistence_key('protect_power_off'):null():default(false),
+        IsLoginInterfaceChanged = Col.BooleandField():cid(40):persistence_key('protect_power_off'):null():default(false)
     }):create_if_not_exist(datas and datas['t_manager_account'])
     obj.ManagerAccountBackup = db:Table('t_manager_account_backup', {
         Id = Col.IntegerField():cid(1):primary_key():persistence_key('protect_power_off'):max_length(8),

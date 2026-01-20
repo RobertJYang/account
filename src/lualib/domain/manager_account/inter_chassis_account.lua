@@ -37,16 +37,28 @@ end
 function inter_chassis_account:flush_default_by_sr(inter_chassis_config)
     if inter_chassis_config.AccessRoleId then
         self.m_account_data.DefaultRoleId = inter_chassis_config.AccessRoleId
+        if not self.m_account_data.IsRoleChanged then
+            self.m_account_data.RoleId = inter_chassis_config.AccessRoleId
+            self.m_account_update_signal:emit('RoleId', self.m_account_data.RoleId)
+        end
     end
     if inter_chassis_config.LoginInterface then
         self.m_account_data.DefaultLoginInterface = inter_chassis_config.LoginInterface
+        if not self.m_account_data.IsLoginInterfaceChanged then
+            self.m_account_data.LoginInterface = inter_chassis_config.LoginInterface
+            self.m_account_update_signal:emit('LoginInterface',
+                utils.convert_num_to_interface_str(self.m_account_data.LoginInterface, true))
+        end
     end
     self.m_account_data:save()
+    self:update_privileges()
 end
 
 function inter_chassis_account:recover_default()
     self.m_account_data.RoleId = self.m_account_data.DefaultRoleId
     self.m_account_data.LoginInterface = self.m_account_data.DefaultLoginInterface
+    self.m_account_data.IsRoleChanged = false
+    self.m_account_data.IsLoginInterfaceChanged = false
 
     self.m_account_update_signal:emit('RoleId', self.m_account_data.DefaultRoleId)
     self.m_account_update_signal:emit('LoginInterface',
@@ -57,6 +69,7 @@ end
 
 function inter_chassis_account:set_role_id(role_id)
     self.m_account_data.RoleId = role_id
+    self.m_account_data.IsRoleChanged = true
     self.m_account_data:save()
     self:update_privileges()
 end
@@ -68,6 +81,7 @@ function inter_chassis_account:set_login_interface(interface)
         error(custom_msg.PropertyItemNotInList('%LoginInterface:' .. interface_str, '%LoginInterface'))
     end
     self.m_account_data.LoginInterface = interface
+    self.m_account_data.IsLoginInterfaceChanged = true
     self.m_account_data:save()
 end
 
