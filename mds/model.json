@@ -845,18 +845,36 @@
             },
             "DefaultRoleId": {
                 "baseType": "U8",
-                "description": "",
+                "description": "默认角色ID，用于框内通信账户恢复",
                 "default": 255,
-                "critical": true,
+                "critical": false,
                 "usage": [
                     "PoweroffPer"
                 ]
             },
             "DefaultLoginInterface": {
                 "baseType": "U32",
-                "description": "",
+                "description": "默认登录接口，用于框内通信账户恢复",
                 "default": 2147483647,
-                "critical": true,
+                "critical": false,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "IsRoleChanged": {
+                "baseType": "Boolean",
+                "description": "RoleId是否发生改变，用于判断PSR配置覆盖",
+                "default": false,
+                "critical": false,
+                "usage": [
+                    "PoweroffPer"
+                ]
+            },
+            "IsLoginInterfaceChanged": {
+                "baseType": "Boolean",
+                "description": "LoginInterface是否发生改变，用于判断PSR配置覆盖",
+                "default": false,
+                "critical": false,
                 "usage": [
                     "PoweroffPer"
                 ]
@@ -1716,6 +1734,24 @@
                     "PoweroffPer"
                 ],
                 "description": "通道编号"
+            }
+        }
+    },
+    "InterChassisAuthConfig": {
+        "properties": {
+            "AccessRoleId": {
+                "baseType": "U8",
+                "description": "框内通信默认角色",
+                "usage": [
+                    "CSR"
+                ]
+            },
+            "LoginInterface": {
+                "baseType": "U32",
+                "description": "框内通信默认可用登录接口",
+                "usage": [
+                    "CSR"
+                ]
             }
         }
     }

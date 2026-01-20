@@ -53,6 +53,27 @@
             },
             "path": "/bmc/kepler/AccountService/Accounts/${Id}",
             "additionalProperties": false
+        },
+        "InterChassisAuthConfig": {
+            "properties": {
+                "AccessRoleId": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/U8"
+                        }
+                    ]
+                },
+                "LoginInterface": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/U32"
+                        }
+                    ]
+                }
+            },
+            "type": "object",
+            "interfaces": {},
+            "additionalProperties": false
         }
     },
     "id": "bmc",
@@ -60,6 +81,9 @@
     "patternProperties": {
         "^ManagerAccount_": {
             "$ref": "#/defs/ManagerAccount"
+        },
+        "^InterChassisAuthConfig_": {
+            "$ref": "#/defs/InterChassisAuthConfig"
         }
     },
     "$schema": "https://json-schema.org/draft/2019-09/schema#",

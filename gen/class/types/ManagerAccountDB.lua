@@ -14,6 +14,99 @@ local def_types = require 'class.types.types'
 
 local MManagerAccountDB = {}
 
+---@class MManagerAccountDB.IsLoginInterfaceChanged
+---@field IsLoginInterfaceChanged boolean
+local TIsLoginInterfaceChanged = {}
+TIsLoginInterfaceChanged.__index = TIsLoginInterfaceChanged
+TIsLoginInterfaceChanged.group = {}
+
+local function TIsLoginInterfaceChanged_from_obj(obj)
+    return setmetatable(obj, TIsLoginInterfaceChanged)
+end
+
+function TIsLoginInterfaceChanged.new(IsLoginInterfaceChanged)
+    return TIsLoginInterfaceChanged_from_obj({IsLoginInterfaceChanged = IsLoginInterfaceChanged or false})
+end
+---@param obj MManagerAccountDB.IsLoginInterfaceChanged
+function TIsLoginInterfaceChanged:init_from_obj(obj)
+    self.IsLoginInterfaceChanged = obj.IsLoginInterfaceChanged or false
+end
+
+function TIsLoginInterfaceChanged:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIsLoginInterfaceChanged.group)
+end
+
+TIsLoginInterfaceChanged.from_obj = TIsLoginInterfaceChanged_from_obj
+
+TIsLoginInterfaceChanged.proto_property = {'IsLoginInterfaceChanged'}
+
+TIsLoginInterfaceChanged.default = {false}
+
+TIsLoginInterfaceChanged.struct = {{name = 'IsLoginInterfaceChanged', is_array = false, struct = nil}}
+
+function TIsLoginInterfaceChanged:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IsLoginInterfaceChanged', self.IsLoginInterfaceChanged, 'bool', false, errs,
+        need_convert)
+
+    TIsLoginInterfaceChanged:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIsLoginInterfaceChanged.proto_property, errs, need_convert)
+    return self
+end
+
+function TIsLoginInterfaceChanged:unpack(_)
+    return self.IsLoginInterfaceChanged
+end
+
+MManagerAccountDB.IsLoginInterfaceChanged = TIsLoginInterfaceChanged
+
+---@class MManagerAccountDB.IsRoleChanged
+---@field IsRoleChanged boolean
+local TIsRoleChanged = {}
+TIsRoleChanged.__index = TIsRoleChanged
+TIsRoleChanged.group = {}
+
+local function TIsRoleChanged_from_obj(obj)
+    return setmetatable(obj, TIsRoleChanged)
+end
+
+function TIsRoleChanged.new(IsRoleChanged)
+    return TIsRoleChanged_from_obj({IsRoleChanged = IsRoleChanged or false})
+end
+---@param obj MManagerAccountDB.IsRoleChanged
+function TIsRoleChanged:init_from_obj(obj)
+    self.IsRoleChanged = obj.IsRoleChanged or false
+end
+
+function TIsRoleChanged:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TIsRoleChanged.group)
+end
+
+TIsRoleChanged.from_obj = TIsRoleChanged_from_obj
+
+TIsRoleChanged.proto_property = {'IsRoleChanged'}
+
+TIsRoleChanged.default = {false}
+
+TIsRoleChanged.struct = {{name = 'IsRoleChanged', is_array = false, struct = nil}}
+
+function TIsRoleChanged:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'IsRoleChanged', self.IsRoleChanged, 'bool', false, errs, need_convert)
+
+    TIsRoleChanged:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TIsRoleChanged.proto_property, errs, need_convert)
+    return self
+end
+
+function TIsRoleChanged:unpack(_)
+    return self.IsRoleChanged
+end
+
+MManagerAccountDB.IsRoleChanged = TIsRoleChanged
+
 ---@class MManagerAccountDB.DefaultLoginInterface
 ---@field DefaultLoginInterface integer
 local TDefaultLoginInterface = {}

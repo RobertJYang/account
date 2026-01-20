@@ -26,6 +26,7 @@ local account_backup_class_types = require 'class.types.AccountBackup'
 local password_policy_db_class_types = require 'class.types.PasswordPolicyDB'
 local account_policy_db_class_types = require 'class.types.AccountPolicyDB'
 local ipmi_channel_config_class_types = require 'class.types.IpmiChannelConfig'
+local inter_chassis_auth_config_class_types = require 'class.types.InterChassisAuthConfig'
 local account_service_intf_types = require 'account.json_types.AccountService'
 local properties_intf_types = require 'mdb.bmc.kepler.Object.PropertiesInterface'
 local manager_accounts_intf_types = require 'account.json_types.ManagerAccounts'
@@ -1161,16 +1162,30 @@ local ManagerAccountDB = {
         ['DefaultRoleId'] = {
             ['baseType'] = 'U8',
             ['default'] = 255,
-            ['critical'] = true,
+            ['critical'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.DefaultRoleId
         },
         ['DefaultLoginInterface'] = {
             ['baseType'] = 'U32',
             ['default'] = 2147483647,
-            ['critical'] = true,
+            ['critical'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.DefaultLoginInterface
+        },
+        ['IsRoleChanged'] = {
+            ['baseType'] = 'Boolean',
+            ['default'] = false,
+            ['critical'] = false,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = manager_account_db_class_types.IsRoleChanged
+        },
+        ['IsLoginInterfaceChanged'] = {
+            ['baseType'] = 'Boolean',
+            ['default'] = false,
+            ['critical'] = false,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = manager_account_db_class_types.IsLoginInterfaceChanged
         }
     },
     ['default_props'] = {
@@ -1211,7 +1226,9 @@ local ManagerAccountDB = {
         ['SNMPPasswordWritable'] = true,
         ['IsOnline'] = false,
         ['DefaultRoleId'] = 255,
-        ['DefaultLoginInterface'] = 2147483647
+        ['DefaultLoginInterface'] = 2147483647,
+        ['IsRoleChanged'] = false,
+        ['IsLoginInterfaceChanged'] = false
     }
 }
 
@@ -2343,6 +2360,25 @@ local IpmiChannelConfig = {
     })
 }
 
+local InterChassisAuthConfig = {
+    ['prop_configs'] = {
+        ['AccessRoleId'] = {
+            ['baseType'] = 'U8',
+            ['usage'] = {'CSR'},
+            ['validator'] = inter_chassis_auth_config_class_types.AccessRoleId
+        },
+        ['LoginInterface'] = {
+            ['baseType'] = 'U32',
+            ['usage'] = {'CSR'},
+            ['validator'] = inter_chassis_auth_config_class_types.LoginInterface
+        }
+    },
+    ['default_props'] = {
+        ['AccessRoleId'] = inter_chassis_auth_config_class_types.AccessRoleId.default[1],
+        ['LoginInterface'] = inter_chassis_auth_config_class_types.LoginInterface.default[1]
+    }
+}
+
 local M = {}
 
 function M.init(bus)
@@ -2366,6 +2402,7 @@ function M.init(bus)
     class('AccountPolicy', AccountPolicy):set_bus(bus)
     class('AccountPolicyDB', AccountPolicyDB):set_bus(bus)
     class('IpmiChannelConfig', IpmiChannelConfig):set_bus(bus)
+    class('InterChassisAuthConfig', InterChassisAuthConfig):set_bus(bus)
 end
 
 -- The callback needs to be registered during app initialization

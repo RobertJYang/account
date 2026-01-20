@@ -12,6 +12,7 @@ local log = require 'mc.logging'
 local mc_admin = require 'mc.mc_admin'
 local mdb_service = require 'mc.mdb.mdb_service'
 local orm_object_manage = require 'mc.orm.object_manage'
+local object_manage = require 'mc.mdb.object_manage'
 local reboot = require 'mc.mdb.micro_component.reboot'
 local utils_core = require 'utils.core'
 local base_msg = require 'messages.base'
@@ -145,6 +146,17 @@ function app:bmcuptime()
     return uptime
 end
 
+function app:object_register()
+    object_manage.on_add_object(self.bus, function(class_name, object, position)
+        if class_name == 'InterChassisAuthConfig' then
+            local inter_chassis_account = self.account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
+            inter_chassis_account:flush_default_by_sr(object)
+        end
+        log:notice("[account] Add object callback, class_name: %s, object_name: %s, position: %s",
+            class_name, object.name, position)
+    end)
+end
+
 function app:skynet_service_init()
     self:bmcuptime()
     self.key_mgmt_client = kmc_client.new(self.bus, function(domain_id, new_key_id)
@@ -164,6 +176,8 @@ function app:skynet_service_init()
 
 
     self.service_ready = self:service_init()
+
+    self:object_register()
 
     -- 信号注册后需要将初始化中预加载的数据上树一次
     self.account_collection:emit_init_account_signal()
