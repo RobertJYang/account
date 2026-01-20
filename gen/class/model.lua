@@ -219,7 +219,7 @@ local AccountService = {
                 ['maximum'] = 17,
                 ['options'] = {['emitsChangedSignal'] = 'true'},
                 ['usage'] = {'PoweroffPer'},
-                ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
+                ['privilege'] = {['read'] = {'UserMgmt'}, ['write'] = {'UserMgmt'}},
                 ['validator'] = account_service_intf_types.EmergencyLoginAccountId
             },
             ['SNMPv3TrapAccountId'] = {
@@ -422,7 +422,7 @@ local AccountService = {
                     },
                     ['MinPasswordValidDays'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
                     ['MaxPasswordValidDays'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
-                    ['EmergencyLoginAccountId'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.UserMgmt},
+                    ['EmergencyLoginAccountId'] = {['read'] = privilege.UserMgmt, ['write'] = privilege.UserMgmt},
                     ['SNMPv3TrapAccountId'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.BasicSetting},
                     ['InactiveDaysThreshold'] = {['read'] = privilege.ReadOnly, ['write'] = privilege.SecurityMgmt},
                     ['WeakPasswordDictionaryEnabled'] = {
