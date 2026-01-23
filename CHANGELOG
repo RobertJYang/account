@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.110.5] - 2026-1-21
+fix:修复部分框内通信账户设置接口操作日志、安全日志呈现问题
+
 ## [1.110.4] - 2026-1-20
 feat:支持通过PSR配置框内通信账户的默认权限和登录接口
 

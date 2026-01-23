@@ -7,8 +7,7 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 --
--- Test passwords:[Admin@9000, Admin@90001234567891, Admin@900012345678912,
--- Admin@90001234567891, Admin@900012345678912]
+-- Test passwords:[Admin@12345]
 local enum = require 'class.types.types'
 local test_case_utils = require 'testcase_utils'
 local utils = require 'infrastructure.utils'
@@ -38,6 +37,7 @@ local inter_chassis_excluded_prop = {
 
 function InterChassisAccountCases.test_set_inter_chassis_account_prop_forbid(bus)
     local ok, err
+    -- 测试属性设置
     for prop, value in pairs(inter_chassis_excluded_prop) do
         ok, err = pcall(function()
             test_case_utils.set_account_property(bus, config.INTER_CHASSIS_ACCOUNT_ID, prop, value)
@@ -45,6 +45,34 @@ function InterChassisAccountCases.test_set_inter_chassis_account_prop_forbid(bus
         assert(not ok)
         assert(err.name == base_msg.ActionNotSupportedMessage.Name)
     end
+
+    -- 测试修改密码
+    ok, err = pcall(function()
+        test_case_utils.call_account_change_pwd(bus, config.INTER_CHASSIS_ACCOUNT_ID, 'Admin@12345')
+    end)
+    assert(not ok)
+    assert(err.name == base_msg.ActionNotSupportedMessage.Name)
+
+    -- 测试修改SNMP密码
+    ok, err = pcall(function()
+        test_case_utils.call_account_change_snmp_pwd(bus, config.INTER_CHASSIS_ACCOUNT_ID, 'Admin@12345')
+    end)
+    assert(not ok)
+    assert(err.name == base_msg.ActionNotSupportedMessage.Name)
+
+    -- 测试修改SNMP鉴权算法
+    ok, err = pcall(function()
+        test_case_utils.call_account_set_authentication_protocol(bus, config.INTER_CHASSIS_ACCOUNT_ID, 3, 'Admin@12345', 'Admin@12345')
+    end)
+    assert(not ok)
+    assert(err.name == base_msg.ActionNotSupportedMessage.Name)
+
+    -- 测试修改SNMP加密算法
+    ok, err = pcall(function()
+        test_case_utils.call_account_set_encryption_protocol(bus, config.INTER_CHASSIS_ACCOUNT_ID, 2)
+    end)
+    assert(not ok)
+    assert(err.name == base_msg.ActionNotSupportedMessage.Name)
 end
 
 function InterChassisAccountCases.test_recover_inter_chassis_account(bus)

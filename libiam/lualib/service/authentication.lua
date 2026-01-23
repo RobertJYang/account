@@ -172,7 +172,8 @@ function Authentication:check_user_lock_status()
     local state, lock_start_time
     for id, account in pairs(self.m_account_cache.cache_collection) do
         if account.AccountType == iam_enum.AccountType.Local or
-            account.AccountType == iam_enum.AccountType.VNC then
+            account.AccountType == iam_enum.AccountType.VNC or
+            account.AccountType == iam_enum.AccountType.InterChassis then
             lock_state = self:get_user_lock_state(account.UserName)
             state, lock_start_time = self.m_account_lock:get_account_lock_state(id)
             is_locked = (state == iam_enum.UserLocked.USER_LOCK) and true or false

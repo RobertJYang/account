@@ -277,6 +277,7 @@ end
 
 function account_mdb:change_password(ctx, account_id, password)
     if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        ctx.operation_log.params = {operate = 'Modify', name = 'inter_chassis', id = config.INTER_CHASSIS_ACCOUNT_ID}
         error(base_msg.ActionNotSupported(string.format("change password for inter chassis account")))
     end
     local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
@@ -291,6 +292,7 @@ end
 
 function account_mdb:change_snmp_password(ctx, account_id, password)
     if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        ctx.operation_log.params = {name = 'inter_chassis', id = config.INTER_CHASSIS_ACCOUNT_ID}
         error(base_msg.ActionNotSupported(string.format("change snmp password for inter chassis account")))
     end
     if not _privilege_check(ctx, account_id, self.m_account_collection) then
@@ -439,6 +441,7 @@ end
 
 function account_mdb:set_authentication_protocol(ctx, account_id, protocol, auth_password, encry_password)
     if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        ctx.operation_log.params = {name = 'inter_chassis', id = config.INTER_CHASSIS_ACCOUNT_ID}
         error(base_msg.ActionNotSupported(string.format("set snmp authentication protocol for inter chassis account")))
     end
     local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
@@ -456,6 +459,7 @@ end
 
 function account_mdb:set_encryption_protocol(ctx, account_id, protocol)
     if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+        ctx.operation_log.params = {name = 'inter_chassis', id = config.INTER_CHASSIS_ACCOUNT_ID}
         error(base_msg.ActionNotSupported(string.format("set snmp encryption protocol for inter chassis account")))
     end
     if not _privilege_check(ctx, account_id, self.m_account_collection) then
