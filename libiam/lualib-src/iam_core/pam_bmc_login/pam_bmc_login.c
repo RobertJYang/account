@@ -22,7 +22,7 @@
 #include "sys/types.h"
 #include "sys/stat.h"
 #include "../common/check_login_rule.h"
-#include "pam_common.h"
+#include "../pam_common.h"
 #include "pam_bmc_login.h"
 
 /*
