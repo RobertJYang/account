@@ -135,6 +135,8 @@ function TestIam:setupClass()
     gen_weakpwddic_file(test_data_dir)
     self.tally_dir = test_data_dir .. '/tally'
     os.execute('mkdir -p ' .. self.tally_dir)
+    self.ip_lock_dir = test_data_dir .. '/ip_lock'
+    os.execute('mkdir -p ' .. self.ip_lock_dir)
     self.IamDB = open_iam_db(test_data_dir .. '/iam.test.db', datas)
     KmcClient.new(nil, nil, true)
     self.test_account_cache = account_cache.new()
@@ -244,5 +246,6 @@ require 'test_login_time_rule_cache'
 require 'authentication.test_authentication_config'
 require 'config_mgmt.test_config'
 require 'test_profile_import'
+require 'authentication.test_ip_lock'
 
 lu.LuaUnit.run()

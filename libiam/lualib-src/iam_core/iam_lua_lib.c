@@ -31,6 +31,7 @@
 #include "../network.h"
 #include "ldap_auth_parse_info.h"
 #include "uip/uip_user.h"
+#include "common/ip_lock.h"
 #include "common/common.h"
 
 #define MAX_CLI_USER_CNT 20  // 最大支持20个cli用户获取
@@ -826,6 +827,84 @@ static int l_is_ipv6_in_subnet(lua_State *L)
     return 1;
 }
 
+static int l_increase_ip_fail_record(lua_State *L)
+{
+    const gchar *dir    = luaL_checkstring(L, 1);
+    const gchar *ip_str = luaL_checkstring(L, 2);
+    gint32 ret = increase_fail_record(dir, ip_str);
+    lua_pushinteger(L, ret);
+    return 1;
+}
+
+static int l_clean_ip_fail_record(lua_State *L)
+{
+    const gchar *dir    = luaL_checkstring(L, 1);
+    const gchar *ip_str = luaL_checkstring(L, 2);
+    gint32 ret = clean_fail_record(dir, ip_str);
+    lua_pushinteger(L, ret);
+    return 1;
+}
+
+static int l_get_one_ip_lock_status(lua_State *L)
+{
+    const gchar *dir            = luaL_checkstring(L, 1);
+    const gchar *ip_str         = luaL_checkstring(L, 2);
+    guint8       lock_threshold = (guint8)luaL_checkinteger(L, 3);
+    guint64      fail_interval  = (guint64)luaL_checkinteger(L, 4);
+    IpLockStatus status         = {0};
+
+    gint32 res = get_one_lock_status(dir, ip_str, lock_threshold, fail_interval, &status);
+    if (res != RET_OK) {
+        return luaL_error(L, "get ip lock records failed!");
+    }
+    lua_pushboolean(L, status.lock_status);
+    return 1;
+}
+
+static int l_get_all_ip_lock_status(lua_State *L)
+{
+    const gchar *dir       = luaL_checkstring(L, 1);
+    guint8  lock_threshold = (guint8)luaL_checkinteger(L, 2);
+    guint64 fail_interval  = (guint64)luaL_checkinteger(L, 3);
+    IpAllStatus records    = {0};
+
+    gint32 res = get_all_lock_status(dir, lock_threshold, fail_interval, &records);
+    if (res != RET_OK) {
+        // 异常场景不需要释放
+        return luaL_error(L, "get all ip lock records failed!");
+    }
+
+    // 先压栈记录的总个数
+    lua_pushinteger(L, records.count);
+
+    // 创建一个表，用于存放多行记录
+    lua_createtable(L, records.count, 0);
+    for (guint32 i = 0; i < records.count; i++) {
+        // 创建一个副表，有3个键值对，对应一个IpLockStatus结构
+        lua_createtable(L, 0, 3);
+
+        // 压栈ip
+        lua_pushstring(L, records.records[i].ip);
+        lua_setfield(L, -2, "ip");
+
+        // 压栈状态
+        lua_pushboolean(L, records.records[i].lock_status);
+        lua_setfield(L, -2, "lock_status");
+
+        // 压栈锁定开始时间
+        lua_pushinteger(L, records.records[i].lock_start_time);
+        lua_setfield(L, -2, "lock_start_time");
+
+        // 附表在栈顶，将其放入主表的数组中第 i+1 的位置
+        lua_rawseti(L, -2, i + 1);
+    }
+
+    g_free(records.records);
+    records.records = NULL;
+    // 返回2个对象，记录总个数和已有的表
+    return 2;
+}
+
 LUAMOD_API int luaopen_iam_core(lua_State *L)
 {
     luaL_checkversion(L);
@@ -856,6 +935,10 @@ LUAMOD_API int luaopen_iam_core(lua_State *L)
         {"decrypt_with_private_key", l_decrypt_with_private_key},                            // 私钥解密
         {"is_ip_in_subnet", l_is_ip_in_subnet},                                              // ipv4子网校验
         {"is_ipv6_in_subnet", l_is_ipv6_in_subnet},                                          // ipv6子网校验
+        {"increase_ip_fail_record", l_increase_ip_fail_record},                              // 增加ip失败记录
+        {"clean_ip_fail_record", l_clean_ip_fail_record},                                    // 重置ip失败记录
+        {"get_one_ip_lock_status", l_get_one_ip_lock_status},                                // 获取特定ip的锁定状态
+        {"get_all_ip_lock_status", l_get_all_ip_lock_status},                                // 获取所有ip的锁定状态
         // 增加DT调试方法
 #if defined(ENABLE_TEST)
         {"set_dt_log_level", l_set_dt_log_level},                                            // 设置日志信息
