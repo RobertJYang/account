@@ -45,6 +45,7 @@ local skynet_ready, skynet = pcall(require, 'skynet')
 local account_cache = require 'domain.cache.account_cache'
 local account_service_cache = require 'domain.cache.account_service_cache'
 local trace = require 'telemetry.trace'
+local session = require 'domain.session'
 
 -- 历史登出会话记录最大数
 local MAX_LOGOUT_SESSION<const> = 32
@@ -482,7 +483,7 @@ function SessionService:new_session(ctx, username, password, session_type, domai
         self:check_first_login(auth_type, auth_account_info.Id)
         -- 创建KVM会话需要检查用户权限及VNC会话模式是否冲突
         local privileges = auth_account_info.current_privileges or
-            privilege.new_from_role_ids({ auth_account_info.RoleId }):to_array()
+            session.get_session_privilege(auth_account_info.RoleId):to_array()
         self:check_remote_console_session_priv(privileges, iam_enum.PrivilegeType.KVMMgmt)
         local vnc_session_service = self.m_session_service_collection[iam_enum.SessionType.VNC:value()]
         local mode = extra_data.SessionMode and tonumber(extra_data.SessionMode) or 0
