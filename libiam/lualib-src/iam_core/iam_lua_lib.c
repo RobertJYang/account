@@ -851,9 +851,10 @@ static int l_get_one_ip_lock_status(lua_State *L)
     const gchar *ip_str         = luaL_checkstring(L, 2);
     guint8       lock_threshold = (guint8)luaL_checkinteger(L, 3);
     guint64      fail_interval  = (guint64)luaL_checkinteger(L, 4);
+    guint64      unlock_time    = (guint64)luaL_checkinteger(L, 5);
     IpLockStatus status         = {0};
 
-    gint32 res = get_one_lock_status(dir, ip_str, lock_threshold, fail_interval, &status);
+    gint32 res = get_one_lock_status(dir, ip_str, lock_threshold, fail_interval, unlock_time, &status);
     if (res != RET_OK) {
         return luaL_error(L, "get ip lock records failed!");
     }
@@ -863,12 +864,13 @@ static int l_get_one_ip_lock_status(lua_State *L)
 
 static int l_get_all_ip_lock_status(lua_State *L)
 {
-    const gchar *dir       = luaL_checkstring(L, 1);
-    guint8  lock_threshold = (guint8)luaL_checkinteger(L, 2);
-    guint64 fail_interval  = (guint64)luaL_checkinteger(L, 3);
-    IpAllStatus records    = {0};
+    const gchar *dir           = luaL_checkstring(L, 1);
+    guint8      lock_threshold = (guint8)luaL_checkinteger(L, 2);
+    guint64     fail_interval  = (guint64)luaL_checkinteger(L, 3);
+    guint64     unlock_time    = (guint64)luaL_checkinteger(L, 4);
+    IpAllStatus records        = {0};
 
-    gint32 res = get_all_lock_status(dir, lock_threshold, fail_interval, &records);
+    gint32 res = get_all_lock_status(dir, lock_threshold, fail_interval, unlock_time, &records);
     if (res != RET_OK) {
         // 异常场景不需要释放
         return luaL_error(L, "get all ip lock records failed!");

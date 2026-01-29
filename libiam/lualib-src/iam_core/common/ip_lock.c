@@ -25,6 +25,8 @@
 #include "utils/file_securec.h"
 #include "ip_lock.h"
 
+static GHashTable *g_ip_map = NULL;
+
 /*
  * Description: 打开faillock文件
  */
@@ -146,10 +148,36 @@ LOCAL gint32 update_record(guint64 now, guint8 *record_cnt, IpFailRecord* record
     return RET_OK;
 }
 
+LOCAL gint32 check_if_increase_record_cnt(const gchar *ip)
+{
+    if (g_ip_map == NULL) {
+        g_ip_map = g_hash_table_new(g_str_hash, g_str_equal);
+    }
+
+    // 如果是表中已有的数据，可以认为OK
+    gpointer value = g_hash_table_lookup(g_ip_map, ip);
+    if (value != NULL) {
+        return RET_OK;
+    }
+
+    if (g_hash_table_size(g_ip_map) >= MAX_IP_RECORD_CNT) {
+        debug_log(DLOG_ERROR, "ip record exceeds the maximum quantity limit");
+        return RET_ERR;
+    }
+
+    g_hash_table_insert(g_ip_map, ip, "");
+    return RET_OK;
+}
 
 // 增加特定ip的失败记录
 gint32 increase_fail_record(const gchar *dir, const gchar *ip)
 {
+    // 判断如果需要新增ip，计数+1
+    gint32 ret = check_if_increase_record_cnt(ip);
+    if (ret != RET_OK) {
+        return RET_ERR;
+    }
+
     // 获取失败记录文件句柄
     FILE *fp = open_ip_fail_record(dir, ip);
     if (fp == NULL) {
@@ -157,7 +185,6 @@ gint32 increase_fail_record(const gchar *dir, const gchar *ip)
         return RET_ERR;
     }
 
-    gint32 ret = RET_OK;
     IpFailRecord *records = NULL;
     do {
         // 获取对应ip的失败记录
@@ -165,6 +192,7 @@ gint32 increase_fail_record(const gchar *dir, const gchar *ip)
         records = (IpFailRecord *)g_malloc0(MAX_RECORD_CNT * sizeof(IpFailRecord));
         if (records == NULL) {
             debug_log(DLOG_ERROR, "g_malloc0 failed");
+            ret = RET_ERR;
             break;
         }
         ret = read_ip_fail_record(fp, &record_cnt, records);
@@ -224,12 +252,18 @@ gint32 clean_fail_record(const gchar *dir, const gchar *ip)
     // 直接删除
     (void)remove(gs_path->str);
     g_string_free(gs_path, TRUE);
+    
+    // 代表要删除记录时，计数-1【无需关注是否存在，删除不存在的key无效果】
+    if (g_ip_map == NULL) {
+        g_ip_map = g_hash_table_new(g_str_hash, g_str_equal);
+    }
+    g_hash_table_remove(g_ip_map, ip);
     return RET_OK;
 }
 
 // 获取单个ip的锁定状态
 gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_threshold, guint64 fail_interval,
-    IpLockStatus *status)
+    guint64 unlock_time, IpLockStatus *status)
 {
     // 获取当前时间
     time_t now = 0;
@@ -277,7 +311,7 @@ gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_thresh
         }
 
         // 若最后一次失败到目前已经超过解锁时间，认为计数为0
-        if (latest_time + IP_UNLOCK_TIME < (guint64)now) {
+        if (latest_time + unlock_time < (guint64)now) {
             fail_cnt = 0;
         }
 
@@ -297,7 +331,8 @@ gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_thresh
 }
 
 // 获取所有锁定状态
-gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail_interval, IpAllStatus *records)
+gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail_interval, guint64 unlock_time,
+    IpAllStatus *records)
 {
     struct dirent *entry;
 
@@ -328,7 +363,7 @@ gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail
             continue;
         }
         (void)strcpy_s(data[i].ip, sizeof(data[i].ip), entry->d_name);
-        (void)get_one_lock_status(dir, entry->d_name, lock_threshold, fail_interval, &data[i]);
+        (void)get_one_lock_status(dir, entry->d_name, lock_threshold, fail_interval, unlock_time, &data[i]);
         i++;
     }
     closedir(cur_dir);

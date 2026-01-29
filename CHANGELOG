@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.110.7] - 2026-1-29
+feat:增加ip锁定记录限制
+
 ## [1.110.6] - 2026-1-27
 feat:支持ip锁定底层库能力
 
