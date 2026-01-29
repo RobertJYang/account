@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.8] - 2026-1-29
+fix:修复Ldap用户使用Rest接口创建KVM会话认证,返回500
 
 ## [1.110.7] - 2026-1-29
 feat:增加ip锁定记录限制
