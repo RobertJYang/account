@@ -207,6 +207,7 @@ function AccountService:set_ipmi_password_complexity(req, ctx)
             log:notice("Skip checking password complexity check lock in manufacture mode")
         elseif control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_DISABLE:value() or
             control == enum.IpmiPwdComplexityEnum.PWD_COMPLEXITY_ENABLE:value() then
+            ctx.operation_log.result = "failed"
             error(custom_msg.PasswordForbidSetComplexityCheck())
         end
     end
