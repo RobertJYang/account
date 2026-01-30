@@ -95,6 +95,23 @@ function SessionType:delete_by_username(username, logout_type)
     return deleted_session_list
 end
 
+--- 根据IP删除会话
+---@param ip string
+---@param logout_type Enum
+function SessionType:delete_by_ip(ip, logout_type)
+    local deleted_session_list = {}
+    for index = #self.m_session_collection, 1, -1 do
+        local session = self.m_session_collection[index]
+        if ip == session.m_ip then
+            table.remove(self.m_session_collection, index)
+            self.m_delete_session:emit(session.m_session_id)
+            record_session_log_out_log(self, logout_type, session)
+            table.insert(deleted_session_list, session.m_session_id)
+        end
+    end
+    return deleted_session_list
+end
+
 --- 根据域控制器和组信息删除对应远程会话
 --- 需覆盖三种场景:
 --- 1、LDAP使能关闭(不带controller_id和inner_id),都不匹配，踢出所有

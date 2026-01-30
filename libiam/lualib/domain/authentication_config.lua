@@ -79,6 +79,12 @@ function authentication_config:get_auth_mode()
     return self.m_db_auth.LocalAccountAuth
 end
 
+function authentication_config:get_auth_lock_config()
+    return self.m_db_auth.AccountLockoutDuration,
+        self.m_db_auth.AccountLockoutThreshold,
+        self.m_db_auth.AccountLockoutCounterResetAfter
+end
+
 function authentication_config:update_pam_faillock(duration, threshold, reset_time)
     duration  = duration    or self.m_db_auth.AccountLockoutDuration
     threshold  = threshold  or self.m_db_auth.AccountLockoutThreshold

@@ -107,6 +107,39 @@ function CLISession:delete_by_username(username, logout_type)
     return deleted_session_list
 end
 
+function CLISession:delete_by_ip(ip, logout_type)
+    local deleted_session_list = {}
+    local cli_session_list = iam_core.get_cli_online_users()
+    for _, cli_session in pairs(cli_session_list) do
+        if cli_session.host == ip then
+            if #cli_session.host == 0 then
+                -- 适配 kill -15 无法正确清除串口会话
+                iam_core.kill(cli_session.pid, SIGKILL)
+            else
+                iam_core.kill(cli_session.pid, SIGTERM)
+            end
+        end
+    end
+
+    for index = #self.m_session_collection, 1, -1 do
+        local session = self.m_session_collection[index]
+        if ip == session.m_ip then
+            table.remove(self.m_session_collection, index)
+            self.m_delete_session:emit(session.m_session_id)
+            local initiator_info = initiator.new(session.m_session_type_name, session.m_username, session.m_ip)
+            if tostring(logout_type) == 'SessionKickout' then
+                log:operation(initiator_info, 'iam', self.logout_type_map_log[tostring(logout_type)],
+                    session.m_username, tostring(session.m_session_type), session.m_ip)
+            else
+                log:operation(initiator_info, 'iam', 
+                    self.logout_type_map_log[tostring(logout_type)], session.m_username, session.m_ip)
+            end
+            table.insert(deleted_session_list, session.m_session_id)
+        end
+    end
+    return deleted_session_list
+end
+
 function CLISession:get_timeout_session_list()
     return {}
 end

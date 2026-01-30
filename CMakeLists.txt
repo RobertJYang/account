@@ -47,6 +47,7 @@ endif()
 add_subdirectory("libiam/lualib-src")
 
 if(ENABLE_TEST)
+    add_definitions(-DG_ENABLE_TEST)
     install(DIRECTORY libiam/lualib/. DESTINATION opt/bmc/lualib/libiam)
 else()
     install(DIRECTORY libiam/lualib/. DESTINATION opt/bmc/lualib/account)

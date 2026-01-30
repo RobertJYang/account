@@ -26,6 +26,7 @@ local cjson = require 'cjson'
 local mc_utils = require 'mc.utils'
 local event = require 'utils.event'
 local signal = require 'mc.signal'
+local config = require 'user_config'
 
 -- Authentication
 local Authentication = class()
@@ -38,6 +39,7 @@ function Authentication:ctor()
     self.m_auth_config = authentication_config.get_instance()
     self.m_account_service = account_service.get_instance()
     self.m_delete_username_session = signal.new()
+    self.m_lock_threshold_changed = signal.new()
 end
 
 -- 本地认证，通过linux shadow形式认证
@@ -93,6 +95,7 @@ function Authentication:vnc_authenticate(ctx, cipher_text, auth_challenge)
     end)
     -- 认证失败
     if not ok then
+        iam_core.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
         error(account_info)
     end
     account_info.Id                 = tonumber(account_info.Id)
@@ -276,8 +279,10 @@ function Authentication:set_account_lockout_threshold(threshold)
     -- 清理不锁定时的日志记录
     if old_threshold == 0 or threshold == 0 then
         self.m_account_service:clean_all_user_lock_state()
+        self.m_lock_threshold_changed:emit()
     elseif old_threshold ~= threshold then
         self.m_account_service:clean_unlock_user_lock_state()
+        self.m_lock_threshold_changed:emit()
     end
     self:update_pam_faillock(nil, threshold, nil, 'AccountLockoutThreshold')
     self.m_auth_config:set_account_lockout_threshold(threshold)
