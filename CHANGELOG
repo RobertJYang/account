@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.10] - 2026-1-30
+feat:支持切面组件配置
+
  ## [1.110.9] - 2026-01-30
 fix:修复强制开启密码复杂度检查，操作日志打印有误的问题
 

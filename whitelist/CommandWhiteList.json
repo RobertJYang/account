@@ -1,0 +1,28 @@
+{
+    "static_commands": [
+        "/bin/cp -rpf /data/trust//home/ /dev/shm/backup_tmp/factory_backup/account/home",
+        "/bin/cp -rpf /data/trust//home/ /dev/shm/backup_tmp/customization_backup/account/home",
+        "/bin/cp -rpf /data/trust/weakdictionary /dev/shm/backup_tmp/factory_backup/account/weakdictionary",
+        "/bin/cp -rpf /data/trust/weakdictionary /dev/shm/backup_tmp/customization_backup/account/weakdictionary",
+        "/bin/cp -rpf /data/trust/pam_faillock /dev/shm/backup_tmp/factory_backup/account/pam_faillock",
+        "/bin/cp -rpf /data/trust/pam_faillock /dev/shm/backup_tmp/customization_backup/account/pam_faillock",
+        "/bin/rm -rf /data/trust/kerberos.pfx",
+        "/bin/rm -rf /dev/shm/backup_tmp/factory_backup/account/pam_faillock",
+        "/bin/rm -rf /dev/shm/backup_tmp/customization_backup/account/pam_faillock",
+        "/bin/rm -rf /dev/shm/backup_tmp/factory_backup/account/weakdictionary",
+        "/bin/rm -rf /dev/shm/backup_tmp/customization_backup/account/weakdictionary",
+        "/bin/rm -rf /dev/shm/backup_tmp/factory_backup/account/home",
+        "/bin/rm -rf /dev/shm/backup_tmp/customization_backup/account/home",
+        "/bin/tar -zcvf /data/trust/opt/bmc/home.tar.gz -C /data/trust home",
+    ],
+    "dynamic_patterns": [
+        "/bin/sh -c /usr/bin/ssh-keygen -i -f /dev/shm/tmp/ssh_rsa\\.pub > /dev/shm/tmp/publickeyconf_[0-9]+",
+        "/bin/sh -c /usr/bin/ssh-keygen -l -E SHA256 -f /dev/shm/tmp/publickeyconf_[0-9]+ > /dev/shm/tmp/publickeyhash_[0-9]+",
+        "/bin/rm -rf /data/trust/home/[^/]+",
+        "/bin/sh -c echo \".*\" > /dev/ttyS0"
+    ],
+    "safe_chars:": "0-9 / ^"
+}
+
+
+
