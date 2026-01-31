@@ -13,7 +13,7 @@
         "/bin/rm -rf /dev/shm/backup_tmp/customization_backup/account/weakdictionary",
         "/bin/rm -rf /dev/shm/backup_tmp/factory_backup/account/home",
         "/bin/rm -rf /dev/shm/backup_tmp/customization_backup/account/home",
-        "/bin/tar -zcvf /data/trust/opt/bmc/home.tar.gz -C /data/trust home",
+        "/bin/tar -zcvf /data/trust/opt/bmc/home.tar.gz -C /data/trust home"
     ],
     "dynamic_patterns": [
         "/bin/sh -c /usr/bin/ssh-keygen -i -f /dev/shm/tmp/ssh_rsa\\.pub > /dev/shm/tmp/publickeyconf_[0-9]+",
