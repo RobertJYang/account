@@ -159,6 +159,7 @@ function account_recover:recover_account(ctx, account_id, policy)
     else
         self:recover_account_while_id_exist(ctx, account_id, backup_data)
     end
+    self.account_collection.m_account_file_flush:emit()
     log:info('[Recover] recover user %d successfully', account_id)
     span:finish()
 end
