@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.12] - 2026-2-2
+修复恢复用户后没有及时刷新导致cli登录延迟
+
 ## [1.110.11] - 2026-1-30
 feat:支持切面组件配置
 
