@@ -34,16 +34,6 @@ local function make_interface()
 end
 
 local function make_channel_config(ctx, account_collection)
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    account_collection:new_account(ctx, account_info, false, false)
     account_collection:set_account_password(ctx, 2, 4, "Paswd@9000")
     local req = {}
     local ctx = {}
@@ -57,6 +47,20 @@ local function make_channel_config(ctx, account_collection)
     req.UserPrivilege = 4
     req.SessionLimit = string.pack(">B", 0)
     return req, ctx
+end
+
+function TestAccount:add_test_account(user_id, login_interface)
+    local interface = login_interface or make_interface()
+    local account_info = {
+        ['id'] = user_id,
+        ['name'] = "test" .. tostring(user_id),
+        ['password'] = "Paswd@9001",
+        ['role_id'] = enum.RoleType.Operator:value(),
+        ['interface'] = interface,
+        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
+    }
+    self.test_account_collection:new_account(self.ctx, account_info, false)
 end
 
 -- 重复获取的公私钥对应当相同(7天有效期内)
@@ -150,16 +154,7 @@ end
 -- 测试增加用户
 function TestAccount:test_add_account()
     local interface = make_interface()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3, interface)
 
     local test_account = self.test_account_collection.collection[3]
     lu.assertEquals(test_account.m_account_data.UserName, "test3")
@@ -171,20 +166,10 @@ end
 
 -- 测试增加用户从2-17
 function TestAccount:test_add_account_full()
-    local interface = make_interface()
     -- 包含默认的一个Administrator和一个VNC用户, IPMI用户与2个snmp community, 一个redfish专用用户，一个设备间内部通信用户
     local table_cnt = 7
     for id = 3, 17 do
-        local account_info = {
-            ['id'] = id,
-            ['name'] = "test" .. tostring(id),
-            ['password'] = "Manufacturer12#$%",
-            ['role_id'] = enum.RoleType.Operator:value(),
-            ['interface'] = interface,
-            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-            ['account_type'] = enum.AccountType.Local:value()
-        }
-        self.test_account_collection:new_account(self.ctx, account_info, false)
+        self:add_test_account(id)
         table_cnt = table_cnt + 1
     end
     local test_account = self.test_account_collection.collection[10]
@@ -201,16 +186,7 @@ function TestAccount:test_add_account_full()
 end
 
 function TestAccount:test_user_file_sync()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test4",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(4)
     local account = self.test_account_collection.collection[4]
 
     local la1 = account_linux.new(config.LINUX_FILES, true)
@@ -231,16 +207,7 @@ function TestAccount:test_user_file_sync()
 end
 
 function TestAccount:test_user_file_sync_dfx()
-    local account_info = {
-        ['id'] = 4,
-        ['name'] = "test4",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(4)
     local account = self.test_account_collection.collection[4]
 
     local la1 = account_linux.new(config.LINUX_FILES, true)
@@ -275,16 +242,7 @@ function TestAccount:test_user_file_sync_dfx()
 end
 
 function TestAccount:test_change_interface()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     local interface = { "IPMI", "Web" }
     self.test_account_collection:set_login_interface(self.ctx, 3, interface)
     local account = self.test_account_collection.collection[3]
@@ -299,16 +257,7 @@ function TestAccount:test_change_interface()
 end
 
 function TestAccount:test_change_role_id()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_collection:set_role_id(self.ctx, 3, 4)
     local account = self.test_account_collection.collection[3]
     lu.assertEquals(account.m_account_data.RoleId, 4)
@@ -318,16 +267,7 @@ function TestAccount:test_change_role_id()
 end
 
 function TestAccount:test_change_user_name()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_collection:set_user_name(self.ctx, 3, "test3_new")
     local account = self.test_account_collection.collection[3]
     lu.assertEquals(account.m_account_data.UserName, "test3_new")
@@ -338,16 +278,7 @@ end
 
 function TestAccount:test_change_user_pwd()
     local account_data, last_sha512_pwd, new_sha512_pwd, last_kdf_pwd, new_kdf_pwd
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     account_data = self.test_account_collection:get_account_data_by_id(3)
     last_sha512_pwd, last_kdf_pwd = account_data.Password, account_data.KDFPassword
     self.test_account_collection:set_account_password(self.ctx, 2, 3, "Paswd@9002")
@@ -360,17 +291,7 @@ function TestAccount:test_change_user_pwd()
 end
 
 function TestAccount:test_change_user_pwd_in_weak_password_dictionary()
-    local last_password = "Paswd@9001"
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = last_password,
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     lu.assertErrorMsgContains(custom_msg.PasswordInWeakPWDDictMessage.Name, function()
         self.test_account_service:set_account_password(self.ctx, 2, 3, "Admin123!")
     end)
@@ -516,16 +437,7 @@ end
 
 function TestAccount:test_set_ipmi_login_interface()
     local interface = { enum.LoginInterface.Redfish, enum.LoginInterface.SFTP }
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3, interface)
     local req = {}
     local ctx = {}
     ctx.operation_log = { operation = nil, result = nil, params = {} }
@@ -541,17 +453,7 @@ function TestAccount:test_set_ipmi_login_interface()
 end
 
 function TestAccount:test_set_user_password()
-    local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish, enum.LoginInterface.SFTP }
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     local account = self.test_account_collection:get_account_by_account_id(3)
     local req = {}
     local ctx = {}
@@ -661,16 +563,7 @@ end
 function TestAccount:test_change_self_pwd_while_in_password_min_valid_limit()
     -- 添加用户Id:3,username:test3
     local interface = { enum.LoginInterface.IPMI, enum.LoginInterface.Redfish, enum.LoginInterface.SFTP }
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3, interface)
     -- 设置最短有效期10天
     self.test_global_account_config:set_min_password_valid_days(10)
     --  直接从collection设置最短密码有效期(未更新状态)
@@ -830,16 +723,7 @@ end
 
 -- 测试设置鉴权算法
 function TestAccount:test_set_auth_protocol()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_service:set_user_auth_protocol(self.ctx, 2, 3,
         enum.SNMPAuthenticationProtocols.SHA512, "Paswd@9000", "Asplin@9000")
     local account = self.test_account_collection.collection[3]
@@ -852,16 +736,7 @@ function TestAccount:test_set_auth_protocol()
 end
 
 function TestAccount:test_set_encrypt_protocol()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_service:set_user_encrypt_protocol(self.ctx, 3, enum.SNMPEncryptionProtocols.AES256)
     local account = self.test_account_collection.collection[3]
     lu.assertEquals(account.m_snmp_user_info_data.EncryptionProtocol, enum.SNMPEncryptionProtocols.AES256)
@@ -871,16 +746,7 @@ function TestAccount:test_set_encrypt_protocol()
 end
 
 function TestAccount:test_set_snmp_password()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_service:set_user_snmp_pwd(self.ctx, 3, "Paswd@90011")
     self.test_account_collection:delete_account(self.ctx, 3)
     local test_account = self.test_account_collection.collection[3]
@@ -889,16 +755,7 @@ end
 
 -- 测试设置非法长度的snmp加密密码时，应该失败
 function TestAccount:test_set_snmp_invalid_length_password_should_fail()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     -- 本用例仅检测关闭密码复杂度检查时的长度校验
     self.test_global_account_config:set_password_complexity_enable(false)
     local invalid_length_password = ''
@@ -919,17 +776,8 @@ end
 
 -- 测试增加用户中account_service业务逻辑
 function TestAccount:test_account_service_add_account()
-    local interface = make_interface()
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_service:new_account(self.ctx, account_info, false)
+    local interface = login_interface or make_interface()
+    self:add_test_account(3, interface)
 
     local test_account = self.test_account_collection.collection[3]
     lu.assertEquals(test_account.m_account_data.UserName, "test3")
@@ -943,28 +791,8 @@ end
 function TestAccount:test_update_user_inactive_start_time()
     -- 启用禁用不活跃用户功能
     self.test_account_service:set_inactive_time_threshold(30)
-    local interface = make_interface()
-    -- 新建用户
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
-    account_info = {
-        ['id'] = 17,
-        ['name'] = "test17",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = interface,
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
+    self:add_test_account(17)
     local cur_timestamp = vos.vos_get_cur_time_stamp()
     -- 设置用户不活跃起始时间为当前
     self.test_account_collection.collection[3]:update_inactive_user_start_time()
@@ -1043,6 +871,7 @@ end
 
 -- set user access 成功设置用户通道权限
 function TestAccount:test_ipmi_set_user_access_when_config_not_exist_should_success()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1053,6 +882,7 @@ end
 
 -- set user access 成功更改用户通道配置(ChangeEnable为1)
 function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1075,6 +905,7 @@ end
 
 -- set user access 成功更改用户通道配置(ChangeEnable为0)
 function TestAccount:test_ipmi_set_user_access_when_config_exist_should_success2()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1097,6 +928,7 @@ end
 
 -- 获取正常用户通道配置测试
 function TestAccount:test_ipmi_get_user_access_success()
+    self:add_test_account(4)
     local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     self.test_account_collection:set_ipmi_user_access(set_req, ctx)
     local req = {}
@@ -1108,13 +940,43 @@ function TestAccount:test_ipmi_get_user_access_success()
     local ok, ret = self.test_account_service:get_ipmi_user_access(req, ctx)
     lu.assertEquals(ok, err_cfg.USER_OPER_SUCCESS)
     lu.assertEquals(ret.MaxUserNumber, 17)
-    lu.assertEquals(ret.EnableStatus, 0)
+    lu.assertEquals(ret.EnableStatus, 1)
     lu.assertEquals(ret.UserNumber, 1)
     lu.assertEquals(ret.IpmiMessaging, 1)
     lu.assertEquals(ret.ChaAccessMode, 1)
     lu.assertEquals(ret.LinkAuthentication, 1)
     lu.assertEquals(ret.PrivilegeLimit, 4)
     self.test_account_collection:delete_account(ctx, 4)
+end
+
+function TestAccount:test_ipmi_get_user_access_enable()
+    local user_id = 8
+    self:add_test_account(user_id)
+
+    local req = { UserId = user_id, PasswordSize = 0 }
+    local ctx = { ChanType = 3 }
+    ctx.session = {}
+    ctx.session.user = {}
+    ctx.session.user.name = 'Administrator'
+    ctx.session.user.id = 2
+    ctx.operation_log = { operation = nil, result = nil, params = {} }
+    req.PasswordData = 'Paswd@90001\0\0\0\0\0' -- 通过\0补齐到16字节
+
+    req.Operation = 0 -- disable user
+    self.test_account_service:ipmi_set_account_password(req, ctx)
+
+    local user_access_req = {}
+    user_access_req.UserId = user_id
+    user_access_req.ChannelNumber = 1
+    local _, ret = self.test_account_service:get_ipmi_user_access(user_access_req, ctx)
+    lu.assertEquals(ret.EnableStatus, 2)
+
+    req.Operation = 1 -- enable user
+    self.test_account_service:ipmi_set_account_password(req, ctx)
+    local _, access_ret = self.test_account_service:get_ipmi_user_access(user_access_req, ctx)
+    lu.assertEquals(access_ret.EnableStatus, 1)
+
+    self.test_account_collection:delete_account(ctx, user_id)
 end
 
 -- 获取空用户通道配置测试
@@ -1141,8 +1003,6 @@ end
 
 -- 用户存在未配置通道权限，获取通道配置成功测试
 function TestAccount:test_ipmi_get_channel_not_config_should_success()
-    -- local set_req, ctx = make_channel_config(self.ctx, self.test_account_collection)
-    -- self.test_account_collection:set_ipmi_user_access(set_req, ctx)
     local req = {}
     local ctx = {}
     req.UserId = 4
@@ -1213,6 +1073,7 @@ end
 
 -- 设置权限异常值失败测试
 function TestAccount:test_ipmi_set_user_access_when_privilege_invalid_should_fail()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     req.UserPrivilege = 0
     local ret = pcall(function()
@@ -1224,6 +1085,7 @@ end
 
 -- 设置通道异常值失败测试
 function TestAccount:test_ipmi_set_user_access_when_channel_invalid_should_fail()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     req.ChannelNumber = 12  -- 通道异常
     local ret = pcall(function()
@@ -1295,6 +1157,7 @@ end
 
 -- 设置set user access命令长度超长测试
 function TestAccount:test_ipmi_set_user_access_when_sessionlimit_too_long_should_fail()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     local ret = pcall(function()
         self.test_account_collection:set_ipmi_user_access(req, ctx)
@@ -1317,6 +1180,7 @@ end
 -- 设置通道为当前通道且不满足通道校验限制失败测试
 -- 设置通道异常值失败测试
 function TestAccount:test_ipmi_set_user_access_when_present_channel_invalid_should_fail()
+    self:add_test_account(4)
     local req, ctx = make_channel_config(self.ctx, self.test_account_collection)
     req.ChannelNumber = 14  -- 通道异常
     ctx.chan_num = 16
@@ -1333,16 +1197,7 @@ function TestAccount:test_get_valid_account_id_should_same_to_min_valid_id_when_
     local account_id = self.test_account_collection:get_valid_account_id(0, nil)
     lu.assertEquals(account_id, 3)
     --  添加id为3的用户,再次获取最小的可用id应为4
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     account_id = self.test_account_collection:get_valid_account_id(0, nil)
     lu.assertEquals(account_id, 4)
     --  恢复操作
@@ -1351,20 +1206,10 @@ end
 
 --- 用户已满时，获取当前可添加用户id应为nil
 function TestAccount:test_get_valid_account_id_should_be_nil_when_user_is_full()
-    local interface = make_interface()
     local account_info
     --  添加id:3-17用户
     for id = 3, 17 do
-        account_info = {
-            ['id'] = id,
-            ['name'] = "test" .. id,
-            ['password'] = "Paswd@9001",
-            ['role_id'] = enum.RoleType.Operator:value(),
-            ['interface'] = interface,
-            ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-            ['account_type'] = enum.AccountType.Local:value()
-        }
-        self.test_account_collection:new_account(self.ctx, account_info, false)
+        self:add_test_account(id)
     end
     lu.assertErrorMsgContains(base_msg.CreateLimitReachedForResourceMessage.Name, function()
         self.test_account_collection:get_valid_account_id(0, nil)
@@ -1420,16 +1265,7 @@ function TestAccount:test_set_same_with_name_password_when_default_should_succes
     lu.assertEquals(default_length, 4)
     local default_status = self.test_global_account_config:get_password_complexity_enable()
     lu.assertEquals(default_status, true)
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test3",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_account_collection:set_user_name(self.ctx, 3, "test3_new")
     self.test_account_collection:set_account_password(self.ctx, 2, 3, "test333@132")
 
@@ -1446,21 +1282,12 @@ function TestAccount:test_set_invalid_password_when_username_pwd_compare_on_shou
     lu.assertEquals(default_length, 4)
     local default_status = self.test_global_account_config:get_password_complexity_enable()
     lu.assertEquals(default_status, true)
-    local account_info = {
-        ['id'] = 3,
-        ['name'] = "test1",
-        ['password'] = "Paswd@9001",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    self:add_test_account(3)
     self.test_global_account_config:set_user_name_password_compared_enabled(true)
     lu.assertErrorMsgContains(custom_msg.PasswordComplexityCheckFailMessage.Name, function()
         self.test_account_collection:set_account_password(self.ctx, 2, 3, "test111@132")
     end)
-    account_info = {
+    local account_info = {
         ['id'] = 4,
         ['name'] = "test4",
         ['password'] = "test111@132",
@@ -1546,25 +1373,16 @@ end
 --- 当创建新用户, PasswordChangeRequired应该为true
 --- 管理员重置密码后应为true, 修改自己密码后变为false
 function TestAccount:test_when_new_account_password_change_required_should_be_true()
-    local account_id = 4
-    local account_info = {
-        ['id'] = account_id,
-        ['name'] = "test4",
-        ['password'] = "Paswd@9000",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    local account_id = 9
+    self:add_test_account(account_id)
 
     local account = self.test_account_collection.collection[account_id]
     lu.assertEquals(account.m_account_data.PasswordChangeRequired, true)
 
-    self.test_account_collection:set_account_password(self.ctx, 2, account_id, "Paswd@9001")
+    self.test_account_collection:set_account_password(self.ctx, 2, account_id, "Paswd@9002")
     lu.assertEquals(account.m_account_data.PasswordChangeRequired, true)
 
-    self.test_account_collection:set_account_password(self.ctx, account_id, account_id, "Paswd@9002")
+    self.test_account_collection:set_account_password(self.ctx, account_id, account_id, "Paswd@9004")
     lu.assertEquals(account.m_account_data.PasswordChangeRequired, false)
     -- 恢复环境
     self.test_account_collection:delete_account(self.ctx, account_id)
@@ -1575,17 +1393,8 @@ end
 -- 提示 - 角色对应权限
 function TestAccount:test_when_new_account_privilege_with_different_initial_policy()
     self.test_account_service:set_initial_account_privilege_restrict_enabled(true)
-    local account_id = 4
-    local account_info = {
-        ['id'] = account_id,
-        ['name'] = "test4",
-        ['password'] = "Paswd@9000",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    local account_id = 11
+    self:add_test_account(account_id)
 
     local account = self.test_account_collection.collection[account_id]
     lu.assertEquals(#account.current_privileges, 1)
@@ -1610,27 +1419,18 @@ end
 -- 用户自己修改初始密码后，用户权限和角色权限一致
 function TestAccount:test_when_change_password_should_update_privilege()
     self.test_account_service:set_initial_account_privilege_restrict_enabled(true)
-    local account_id = 4
-    local account_info = {
-        ['id'] = account_id,
-        ['name'] = "test4",
-        ['password'] = "Paswd@9000",
-        ['role_id'] = enum.RoleType.Operator:value(),
-        ['interface'] = make_interface(),
-        ['first_login_policy'] = enum.FirstLoginPolicy.ForcePasswordReset,
-        ['account_type'] = enum.AccountType.Local:value()
-    }
-    self.test_account_collection:new_account(self.ctx, account_info, false)
+    local account_id = 12
+    self:add_test_account(account_id)
 
     local account = self.test_account_collection.collection[account_id]
     lu.assertEquals(#account.current_privileges, 1)
     lu.assertEquals(account.current_privileges, {tostring(enum.PrivilegeType.ConfigureSelf)})
 
-    self.test_account_collection:set_account_password(self.ctx, 2,  account_id, "Paswd@9001")
+    self.test_account_collection:set_account_password(self.ctx, 2,  account_id, "Paswd@9002")
     lu.assertEquals(#account.current_privileges, 1)
     lu.assertEquals(account.current_privileges, {tostring(enum.PrivilegeType.ConfigureSelf)})
 
-    self.test_account_collection:set_account_password(self.ctx, account_id, account_id, "Paswd@9002")
+    self.test_account_collection:set_account_password(self.ctx, account_id, account_id, "Paswd@9003")
     lu.assertEquals(#account.current_privileges, 6)
 
     -- 恢复环境
