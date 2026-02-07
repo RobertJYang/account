@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.13] - 2026-2-6
+修复IPMI Get user access返回enable status错误问题
+
 ## [1.110.12] - 2026-2-2
 修复恢复用户后没有及时刷新导致cli登录延迟
 
