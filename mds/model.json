@@ -105,7 +105,7 @@
                     },
                     "EmergencyLoginAccountId": {
                         "privilege": {
-                            "read": ["ReadOnly"],
+                            "read": ["UserMgmt"],
                             "write": ["UserMgmt"]
                         },
                         "default": 0,

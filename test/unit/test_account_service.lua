@@ -776,7 +776,7 @@ end
 
 -- 测试增加用户中account_service业务逻辑
 function TestAccount:test_account_service_add_account()
-    local interface = login_interface or make_interface()
+    local interface = make_interface()
     self:add_test_account(3, interface)
 
     local test_account = self.test_account_collection.collection[3]
