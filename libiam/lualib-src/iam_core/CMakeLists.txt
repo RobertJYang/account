@@ -21,11 +21,13 @@ target_link_libraries(${PASSWOED_LIB}
 )
 
 if(NOT (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64"))
-    message(STATUS "not dt mode, build pam_bmc_login")
+    message(STATUS "not dt mode, build pam_bmc_login and pam_ip_lock")
     add_subdirectory("pam_bmc_login")
+    
 endif()
 
 add_subdirectory("uip")
+add_subdirectory("ip_lock")
 
 set_target_properties(${PASSWOED_LIB} PROPERTIES PREFIX "")
 if(ENABLE_TEST)

@@ -339,7 +339,7 @@ return {
     [USER_GID] = USER_GROUP_NAME,
     [NO_ACCESS_USER_GID] = NO_ACCESS_GROUP_NAME,
     [ADMINISTRATOR_GID] = ADMINISTRATOR_GROUP_NAME,
-},
+  },
 
   -- 启用cli扫描用户的ssh进程，该功能需要在集成测试禁用，防止linux中集成测试失败
   ENABLE_CLI_SSHD_SCAN = true,
@@ -371,5 +371,9 @@ return {
   MAX_WEB_SESSION_COUNT = MAX_WEB_SESSION_COUNT,
 
   MAX_LOCAL_USER_NUM = 17,
-  MIN_LOCAL_USER_NUM = 2
+  MIN_LOCAL_USER_NUM = 2,
+
+  IP_LOCK_PATH = "/dev/shm/ip_lock",
+  IAM_SHM_PATH = "/dev/shm/iam",
+  ACCESS_CONFIG_FILE = "/dev/shm/iam/pam_access.conf"
 }

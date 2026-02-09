@@ -11,13 +11,13 @@
  * PURPOSE.
  * See the Mulan PSL v2 for more details.
  *
- * Create: 2026-01-26
+ * Create: 2026-02-09
  */
 
 #ifndef __IP_LOCK_H__
 #define __IP_LOCK_H__
 
-#include "common.h"
+#include "../common/common.h"
 
 #define MAX_IP_LENGTH     64
 #define MAX_NAME_LENGTH   64
@@ -26,6 +26,17 @@
 
 #define SNMPD_USER_GROUP 95
 #define SECBOX_UID       104
+
+#define DEFAULT_RECORD_DIR "/dev/shm/ip_lock"
+
+#define IAM_SERVICE                    "bmc.kepler.iam"
+#define ACCOUNT_SERVICE                "bmc.kepler.account"
+#define AUTHENTICATION_PATH            "/bmc/kepler/AccountService/Authentication"
+#define AUTHENTICATION_INTF            "bmc.kepler.AccountService.Authentication"
+#define PROPERTIES_INTF                "org.freedesktop.DBus.Properties"
+#define PROPERTY_LOCKOUT_DURATION      "AccountLockoutDuration"
+#define PROPERTY_LOCKOUT_THRESHOLD     "AccountLockoutThreshold"
+#define PROPERTY_LOCKOUT_TIME_INTERVAL "AccountLockoutCounterResetAfter"
 
 typedef struct ip_fail_record {
     gchar   record_name[MAX_NAME_LENGTH];
@@ -49,5 +60,6 @@ gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_thresh
     guint64 unlock_time, IpLockStatus *status);
 gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail_interval, guint64 unlock_time,
     IpAllStatus *records);
+gint32 clean_all_fail_record(const gchar *dir);
 
 #endif // __IP_LOCK_H__

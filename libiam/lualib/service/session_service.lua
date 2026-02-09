@@ -24,6 +24,7 @@ local video_session = require 'domain.session_type.session_video'
 local inter_chassis_session = require 'domain.session_type.session_inter_chassis'
 local authentication_service = require 'service.authentication'
 local ldap_authentication_service = require 'service.ldap_authentication'
+local access_service = require 'service.access_service'
 local ldap_config = require 'domain.ldap_config'
 local ldap_controller_collection = require 'domain.ldap.ldap_controller_collection'
 local remote_group_collection = require 'domain.remote_group.remote_group_collection'
@@ -46,6 +47,7 @@ local account_cache = require 'domain.cache.account_cache'
 local account_service_cache = require 'domain.cache.account_service_cache'
 local trace = require 'telemetry.trace'
 local session = require 'domain.session'
+local ip_lock = require 'ip_lock'
 
 -- 历史登出会话记录最大数
 local MAX_LOGOUT_SESSION<const> = 32
@@ -176,6 +178,7 @@ function SessionService:ctor(db)
     self.m_account_cache = account_cache.get_instance()
     self.m_account_service_cache = account_service_cache.get_instance()
     self.m_certificate_authtication = certificate_authentication.get_instance()
+    self.m_access_service = access_service.get_instance()
 
     self.m_sessions_db = db:select(db.Sessions):first()
 end
@@ -226,6 +229,7 @@ function SessionService:init()
     self:register_account_signals()
     self:register_mutual_auth_signals()
     self:delete_username_session_signals()
+    self:register_access_signals()
 end
 
 -- 新增的独立方法：处理超时会话
@@ -341,6 +345,12 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
     local server_id, func, ok, auth_account_info
     local is_no_access = false
 
+    -- 在认证之前判断本ip是否锁定
+    if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
+        log:error("ip is locked by auth failed")
+        error(custom_msg.AuthorizationFailed())
+    end
+
     -- 遍历可用的auth_type
     for _, auth_type in pairs(auth_types) do
         -- 首先认证，以保证不暴露内部其他实现，暂不支持本地认证/LDAP外的其他认证
@@ -356,6 +366,8 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
         ok, auth_account_info = pcall(func, username, password, ip, interface, server_id, ext_config)
 
         if ok then
+            -- 若有成功，无论何种形式，解锁ip
+            ip_lock.clean_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
             return auth_account_info, auth_type
         end
         -- 异常场景下auth_account_info为抛出的错误，无权限用户认证失败后优先抛错NoAccess
@@ -364,6 +376,10 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
         end
     end
 
+    -- IP锁定无关用户，各种方式认证失败均记录，所以在此处判断增加记录（仅非DT模式下使用,SSH不记录，由openssh记录）
+    if not skynet.getenv('TEST_DATA_DIR') and ctx.Interface ~= 'SSH' then
+        ip_lock.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
+    end
     collectgarbage('collect')
     span:finish()
     -- 若不ok，第二个参数为错误信息
@@ -888,6 +904,23 @@ function SessionService:delete_session_by_username(username, logout_type)
     end
 end
 
+function SessionService:delete_session_by_ip(ip, logout_type)
+    for session_type, session_collection in pairs(self.m_session_service_collection) do
+        if session_type == iam_enum.SessionType.CLI:value() and skynet_ready then
+            skynet.fork_once(function()
+                -- 协程等待，防止CLI回显失败
+                skynet.sleep(50)
+                local del_session_list = session_collection:delete_by_ip(ip, logout_type)
+                self:record_logout_session(del_session_list, logout_type)
+            end
+            )
+        else
+            local del_session_list = session_collection:delete_by_ip(ip, logout_type)
+            self:record_logout_session(del_session_list, logout_type)
+        end
+    end
+end
+
 --- 根据域控制器和组信息删除对应远程会话
 function SessionService:delete_remote_session(controller_id, inner_id, logout_type)
     for _, session_collection in pairs(self.m_session_service_collection) do
@@ -1020,6 +1053,12 @@ end
 --- 获取指定会话类型的最长超时时间
 function SessionService:get_max_session_timeout(session_type)
     return self.m_session_service_collection[session_type:value()]:get_max_session_timeout()
+end
+
+function SessionService:register_access_signals()
+    self.m_access_service.m_ip_locked_sig:on(function(ip)
+        self:delete_session_by_ip(ip, iam_enum.SessionLogoutType.SessionKickout)
+    end)
 end
 
 --- 用户信息删除及修改回调注册

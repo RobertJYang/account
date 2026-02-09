@@ -8,6 +8,7 @@
 -- IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 -- PURPOSE.
 -- See the Mulan PSL v2 for more details.
+local skynet = require 'skynet'
 local singleton = require 'mc.singleton'
 local class = require 'mc.class'
 local cls_mng = require 'mc.class_mgnt'
@@ -21,6 +22,8 @@ local operation_logger = require 'interface.operation_logger'
 local authentication_service = require 'service.authentication'
 local trace = require 'telemetry.trace'
 local vos_utils  = require 'utils.vos'
+local config = require 'user_config'
+local iam_core = require 'iam_core'
 
 local INTERFACE_AUTHENTICATION = "bmc.kepler.AccountService.Authentication"
 local PATH_AUTHENTICATION      = "/bmc/kepler/AccountService/Authentication"
@@ -139,6 +142,7 @@ function AuthenticationMdb:authenticate(ctx, username, password, domain)
     }
     local auth_account_info = self.m_session_service:authenticate(ctx, username, password, ctx.Interface,
         ctx.ClientAddr, domain, ext_config)
+
     local extra_data = {}
     local role_id_table = {}
 

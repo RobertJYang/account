@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.14] - 2026-2-9
+feat:支持本地认证基于IP进行锁定
+
 ## [1.110.13] - 2026-2-6
 修复非管理员可以查看紧急用户问题
 修复IPMI Get user access返回enable status错误问题
