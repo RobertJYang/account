@@ -27,6 +27,9 @@
 #define SNMPD_USER_GROUP 95
 #define SECBOX_UID       104
 
+#define DO_CHECK 1
+#define NO_CHECK 0
+
 #define DEFAULT_RECORD_DIR "/dev/shm/ip_lock"
 
 #define IAM_SERVICE                    "bmc.kepler.iam"
@@ -54,7 +57,7 @@ typedef struct ip_all_status {
     IpLockStatus *records;
 } IpAllStatus;
 
-gint32 increase_fail_record(const gchar *dir, const gchar *ip);
+gint32 increase_fail_record(const gchar *dir, const gchar *ip, guint8 is_check_lock);
 gint32 clean_fail_record(const gchar *dir, const gchar *ip);
 gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_threshold, guint64 fail_interval,
     guint64 unlock_time, IpLockStatus *status);

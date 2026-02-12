@@ -347,7 +347,7 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
 
     -- 在认证之前判断本ip是否锁定
     if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
-        log:error("ip is locked by auth failed")
+        log:error("ip %s is locked by auth failed", ctx.ClientAddr)
         error(custom_msg.AuthorizationFailed())
     end
 
@@ -378,7 +378,7 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
 
     -- IP锁定无关用户，各种方式认证失败均记录，所以在此处判断增加记录（仅非DT模式下使用,SSH不记录，由openssh记录）
     if not skynet.getenv('TEST_DATA_DIR') and ctx.Interface ~= 'SSH' then
-        ip_lock.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
+        ip_lock.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr, 0)
     end
     collectgarbage('collect')
     span:finish()
@@ -735,6 +735,11 @@ end
 ---@param auth_challenge string
 function SessionService:new_vnc_session(ctx, ciphertext, auth_challenge, session_mode)
     local span = trace.start_span('libiam.SessionService.new_vnc_session', {session_mode = session_mode})
+    -- 在认证之前判断本ip是否锁定
+    if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
+        log:error("ip %s is locked by auth failed", ctx.ClientAddr)
+        error(custom_msg.AuthorizationFailed())
+    end
     local vnc_account = self.m_authentication_service:vnc_authenticate(ctx, ciphertext, auth_challenge)
     -- mode为2,vnc先进行认证动作,不记录操作日志
     if session_mode == 2 then
