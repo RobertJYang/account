@@ -27,6 +27,7 @@ local mc_utils = require 'mc.utils'
 local event = require 'utils.event'
 local signal = require 'mc.signal'
 local config = require 'user_config'
+local ip_lock = require 'ip_lock'
 
 -- Authentication
 local Authentication = class()
@@ -95,7 +96,7 @@ function Authentication:vnc_authenticate(ctx, cipher_text, auth_challenge)
     end)
     -- 认证失败
     if not ok then
-        iam_core.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
+        ip_lock.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr, 0)
         error(account_info)
     end
     account_info.Id                 = tonumber(account_info.Id)

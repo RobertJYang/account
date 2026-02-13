@@ -27,9 +27,10 @@
 
 static int l_increase_ip_fail_record(lua_State *L)
 {
-    const gchar *dir    = luaL_checkstring(L, 1);
-    const gchar *ip_str = luaL_checkstring(L, 2);
-    gint32 ret = increase_fail_record(dir, ip_str);
+    const gchar *dir     = luaL_checkstring(L, 1);
+    const gchar *ip_str  = luaL_checkstring(L, 2);
+    guint8 is_check_lock = (guint8)luaL_checkinteger(L, 3);
+    gint32 ret = increase_fail_record(dir, ip_str, is_check_lock);
     lua_pushinteger(L, ret);
     return 1;
 }

@@ -29,7 +29,7 @@ function TestIam:test_check_one_ip_lock()
 
     -- 增加三次记录后，拿到的锁定状态为true
     for _ = 1, lock_threshold do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     end
     lu.assertIsTrue(ip_lock.get_one_ip_lock_status(self.ip_lock_dir, TEST_IP_1, lock_threshold, fail_interval, unlock_time))
 
@@ -52,7 +52,7 @@ function TestIam:test_two_ip_lock_is_independent_of_other()
 
     -- 对IP1增加三次记录后，IP1的锁定状态为true，IP2的锁定状态依然为false
     for _ = 1, lock_threshold do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     end
     lu.assertIsTrue(ip_lock.get_one_ip_lock_status(self.ip_lock_dir, TEST_IP_1, lock_threshold, fail_interval, unlock_time))
     lu.assertIsFalse(ip_lock.get_one_ip_lock_status(self.ip_lock_dir, TEST_IP_2, lock_threshold, fail_interval, unlock_time))
@@ -69,9 +69,9 @@ function TestIam:test_fali_time_exceed_the_interval_not_lock()
     local unlock_time = 5
 
     -- 两次记录间隔为4秒，第一次记录无效，锁定状态理应为false
-    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     os.execute("sleep " .. 4)
-    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     lu.assertIsFalse(ip_lock.get_one_ip_lock_status(self.ip_lock_dir, TEST_IP_1, lock_threshold, fail_interval, unlock_time))
 
     -- 清理锁定记录
@@ -94,7 +94,7 @@ function TestIam:test_get_all_ip_lock_records()
 
     for k, v in pairs(suit_table) do
         for _ = 1, v.time do
-            lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, k), 0)
+            lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, k, 0), 0)
         end
     end
 
@@ -105,12 +105,7 @@ function TestIam:test_get_all_ip_lock_records()
     -- 对每条记录判断预期
     for _, v in pairs(records) do
         lu.assertEquals(v.lock_status, suit_table[v.ip].expect_lock_status)
-        if suit_table[v.ip].expect_lock_status then
-            -- 因为lock_start_time是个时间戳不好断言，所以仅判断是否为0
-            lu.assertNotEquals(v.lock_start_time, 0)
-        else
-            lu.assertEquals(v.lock_start_time, 0)
-        end
+        lu.assertNotEquals(v.lock_start_time, 0)
     end
 
     -- 清理锁定记录
@@ -126,13 +121,13 @@ function TestIam:test_single_ip_fail_record_cnt()
 
     -- 写入100次，文件达到最大记录
     for _ = 1, 100 do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     end
     lu.assertEquals(vos_utils.get_file_length(self.ip_lock_dir .. "/" .. TEST_IP_1), max_file_length)
 
     -- 再写入5次，文件大小不会再变更
     for _ = 1, 5 do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, TEST_IP_1, 0), 0)
     end
     lu.assertEquals(vos_utils.get_file_length(self.ip_lock_dir .. "/" .. TEST_IP_1), max_file_length)
 
@@ -144,14 +139,14 @@ end
 function TestIam:test_all_ip_records_cnt()
     -- 首先增加记录到1000条，均成功
     for i = 1, 1000 do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, tostring(i)), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, tostring(i), 0), 0)
     end
 
     -- 再进行尝试，无法增加
-    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, "test"), -1)
+    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, "test", 0), -1)
 
     -- 尝试增加已有的ip的记录，可以成功
-    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, "111"), 0)
+    lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, "111", 0), 0)
 
     -- 清理锁定记录
     lu.assertEquals(ip_lock.clean_all_ip_fail_record(self.ip_lock_dir), 0)
@@ -181,10 +176,10 @@ function TestIam:test_ip_with_port_should_count_ip_only()
     local unlock_time = 5
 
     for _, ip in pairs(test_ipv4) do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, ip), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, ip, 0), 0)
     end
     for _, ip in pairs(test_ipv6) do
-        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, ip), 0)
+        lu.assertEquals(ip_lock.increase_ip_fail_record(self.ip_lock_dir, ip, 0), 0)
     end
 
     -- 预期："127.0.0.1"有3条记录，未锁定；"2001:db8::1"有四条记录，锁定

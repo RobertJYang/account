@@ -69,7 +69,7 @@ LOCAL FILE *open_ip_fail_record(const gchar *dir, const gchar *ip)
     gint32 fd = fileno(fp);
     (void)fchmod(fd, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     // 保证snmp接口调用时能读到faillock文件
-    if (fchown(fd, -1, SNMPD_USER_GROUP) != 0) {
+    if (fchown(fd, SECBOX_UID, SNMPD_USER_GROUP) != 0) {
         debug_log(DLOG_DEBUG, "change ip_record file group failed.");
     }
     while (flock(fd, LOCK_EX) == -1 && errno == EINTR) {
@@ -377,7 +377,7 @@ LOCAL gboolean check_if_locked(const gchar *dir, const gchar *ip)
 #endif // G_ENABLE_TEST
 
 // 增加特定ip的失败记录
-gint32 increase_fail_record(const gchar *dir, const gchar *ip)
+gint32 increase_fail_record(const gchar *dir, const gchar *ip, guint8 is_check_lock)
 {
     gchar clean_ip[MAX_IP_LENGTH] = {0};
     gint32 ret = remove_port_from_ip(ip, clean_ip, MAX_IP_LENGTH);
@@ -392,13 +392,13 @@ gint32 increase_fail_record(const gchar *dir, const gchar *ip)
         return RET_ERR;
     }
 
-#ifndef G_ENABLE_TEST
     // 若已经锁定，不再增加锁定记录，避免持续刷新时间导致无法解锁
-    if (check_if_locked(dir, clean_ip)) {
-        debug_log(DLOG_NOTICE, "ip %s is locked, not increase fail record", clean_ip);
-        return RET_OK;
+    if (is_check_lock == DO_CHECK) {
+        if (check_if_locked(dir, clean_ip)) {
+            debug_log(DLOG_NOTICE, "ip %s is locked, not increase fail record", clean_ip);
+            return RET_OK;
+        }
     }
-#endif // G_ENABLE_TEST
 
     // 获取失败记录文件句柄
     FILE *fp = open_ip_fail_record(dir, clean_ip);
@@ -553,7 +553,7 @@ gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_thresh
 
         // 判断有效失败次数是否已经达到锁定次数
         status->lock_status = (fail_cnt >= lock_threshold);
-        status->lock_start_time = status->lock_status ? latest_time : 0;
+        status->lock_start_time = latest_time;
         
         res = RET_OK;
     } while(0);
