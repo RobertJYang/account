@@ -8,6 +8,7 @@
 -- See the Mulan PSL v2 for more details.
 local lu = require 'luaunit'
 local sqlite3 = require 'lsqlite3'
+local config_handle = require 'interface.config_mgmt.config_handle'
 local profile_adapter = require 'interface.config_mgmt.profile.profile_adapter'
 local mc_context = require 'mc.context'
 local cjson = require 'cjson'
@@ -270,4 +271,16 @@ function TestAccount:test_password_complexity_check_should_fail()
         }
     }
     config_service:on_import(ctx, object)
+end
+
+function TestAccount:test_when_import_empty_config_success()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local PROJECT_DIR = os.getenv('PROJECT_DIR')
+
+    local file = io.open(PROJECT_DIR .. "/test/unit/test_data/config_empty.json")
+    lu.assertNotEquals(file, nil)
+    local config_data = file:read("a")
+    
+    local handler = config_handle.new()
+    handler:on_import(ctx, config_data, "configuration")
 end

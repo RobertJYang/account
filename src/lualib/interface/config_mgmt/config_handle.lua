@@ -58,7 +58,7 @@ function ConfigHandle:on_import(ctx, config_data, import_type)
     end
     local object = cjson.decode(config_data).ConfigData
     if not object then
-        log:error('Import data is invalid')
+        log:notice('No ConfigData in config.json, nothing to import')
         return
     end
 

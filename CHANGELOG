@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.16] - 2026-2-24
+优化配置导入时无导入项时日志打印级别
 
 ## [1.110.15] - 2026-2-12
 feat:支持本地认证基于IP进行锁定(适配ipmi、snmp)
