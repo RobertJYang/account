@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.18] - 2026-2-25
+fix:ipmi命令带外认证数据库使用优化
 
 ## [1.110.17] - 2026-2-25
 feat:支持会话最大生命周期

@@ -683,7 +683,7 @@
                 "baseType": "U32",
                 "description": "",
                 "default": 4294967295,
-                "critical": true,
+                "critical": false,
                 "usage": [
                     "PoweroffPer"
                 ]
@@ -692,7 +692,7 @@
                 "baseType": "String",
                 "description": "",
                 "default": "",
-                "critical": true,
+                "critical": false,
                 "usage": [
                     "PoweroffPer"
                 ]
@@ -702,7 +702,7 @@
                 "description": "",
                 "default": "Web",
                 "$ref": "types.json#/defs/LoginInterface",
-                "critical": true,
+                "critical": false,
                 "usage": [
                     "PoweroffPer"
                 ]

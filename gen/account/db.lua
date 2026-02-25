@@ -299,10 +299,10 @@ function AccountDBDatabase.new(path, datas)
         InactUserRemainDays = Col.IntegerField():cid(18):persistence_key('protect_power_off'):null():max_length(32)
             :default(4294967295):critical(),
         LastLoginTime = Col.IntegerField():cid(19):persistence_key('protect_power_off'):null():max_length(32):default(
-            4294967295):critical(),
-        LastLoginIP = Col.TextField():cid(20):persistence_key('protect_power_off'):null():default('\'\''):critical(),
+            4294967295),
+        LastLoginIP = Col.TextField():cid(20):persistence_key('protect_power_off'):null():default('\'\''),
         LastLoginInterface = Col.EnumField(def_types.LoginInterface):cid(21):persistence_key('protect_power_off'):null()
-            :default(def_types.LoginInterface.Web):critical(),
+            :default(def_types.LoginInterface.Web),
         FirstLoginPolicy = Col.EnumField(def_types.FirstLoginPolicy):cid(22):persistence_key('protect_power_off'):null()
             :default(def_types.FirstLoginPolicy.ForcePasswordReset):critical(),
         AccountType = Col.EnumField(def_types.AccountType):cid(23):persistence_key('protect_power_off'):null():default(

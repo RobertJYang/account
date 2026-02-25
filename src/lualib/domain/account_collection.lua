@@ -555,6 +555,28 @@ function AccountCollection:recover_inter_chassis_account_to_default()
     end
 end
 
+function AccountCollection:_clear_account(ctx, account, account_id)
+    local username = account:get_user_name()
+        
+    -- 清除历史密码
+    account.m_history_password:delete()
+    -- 清除通道配置
+    self.ipmi_channel_config:delete(account_id)
+    -- 将用户从db与mbd移除
+    account.m_account_data:delete()
+    account.m_snmp_user_info_data:delete()
+    account.m_ipmi_user_info_data:delete()
+        
+    self.collection[account_id] = nil
+    -- 将用户从linux系统移除
+    -- 调整为信号量触发，将几个关键文件的读写操作解耦
+    self.m_account_file_flush:emit()
+    self.m_account_removed:emit(account_id, username)
+    self:update_deletable()
+    -- 删除客户端证书
+    self:_delete_cert(ctx, account_id)
+end
+
 --- 删除用户
 ---@param ctx table 上下文信息
 ---@param account_id number 用户ID
@@ -599,32 +621,15 @@ function AccountCollection:delete_account(ctx, account_id, validation_skipped)
                 self:change_snmp_v3_trap_account(account_id)
         end
 
-        --判断该类型用户是否可被删除account_policy中的Deletable属性
+        -- 判断该类型用户是否可被删除account_policy中的Deletable属性
         if not validation_skipped and
             not self.account_policy_collection:get_deletable(account.m_account_data.AccountType:value()) then
             log:error('Delete account failed, account (user%d) is not deletable.', account_id)
             error(custom_msg.AccountForbidRemoved())
         end
 
-        local username = account:get_user_name()
-
-        -- 清除历史密码
-        account.m_history_password:delete()
-        -- 清除通道配置
-        self.ipmi_channel_config:delete(account_id)
-        -- 将用户从db与mbd移除
-        account.m_account_data:delete()
-        account.m_snmp_user_info_data:delete()
-        account.m_ipmi_user_info_data:delete()
-
-        self.collection[account_id] = nil
-        -- 将用户从linux系统移除
-        -- 调整为信号量触发，将几个关键文件的读写操作解耦
-        self.m_account_file_flush:emit()
-        self.m_account_removed:emit(account_id, username)
-        self:update_deletable()
-        -- 删除客户端证书
-        self:_delete_cert(ctx, account_id)
+        -- 清除用户信息
+        self:_clear_account(ctx, account, account_id)
     end)
 end
 
