@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.19] - 2026-2-26
+fix:修复单主机场景下,操作日志和在线用户会显示systemid的问题
+
 ## [1.110.18] - 2026-2-25
 fix:ipmi命令带外认证数据库使用优化
 

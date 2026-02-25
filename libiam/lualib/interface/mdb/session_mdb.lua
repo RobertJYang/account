@@ -49,6 +49,7 @@ function SessionMdb:regist_session_signals()
 end
 
 function SessionMdb:create_session_to_mdb_tree(info)
+    local host_number = self.m_session_service.get_host_number()
     local sessions = service:CreateSession(info.m_session_id, function(session)
         session.UserName = info.m_username
         session.AccountId = tostring(info.m_account_id)
@@ -56,7 +57,7 @@ function SessionMdb:create_session_to_mdb_tree(info)
         session.AuthType = info.m_auth_type:value()
         session.BrowserType = info.m_browser_type or 0
         session.SessionId = info.m_session_id
-        session.SessionType = session_utils.convert_mdb_session_type(info)
+        session.SessionType = session_utils.convert_mdb_session_type(info, host_number)
         session.OemSessionType = info.m_oem_session_type and info.m_oem_session_type:value() or 0
         session.ClientOriginIPAddress = info.m_ip
         session.CreatedTime = iam_utils.convert_time_to_str(info.m_created_time)

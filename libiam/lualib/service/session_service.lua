@@ -91,11 +91,32 @@ local function get_chip_env_obj(manager_id)
    return obj
 end
 
+function SessionService:get_host_number()
+    local obj = get_chip_env_obj(1) -- ManagerId默认为1
+    if obj == nil then
+        log:error("The retrieved object is null")
+        error(base_msg.InternalError())
+    end
+    local systemids = obj.SystemIds
+    return #systemids
+end
+
+local function set_host_operation_log(ctx)
+    if SessionService:get_host_number() == 1 then -- 表示单系统
+        ctx.operation_log.result = "fail"
+        ctx.operation_log.params = { username = ctx.UserName, ip = ctx.ClientAddr }
+    else
+        ctx.operation_log.result = "fail_multihost"
+        ctx.operation_log.params = { username = ctx.UserName, ip = ctx.ClientAddr, systemid = ctx.SystemId }
+    end
+end
+
 -- 对传入的SystemId做效验
 function SessionService:check_system_id(ctx)
     local obj = get_chip_env_obj(1) -- ManagerId默认为1
     if obj == nil then
         log:error("The retrieved object is null")
+        set_host_operation_log(ctx)
         error(base_msg.InternalError())
     end
     local systemids = obj.SystemIds
@@ -111,6 +132,7 @@ function SessionService:check_system_id(ctx)
     end
     if not flag then
         log:error("The system id(%s) does not exist", tonumber(ctx.SystemId))
+        set_host_operation_log(ctx)
         error(base_msg.PropertyValueNotInList(ctx.SystemId, 'systemids'))
     end
 end
@@ -530,6 +552,7 @@ function SessionService:new_session(ctx, username, password, session_type, domai
     end
 
     span:finish()
+    set_host_operation_log(ctx)
     return new_session.m_token, new_session.m_csrf_token, new_session.m_session_id
 end
 
@@ -630,6 +653,7 @@ function SessionService:new_remote_console_session_kvm(ctx, token, session_type,
         is_create_by_session = false
     else
         log:error('There is no valid session to create kvm session')
+        set_host_operation_log(ctx)
         error(base_msg.NoValidSession())
     end
     -- 创建KVM会话需要检查VNC会话模式是否冲突
@@ -637,6 +661,7 @@ function SessionService:new_remote_console_session_kvm(ctx, token, session_type,
     if not session_utils.check_remote_console_session_mode_conflicts(vnc_session_service,
             iam_enum.OccupationMode.new(create_session_mode)) then
         log:error('Failed to create KVM session due to a conflict with the VNC session mode.')
+        set_host_operation_log(ctx)
         error(custom_msg.SessionModeIsExclusive('KVM'))
     end
 
