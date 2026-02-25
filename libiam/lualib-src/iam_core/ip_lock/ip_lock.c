@@ -552,7 +552,7 @@ gint32 get_one_lock_status(const gchar *dir, const gchar *ip, guint8 lock_thresh
         }
 
         // 判断有效失败次数是否已经达到锁定次数
-        status->lock_status = (fail_cnt >= lock_threshold);
+        status->lock_status = lock_threshold != 0 ? (fail_cnt >= lock_threshold) : FALSE;
         status->lock_start_time = latest_time;
         
         res = RET_OK;

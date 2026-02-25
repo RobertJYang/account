@@ -1,4 +1,9 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.17] - 2026-2-25
+feat:支持会话最大生命周期
+fix:修复锁定次数为0时ip_lock判断锁定的异常
+
 ## [1.110.16] - 2026-2-24
 优化配置导入时无导入项时日志打印级别
 

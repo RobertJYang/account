@@ -14,8 +14,10 @@ local signal = require 'mc.signal'
 local log = require 'mc.logging'
 local initiator = require 'mc.initiator'
 local base_msg = require 'messages.base'
+local vos = require 'utils.vos'
 local iam_core = require 'iam_core'
 local iam_enum = require 'class.types.types'
+local user_config = require 'user_config'
 
 local SessionType = class()
 function SessionType:ctor(session_service_db)
@@ -194,13 +196,21 @@ function SessionType:get_timeout_session_list()
     if self.m_session_service_config.SessionTimeout == 0 then
         return timeout_session_list
     end
+
+    local now = vos.vos_get_cur_time_stamp()
+    local cur_session
     for index = #self.m_session_collection, 1, -1 do
-        local session = self.m_session_collection[index]
+         cur_session = self.m_session_collection[index]
         -- 每5秒检查一次会话超时时间
-        session.m_last_active_time = session.m_last_active_time + 5
-        if session.m_last_active_time >= self:get_session_timeout() then
-            table.insert(timeout_session_list, session)
+        cur_session.m_last_active_time = cur_session.m_last_active_time + 5
+        if cur_session.m_last_active_time >= self:get_session_timeout() then
+            table.insert(timeout_session_list, cur_session)
+            goto continue
         end
+        if cur_session.m_created_time < now - user_config.SESSION_EXIPRES_SEC then
+            table.insert(timeout_session_list, cur_session)
+        end
+        ::continue::
     end
     return timeout_session_list
 end
