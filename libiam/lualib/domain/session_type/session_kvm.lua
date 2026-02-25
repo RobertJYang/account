@@ -16,6 +16,8 @@ local log = require 'mc.logging'
 local iam_enum = require 'class.types.types'
 local base_msg = require 'messages.base'
 local custom_msg = require 'messages.custom'
+local vos = require 'utils.vos'
+local user_config = require 'user_config'
 local KVM_KEY_TIMEOUT<const> = 120 -- KVM_KEY2分钟失效
 local KVM_NOT_AUTH_TIMEOUT<const> = 120 -- KVM未认证会话2分钟失效
 
@@ -68,8 +70,9 @@ function KVMSession:get_timeout_session_list()
     local timeout_session_list = {}
 
     -- 未认证会话的超时校验优先于常规超时校验
+    local cur_session
     for index = #self.m_session_collection, 1, -1 do
-        local cur_session = self.m_session_collection[index]
+        cur_session = self.m_session_collection[index]
         local system_id = cur_session.system_id
         cur_session.m_no_valid_check_time = cur_session.m_no_valid_check_time + 5
         if not cur_session.m_valid_flag and cur_session.m_no_valid_check_time > KVM_NOT_AUTH_TIMEOUT then
@@ -84,15 +87,23 @@ function KVMSession:get_timeout_session_list()
         return timeout_session_list
     end
 
+    local now = vos.vos_get_cur_time_stamp()
     for index = #self.m_session_collection, 1, -1 do
-        local cur_session = self.m_session_collection[index]
+         cur_session = self.m_session_collection[index]
         -- 每5秒检查一次会话超时时间
         cur_session.m_last_active_time = cur_session.m_last_active_time + 5
         if cur_session.m_last_active_time >= self:get_session_timeout() then
             if not is_session_in_list(timeout_session_list, cur_session) then
                 table.insert(timeout_session_list, cur_session)
             end
+            goto continue
         end
+        if cur_session.m_created_time < now - user_config.SESSION_EXIPRES_SEC then
+            if not is_session_in_list(timeout_session_list, cur_session) then
+                table.insert(timeout_session_list, cur_session)
+            end
+        end
+        ::continue::
     end
     return timeout_session_list
 end

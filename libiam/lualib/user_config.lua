@@ -375,5 +375,7 @@ return {
 
   IP_LOCK_PATH = "/dev/shm/ip_lock",
   IAM_SHM_PATH = "/dev/shm/iam",
-  ACCESS_CONFIG_FILE = "/dev/shm/iam/pam_access.conf"
+  ACCESS_CONFIG_FILE = "/dev/shm/iam/pam_access.conf",
+
+  SESSION_EXIPRES_SEC = 86400
 }
