@@ -431,8 +431,10 @@ local operation_log_map = {
         fail = 'User {username}({ip}) login to {type} by sso failed'
     },
     NewRemoteConsoleSession = {
-        success = 'User {username}({ip}) systemid({systemid}) login successfully({mode} mode)',
-        fail = 'User {username}({ip}) systemid({systemid}) login failed'
+        success = 'User {username}({ip}) login successfully({mode} mode)',
+        success_multihost = 'User {username}({ip}) systemid({systemid}) login successfully({mode} mode)',
+        fail = 'User {username}({ip}) login failed',
+        fail_multihost = 'User {username}({ip}) systemid({systemid}) login failed'
     },
     NewVNCSession = {
         security_log = true,

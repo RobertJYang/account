@@ -124,10 +124,14 @@ end
 
 -- 实现remote_console接口
 function SessionsMdb:new_remote_console_session(ctx, token, session_type, session_mode)
-    if ctx.SystemId == nil then
-        ctx.SystemId = 1 --SystemId默认为1
+    if self.m_session_service:get_host_number() == 1 then -- 表示单系统
+        ctx.operation_log.result = "success"
+        ctx.operation_log.params = { username = ctx.UserName, ip = ctx.ClientAddr }
+    else
+        ctx.operation_log.result = "success_multihost"
+        ctx.operation_log.params = { username = ctx.UserName, ip = ctx.ClientAddr, systemid = ctx.SystemId }
     end
-    ctx.operation_log.params = { username = ctx.UserName, ip = ctx.ClientAddr, systemid = ctx.SystemId }
+    ctx.HostNume = self.m_session_service:get_host_number()
     session_type = iam_enum.SessionType.new(session_type)
     session_mode = iam_enum.OccupationMode.new(session_mode)
     return self.m_session_service:new_remote_console_session(ctx, token, session_type, session_mode)

@@ -57,14 +57,16 @@ function SessionUtils.parse_login_interface(session_type, login_interface)
 end
 
 -- 转换会话类型,针对KVM与VNC会话添加SessionMode
-function SessionUtils.convert_mdb_session_type(session)
+function SessionUtils.convert_mdb_session_type(session, host_number)
     local session_type = session.m_session_type
     local session_mode = session.m_session_mode
-    if session_type == iam_enum.SessionType.KVM then
+    if (session_type == iam_enum.SessionType.KVM or session_type == iam_enum.SessionType.VNC
+        or session_type == iam_enum.SessionType.VIDEO) and host_number > 1 then
         local mode_str = session_mode == iam_enum.OccupationMode.Shared and 'Shared' or 'Private'
         local system_id = session.system_id
         return string.format('%s(%s)System(%s)', session_type, mode_str, system_id)
-    elseif session_type == iam_enum.SessionType.VNC then
+    elseif (session_type == iam_enum.SessionType.KVM or session_type == iam_enum.SessionType.VNC
+        or session_type == iam_enum.SessionType.VIDEO) and host_number == 1 then
         local mode_str = session_mode == iam_enum.OccupationMode.Shared and 'Shared' or 'Private'
         return string.format('%s(%s)', session_type, mode_str)
     elseif session_type == iam_enum.SessionType.GUI and session.m_sso_token then
