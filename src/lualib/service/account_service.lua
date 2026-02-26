@@ -680,6 +680,10 @@ local function user_time_monitor_func(self, skynet)
         self:loop_update_operation()
         -- 间隔1小时将用户活动记录写flash
         if loop_count == MAC_COUNT / 2 or loop_count == MAC_COUNT then
+            -- 每隔1小时检测一次用户是否需要刷新登录记录（1小时周期减少nandflash写入）
+            pcall(function ()
+                self.m_account_collection:flash_login_record()
+            end)
             pcall(function ()
                 self.m_account_collection:flash_user_inactive_start_time()
             end)
@@ -709,10 +713,6 @@ function AccountService:check_user_time_info()
 end
 
 function AccountService:loop_update_operation()
-    -- 每隔5秒检测一次用户是否需要刷新登录记录
-    pcall(function ()
-        self.m_account_collection:flash_login_record()
-    end)
     -- 每隔5秒检测一次公私钥是否过期
     pcall(function()
         self.m_account_config:update_requested_key_pair(5)

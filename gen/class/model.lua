@@ -1034,14 +1034,14 @@ local ManagerAccountDB = {
         ['LastLoginTime'] = {
             ['baseType'] = 'U32',
             ['default'] = 4294967295,
-            ['critical'] = true,
+            ['critical'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.LastLoginTime
         },
         ['LastLoginIP'] = {
             ['baseType'] = 'String',
             ['default'] = '',
-            ['critical'] = true,
+            ['critical'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.LastLoginIP
         },
@@ -1049,7 +1049,7 @@ local ManagerAccountDB = {
             ['baseType'] = 'Enum',
             ['default'] = 'Web',
             ['$ref'] = 'types.json#/defs/LoginInterface',
-            ['critical'] = true,
+            ['critical'] = false,
             ['usage'] = {'PoweroffPer'},
             ['validator'] = manager_account_db_class_types.LastLoginInterface
         },
