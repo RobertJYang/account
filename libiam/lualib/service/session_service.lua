@@ -241,7 +241,13 @@ local function init_cert_auth_session(self)
             return self:new_mutual_auth_session(...)
         end,
         [iam_enum.NewSessionBrowserType.InterChassis:value()] = function(...)
-            return self:new_inter_chassis_session(...)
+            return self:new_inter_chassis_session(iam_enum.NewSessionBrowserType.InterChassis, ...)
+        end,
+        [iam_enum.NewSessionBrowserType.InterChassisRest:value()] = function(...)
+            return self:new_inter_chassis_session(iam_enum.NewSessionBrowserType.InterChassisRest, ...)
+        end,
+        [iam_enum.NewSessionBrowserType.InterChassisSsh:value()] = function(...)
+            return self:new_inter_chassis_ssh_session(...)
         end
     }
 end
@@ -835,9 +841,9 @@ end
 function SessionService:validate_session(session_type, token, csrf_token)
     local session = self.m_session_service_collection[session_type:value()]:get_session_by_token(token, csrf_token)
     -- 板间通信恢复校验时会按照Redfish会话来，需要独立处理查找的逻辑
-    if (not session) and session_type == iam_enum.SessionType.Redfish then
-        session_type = iam_enum.SessionType.INTER_CHASSIS
-        session = self.m_session_service_collection[session_type:value()]:get_session_by_token(token, csrf_token)
+    if (not session) and (session_type == iam_enum.SessionType.Redfish or session_type == iam_enum.SessionType.GUI)  then
+        session = self.m_session_service_collection[iam_enum.SessionType.INTER_CHASSIS:value()]:
+            get_session_by_token(token, csrf_token, session_type)
     end
 
     if not session then
@@ -1272,7 +1278,12 @@ function SessionService:validate_inter_chasiss_requestor(serial_number, issuer, 
     end
 end
 
-function SessionService:new_inter_chassis_session(ctx, serial_number, issuer, subject, ip)
+local browser_type_to_session_type = {
+    [iam_enum.NewSessionBrowserType.InterChassisRest] = iam_enum.SessionType.GUI,
+    [iam_enum.NewSessionBrowserType.InterChassis] = iam_enum.SessionType.Redfish
+}
+
+function SessionService:new_inter_chassis_session(browser_type, ctx, serial_number, issuer, subject, ip)
     -- 板间通信会话不记录操作日志
     ctx.operation_log.operation = 'SkipLog'
 
@@ -1286,9 +1297,18 @@ function SessionService:new_inter_chassis_session(ctx, serial_number, issuer, su
     end
 
     local current_session_type = self.m_session_service_collection[iam_enum.SessionType.INTER_CHASSIS:value()]
+    local session_type = browser_type_to_session_type[browser_type]
+    local validation = self.m_certificate_authtication:get_inter_chassis_validation()
+    if validation == "LLDP" then
+        local old_session = current_session_type:get_session_by_ip(ip, session_type)
+        if old_session then
+            return old_session.m_token, old_session.m_csrf_token, old_session.m_session_id
+        end
+    end
+
     local account_data = package_session_create_account_info(account_info, nil)
     local new_session = current_session_type:create(account_data, iam_enum.AuthType.skip_auth, ip,
-        iam_enum.NewSessionBrowserType.InterChassis:value())
+        browser_type:value(), session_type)
 
     return new_session.m_token, new_session.m_csrf_token, new_session.m_session_id
 end

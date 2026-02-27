@@ -211,3 +211,56 @@ function TestIam:test_session_validate_whitelist()
     collection:delete(session_id)
     self.test_account_cache.cache_collection[23] = nil
 end
+
+function TestIam:test_new_inter_rest_chassis_and_validate()
+    -- 打桩一个23号用户
+    self.test_account_cache.cache_collection[23] = {
+        Id = 23,
+        UserName = '<inter chassis>',
+        RoleId = iam_enum.RoleType.Administrator:value(),
+        AccountType = iam_enum.AccountType.InterChassis,
+        LastLoginIP = '',
+        LastLoginTime = 0xffffffff,
+        current_privileges = {
+            tostring(iam_enum.PrivilegeType.ConfigureSelf),
+            tostring(iam_enum.PrivilegeType.DiagnoseMgmt),
+            tostring(iam_enum.PrivilegeType.PowerMgmt),
+            tostring(iam_enum.PrivilegeType.SecurityMgmt),
+            tostring(iam_enum.PrivilegeType.VMMMgmt),
+            tostring(iam_enum.PrivilegeType.KVMMgmt),
+            tostring(iam_enum.PrivilegeType.BasicSetting),
+            tostring(iam_enum.PrivilegeType.UserMgmt),
+            tostring(iam_enum.PrivilegeType.ReadOnly)
+        },
+        PasswordChangeRequired = false,
+        FirstLoginPolicy = iam_enum.FirstLoginPolicy.PromptPasswordReset,
+        is_flush = true
+    }
+
+    -- 创建会话
+    local token, csrf_token, session_id =
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", '127.0.0.1',
+        iam_enum.NewSessionBrowserType.InterChassisRest:value())
+
+    lu.assertNotIsNil(token)
+    lu.assertNotIsNil(csrf_token)
+    lu.assertNotIsNil(session_id)
+
+    -- 查看会话信息
+    local session = self.test_session_service:get_session_by_session_id(session_id)
+    lu.assertNotIsNil(session)
+    lu.assertEquals(session.m_username, '<inter chassis>')
+    lu.assertEquals(session.m_role_id, iam_enum.RoleType.Administrator:value())
+    lu.assertEquals(tostring(session.m_session_type), "INTER_CHASSIS")
+
+    -- 校验会话信息(请求会以Rest类型发过来校验)
+    local validate_session_id =
+        self.test_session_service:validate_session(iam_enum.SessionType.GUI, token, csrf_token)
+    lu.assertEquals(validate_session_id, session_id)
+
+    -- 恢复
+    local session_type_num = iam_enum.SessionType.INTER_CHASSIS:value()
+    local collection =  self.test_session_service.m_session_service_collection[session_type_num]
+    collection:delete(session_id)
+    self.test_account_cache.cache_collection[23] = nil
+end
