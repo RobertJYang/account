@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.20] - 2026-2-27
+feat:板间通信会话增加rest类型，增加根据ip获取会话方法
+
 ## [1.110.19] - 2026-2-26
 fix:修复单主机场景下,操作日志和在线用户会显示systemid的问题
 

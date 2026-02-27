@@ -8,6 +8,7 @@
 -- IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FIT FOR A PARTICULAR
 -- PURPOSE.
 -- See the Mulan PSL v2 for more details.
+local inter_chassis_session = require 'domain.session_type.session_inter_chassis'
 local custom_msg = require 'messages.custom'
 local iam_enum = require 'class.types.types'
 local lu = require 'luaunit'
@@ -85,6 +86,73 @@ function TestIam:test_no_access_to_create_inter_chassis_session()
         self.test_session_service:new_session_by_cert(self.ctx, "", "", "", '127.0.0.1',
         iam_enum.NewSessionBrowserType.InterChassis:value())
     end)
+
+    -- 恢复
+    self.test_account_cache.cache_collection[23] = nil
+end
+
+function TestIam:test_get_session_by_ip_or_token()
+    local inter_chassis_session = inter_chassis_session:get_instance()
+    -- 打桩一个23号用户
+    self.test_account_cache.cache_collection[23] = {
+        Id = 23,
+        UserName = '<inter chassis>',
+        RoleId = iam_enum.RoleType.Administrator:value(),
+        AccountType = iam_enum.AccountType.InterChassis,
+        LastLoginIP = '',
+        LastLoginTime = 0xffffffff,
+        current_privileges = {
+            tostring(iam_enum.PrivilegeType.ConfigureSelf),
+            tostring(iam_enum.PrivilegeType.DiagnoseMgmt),
+            tostring(iam_enum.PrivilegeType.PowerMgmt),
+            tostring(iam_enum.PrivilegeType.SecurityMgmt),
+            tostring(iam_enum.PrivilegeType.VMMMgmt),
+            tostring(iam_enum.PrivilegeType.KVMMgmt),
+            tostring(iam_enum.PrivilegeType.BasicSetting),
+            tostring(iam_enum.PrivilegeType.UserMgmt),
+            tostring(iam_enum.PrivilegeType.ReadOnly)
+        },
+        PasswordChangeRequired = false,
+        FirstLoginPolicy = iam_enum.FirstLoginPolicy.PromptPasswordReset,
+        is_flush = true
+    }
+
+    -- 创建会话
+    local token, csrf_token, session_id =
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", '127.0.0.1',
+        iam_enum.NewSessionBrowserType.InterChassis:value())
+
+    lu.assertNotIsNil(token)
+    lu.assertNotIsNil(csrf_token)
+    lu.assertNotIsNil(session_id)
+
+    -- 通过session_id获取会话
+    local temp_session = self.test_session_service:get_session_by_session_id(session_id)
+    lu.assertNotIsNil(temp_session)
+    lu.assertEquals(temp_session.m_session_id, session_id)
+
+
+    -- 通过token和会话类型查询会话
+    temp_session = inter_chassis_session:get_session_by_token(token, csrf_token,
+        iam_enum.SessionType.Redfish)
+    lu.assertNotIsNil(temp_session)
+    lu.assertEquals(temp_session.m_session_id, session_id)
+    -- 没有GUI会话，查询为nil
+    temp_session = inter_chassis_session:get_session_by_token(token, csrf_token,
+        iam_enum.SessionType.GUI)
+    lu.assertIsNil(temp_session)
+
+    -- 通过ip查询会话
+    temp_session = inter_chassis_session:get_session_by_ip('127.0.0.1', iam_enum.SessionType.Redfish)
+    lu.assertNotIsNil(temp_session)
+    lu.assertEquals(temp_session.m_session_id, session_id)
+    -- 没有GUI会话，查询为nil
+    temp_session = inter_chassis_session:get_session_by_ip('127.0.0.1', iam_enum.SessionType.GUI)
+    lu.assertIsNil(temp_session)
+
+    -- 删除会话
+    self.test_session_service:delete_all_session(nil, iam_enum.SessionLogoutType.SessionLogout,
+        iam_enum.SessionType.All, iam_enum.IpType.All)
 
     -- 恢复
     self.test_account_cache.cache_collection[23] = nil
