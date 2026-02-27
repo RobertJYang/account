@@ -98,6 +98,11 @@ local def_types = require 'class.types.types'
 ---@field InterChassisValidation FieldBase
 ---@field Id FieldBase
 
+---@class InterChassisWhitelistTable: Table
+---@field Type FieldBase
+---@field Id FieldBase
+---@field Item FieldBase
+
 ---@class IamDBDatabase
 ---@field db DataBase
 ---@field select fun(db:DataBase, table: any, ...): SelectStatement
@@ -112,6 +117,7 @@ local def_types = require 'class.types.types'
 ---@field RemoteGroupsDB RemoteGroupsDBTable
 ---@field RemoteGroup RemoteGroupTable
 ---@field CertificateAuthentication CertificateAuthenticationTable
+---@field InterChassisWhitelist InterChassisWhitelistTable
 local IamDBDatabase = {}
 IamDBDatabase.__index = IamDBDatabase
 
@@ -208,6 +214,11 @@ function IamDBDatabase.new(path, datas)
         InterChassisValidation = Col.TextField():cid(4):persistence_key('protect_power_off'):null():default('\'LLDP\''),
         Id = Col.IntegerField():cid(5):primary_key():persistence_key('protect_power_off'):max_length(8)
     }):create_if_not_exist(datas and datas['t_certificate_authentication'])
+    obj.InterChassisWhitelist = db:Table('t_inter_chassis_whitelist', {
+        Type = Col.TextField():cid(1):primary_key():persistence_key('protect_power_off'),
+        Id = Col.IntegerField():cid(2):primary_key():persistence_key('protect_power_off'):max_length(8),
+        Item = Col.TextField():cid(3):persistence_key('protect_power_off'):null()
+    }):create_if_not_exist(datas and datas['t_inter_chassis_whitelist'])
 
     obj.tables = db.tables
     return setmetatable(obj, IamDBDatabase)

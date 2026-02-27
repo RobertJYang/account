@@ -13,11 +13,13 @@ local custom_msg = require 'messages.custom'
 local iam_enum = require 'class.types.types'
 local lu = require 'luaunit'
 
+local TEST_IP = "127.0.0.1"
+
 function TestIam:test_new_inter_chassis_session()
     -- 打桩一个23号用户
     self.test_account_cache.cache_collection[23] = {
         Id = 23,
-        UserName = '<inter chassis>',
+        UserName = 'inter_chassis',
         RoleId = iam_enum.RoleType.Administrator:value(),
         AccountType = iam_enum.AccountType.InterChassis,
         LastLoginIP = '',
@@ -40,7 +42,7 @@ function TestIam:test_new_inter_chassis_session()
 
     -- 创建会话
     local token, csrf_token, session_id =
-        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", '127.0.0.1',
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", TEST_IP,
         iam_enum.NewSessionBrowserType.InterChassis:value())
 
     lu.assertNotIsNil(token)
@@ -50,7 +52,7 @@ function TestIam:test_new_inter_chassis_session()
     -- 查看会话信息
     local session = self.test_session_service:get_session_by_session_id(session_id)
     lu.assertNotIsNil(session)
-    lu.assertEquals(session.m_username, '<inter chassis>')
+    lu.assertEquals(session.m_username, 'inter_chassis')
     lu.assertEquals(session.m_role_id, iam_enum.RoleType.Administrator:value())
     lu.assertEquals(tostring(session.m_session_type), "INTER_CHASSIS")
 
@@ -70,7 +72,7 @@ function TestIam:test_no_access_to_create_inter_chassis_session()
     -- 打桩一个23号用户
     self.test_account_cache.cache_collection[23] = {
         Id = 23,
-        UserName = '<inter chassis>',
+        UserName = 'inter_chassis',
         RoleId = iam_enum.RoleType.NoAccess:value(),
         AccountType = iam_enum.AccountType.InterChassis,
         LastLoginIP = '',
@@ -83,7 +85,7 @@ function TestIam:test_no_access_to_create_inter_chassis_session()
 
     -- 尝试创建会话
     lu.assertErrorMsgContains(custom_msg.NoAccessMessage.Name, function()
-        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", '127.0.0.1',
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", TEST_IP,
         iam_enum.NewSessionBrowserType.InterChassis:value())
     end)
 
@@ -155,5 +157,57 @@ function TestIam:test_get_session_by_ip_or_token()
         iam_enum.SessionType.All, iam_enum.IpType.All)
 
     -- 恢复
+    self.test_account_cache.cache_collection[23] = nil
+end
+
+function TestIam:test_session_validate_whitelist()
+    -- 打桩一个23号用户
+    self.test_account_cache.cache_collection[23] = {
+        Id = 23,
+        UserName = 'inter_chassis',
+        RoleId = iam_enum.RoleType.Administrator:value(),
+        AccountType = iam_enum.AccountType.InterChassis,
+        LastLoginIP = '',
+        LastLoginTime = 0xffffffff,
+        current_privileges = {
+            tostring(iam_enum.PrivilegeType.ConfigureSelf),
+            tostring(iam_enum.PrivilegeType.DiagnoseMgmt),
+            tostring(iam_enum.PrivilegeType.PowerMgmt),
+            tostring(iam_enum.PrivilegeType.SecurityMgmt),
+            tostring(iam_enum.PrivilegeType.VMMMgmt),
+            tostring(iam_enum.PrivilegeType.KVMMgmt),
+            tostring(iam_enum.PrivilegeType.BasicSetting),
+            tostring(iam_enum.PrivilegeType.UserMgmt),
+            tostring(iam_enum.PrivilegeType.ReadOnly)
+        },
+        PasswordChangeRequired = false,
+        FirstLoginPolicy = iam_enum.FirstLoginPolicy.PromptPasswordReset,
+        is_flush = true
+    }
+
+    -- 设置校验模式为Static
+    self.certificate_authentication:set_inter_chassis_validation("Static")
+
+    -- 增加白名单
+    self.test_inter_chassis_validator:add("IP", TEST_IP)
+
+    -- 创建会话
+    local token, csrf_token, session_id =
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", TEST_IP,
+        iam_enum.NewSessionBrowserType.InterChassis:value())
+    lu.assertNotIsNil(token)
+    lu.assertNotIsNil(csrf_token)
+    lu.assertNotIsNil(session_id)
+
+    -- 尝试用白名单外的IP创建会话
+    lu.assertErrorMsgContains(custom_msg.AuthorizationFailedMessage.Name, function()
+        self.test_session_service:new_session_by_cert(self.ctx, "", "", "", "192.168.0.1",
+            iam_enum.NewSessionBrowserType.InterChassis:value())
+    end)
+
+    -- 恢复
+    local session_type_num = iam_enum.SessionType.INTER_CHASSIS:value()
+    local collection =  self.test_session_service.m_session_service_collection[session_type_num]
+    collection:delete(session_id)
     self.test_account_cache.cache_collection[23] = nil
 end

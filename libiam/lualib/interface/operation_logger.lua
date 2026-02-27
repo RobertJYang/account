@@ -521,6 +521,13 @@ local operation_log_map = {
         success = 'Set inter chassis authentication validate mode to {value} successfully',
         fail = 'Set inter chassis authentication validate mode failed'
     },
+    ManageInterChassisWhitelist = {
+        add_success = 'Add inter chassis authentication {type} whitelist success',
+        add_fail = 'Add inter chassis authentication {type} whitelist failed',
+        remove_success = 'Remove inter chassis authentication {type} whitelist success',
+        remove_fail = 'Remove inter chassis authentication {type} whitelist failed',
+        fail = 'Manage inter chassis authentication {type} whitelist failed'
+    },
     -----------  certificate_authentication_mdb end  ---------
     -----------------    authenticate_mdb   ------------------
     Authenticate = {

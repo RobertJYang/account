@@ -196,6 +196,9 @@ function AccessService:get_ip_lock_access()
         if state_changed_cb[changed] then
             state_changed_cb[changed](self, ip)
         end
+        if changed == 'unlocked' then
+            ip_lock.clean_ip_fail_record(config.IP_LOCK_PATH, ip)
+        end
         ::continue::
     end
 
