@@ -25,6 +25,7 @@ local kerberos_class_types = require 'class.types.Kerberos'
 local remote_groups_db_class_types = require 'class.types.RemoteGroupsDB'
 local remote_group_class_types = require 'class.types.RemoteGroup'
 local certificate_authentication_class_types = require 'class.types.CertificateAuthentication'
+local inter_chassis_whitelist_class_types = require 'class.types.InterChassisWhitelist'
 local session_service_intf_types = require 'iam.json_types.SessionService'
 local properties_intf_types = require 'iam.json_types.Properties'
 local session_intf_types = require 'iam.json_types.Session'
@@ -1445,7 +1446,7 @@ local CertificateAuthentication = {
                 ['default'] = false,
                 ['readOnly'] = false,
                 ['options'] = {['emitsChangedSignal'] = 'true'},
-                ['usage'] = {'PoweroffPer'},
+                ['usage'] = {'PoweroffPer', 'CSR'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
                 ['validator'] = certificate_authentication_intf_types.InterChassisAuthEnabled
             },
@@ -1454,8 +1455,8 @@ local CertificateAuthentication = {
                 ['default'] = 'LLDP',
                 ['readOnly'] = false,
                 ['options'] = {['emitsChangedSignal'] = 'false'},
-                ['enum'] = {'None', 'LLDP'},
-                ['usage'] = {'PoweroffPer'},
+                ['enum'] = {'None', 'LLDP', 'Static'},
+                ['usage'] = {'PoweroffPer', 'CSR'},
                 ['privilege'] = {['read'] = {'ReadOnly'}, ['write'] = {'UserMgmt'}},
                 ['validator'] = certificate_authentication_intf_types.InterChassisValidation
             }
@@ -1511,6 +1512,34 @@ local CertificateAuthentication = {
     })
 }
 
+local InterChassisWhitelist = {
+    ['table_name'] = 't_inter_chassis_whitelist',
+    ['prop_configs'] = {
+        ['Type'] = {
+            ['baseType'] = 'String',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = inter_chassis_whitelist_class_types.Type
+        },
+        ['Id'] = {
+            ['baseType'] = 'U8',
+            ['primaryKey'] = true,
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = inter_chassis_whitelist_class_types.Id
+        },
+        ['Item'] = {
+            ['baseType'] = 'String',
+            ['usage'] = {'PoweroffPer'},
+            ['validator'] = inter_chassis_whitelist_class_types.Item
+        }
+    },
+    ['default_props'] = {
+        ['Type'] = inter_chassis_whitelist_class_types.Type.default[1],
+        ['Id'] = inter_chassis_whitelist_class_types.Id.default[1],
+        ['Item'] = inter_chassis_whitelist_class_types.Item.default[1]
+    }
+}
+
 local M = {}
 
 function M.init(bus)
@@ -1525,6 +1554,7 @@ function M.init(bus)
     class('RemoteGroupsDB', RemoteGroupsDB):set_bus(bus)
     class('RemoteGroup', RemoteGroup):set_bus(bus)
     class('CertificateAuthentication', CertificateAuthentication):set_bus(bus)
+    class('InterChassisWhitelist', InterChassisWhitelist):set_bus(bus)
 end
 
 -- The callback needs to be registered during app initialization

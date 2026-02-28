@@ -19,9 +19,10 @@ local signal = require 'mc.signal'
 -- 双因素认证配置
 local CertificateAuthentication = class()
 
-function CertificateAuthentication:ctor(db)
+function CertificateAuthentication:ctor(db, inter_chassis_validator)
     self.mutual_auth_state_changed = signal.new()
     self.m_db_config = db:select(db.CertificateAuthentication):first()
+    self.m_inter_chassis_validator = inter_chassis_validator
 end
 
 function CertificateAuthentication:set_certificate_authentication_state(ctx, Enabled)
@@ -109,8 +110,9 @@ function CertificateAuthentication:get_inter_chassis_auth_enabled()
 end
 
 local validation_map = {
-    ['None'] = true,
-    ['LLDP'] = true
+    ['None']   = true,
+    ['LLDP']   = true,
+    ['Static'] = true
 }
 
 function CertificateAuthentication:set_inter_chassis_validation(value)
@@ -123,6 +125,49 @@ end
 
 function CertificateAuthentication:get_inter_chassis_validation()
     return self.m_db_config.InterChassisValidation
+end
+
+local default_ope_type = {
+    ['Get'] = {
+        ['succ'] = 'SkipLog',
+        ['fail'] = 'SkipLog'
+    },
+    ['Add'] = {
+        ['succ'] = 'add_success',
+        ['fail'] = 'add_fail'
+    },
+    ['Remove'] = {
+        ['succ'] = 'remove_success',
+        ['fail'] = 'remove_fail'
+    }
+}
+
+function CertificateAuthentication:manage_inter_chassis_whitelist(ctx, operation, type, item)
+    ctx.operation_log.params = {type = type}
+    if not default_ope_type[operation] then
+        log:error("invalid operation(%s)", operation)
+        ctx.operation_log.result = 'fail'
+        error(custom_msg.PropertyValueNotInList(operation, "Operation"))
+    end
+    local ok, result = pcall(function()
+        if operation == 'Get' then
+            return self.m_inter_chassis_validator:get(type)
+        elseif operation == 'Add' then
+            self.m_inter_chassis_validator:add(type, item)
+            return self.m_inter_chassis_validator:get(type)
+        elseif operation == 'Remove' then
+            self.m_inter_chassis_validator:remove(type, item)
+            return self.m_inter_chassis_validator:get(type)
+        end
+    end)
+
+    if ok then
+        ctx.operation_log.result = default_ope_type[operation]['succ']
+        return result
+    else
+        ctx.operation_log.result = default_ope_type[operation]['fail']
+        error(result)
+    end
 end
 
 return singleton(CertificateAuthentication)

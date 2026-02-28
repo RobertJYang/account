@@ -179,7 +179,7 @@ local function record_login_info(user_name, ip, interface, is_record_login_info,
     return ok
 end
 
-function SessionService:ctor(db)
+function SessionService:ctor(db, inter_chassis_validator)
     local session_service_db = db:select(db.SessionService)
     local session_service_collection = session_service_db:fold(function(session_service_type_db, acc)
         local session_type = session_service_type_db.SessionType:value()
@@ -201,6 +201,7 @@ function SessionService:ctor(db)
     self.m_account_service_cache = account_service_cache.get_instance()
     self.m_certificate_authtication = certificate_authentication.get_instance()
     self.m_access_service = access_service.get_instance()
+    self.m_inter_chassis_validator = inter_chassis_validator
 
     self.m_sessions_db = db:select(db.Sessions):first()
 end
@@ -1254,6 +1255,12 @@ function SessionService:validate_inter_chasiss_requestor(serial_number, issuer, 
                 return
             end
         end)
+    elseif validation == 'Static' then
+        log:info("validate by Whitelist")
+        local item = {['IP'] = ip}
+        if self.m_inter_chassis_validator:validate(item) then
+            validate_flag = true
+        end
     elseif validation == 'None' then
         log:info("no need to validate")
         return

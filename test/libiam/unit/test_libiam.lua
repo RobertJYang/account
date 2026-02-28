@@ -60,6 +60,7 @@ local authentication_config = require 'domain.authentication_config'
 local account_cache = require 'domain.cache.account_cache'
 local login_time_rule_cache = require 'domain.cache.login_rule.login_time_rule_cache'
 local access_service = require 'service.access_service'
+local inter_chassis_validator = require 'domain.inter_chassis_whitelist.inter_chassis_validator'
 
 TestIam = {}
 
@@ -143,7 +144,8 @@ function TestIam:setupClass()
     self.test_account_cache = account_cache.new()
     self.authentication_config = authentication_config.new(self.IamDB)
     self.test_authentication = authentication.new(self.IamDB)
-    self.certificate_authentication = certificate_authentication.new(self.IamDB)
+    self.test_inter_chassis_validator = inter_chassis_validator.new(self.IamDB)
+    self.certificate_authentication = certificate_authentication.new(self.IamDB, self.test_inter_chassis_validator)
     self.test_ldap_config = ldap_config.new(self.IamDB)
     self.test_remote_groups_config = remote_groups_config.new(self.IamDB)
     self.test_ldap_config = ldap_config.new(self.IamDB)
@@ -151,7 +153,7 @@ function TestIam:setupClass()
     self.test_remote_group_collection = remote_group_collection.new(self.IamDB)
     self.test_ldap_authentication = ldap_authentication.new(nil, self.IamDB)
     self.test_access_service = access_service.new(self.test_authentication, self.certificate_authentication)
-    self.test_session_service = SessionService.new(self.IamDB)
+    self.test_session_service = SessionService.new(self.IamDB, self.test_inter_chassis_validator)
     self.ipmi_running_record = ipmi_running_record.new()
     self.test_session_ipmi = session_ipmi.new()
     self.test_account_service_ipmi = accoutn_service_ipmi.new()
@@ -237,6 +239,7 @@ require 'test_web_session'
 require 'test_kvm_session'
 require 'test_cli_session'
 require 'test_inter_chassis_session'
+require 'test_inter_chassis_validator'
 require 'test_ldap_config'
 require 'test_ldap_controller'
 require 'test_remote_group'
