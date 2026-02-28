@@ -552,7 +552,6 @@ function SessionService:new_session(ctx, username, password, session_type, domai
     end
 
     span:finish()
-    set_host_operation_log(ctx)
     return new_session.m_token, new_session.m_csrf_token, new_session.m_session_id
 end
 
@@ -571,6 +570,7 @@ function SessionService:new_remote_console_session(ctx, token, session_type, cre
         new_session = self:new_remote_console_session_video(ctx, token, session_type, create_session_mode)
     else
         span:finish()
+        set_host_operation_log(ctx)
         error(base_msg.PropertyValueNotInList(tostring(session_type), 'SessionType'))
     end
     span:finish()
