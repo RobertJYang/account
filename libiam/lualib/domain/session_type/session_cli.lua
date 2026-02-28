@@ -34,7 +34,8 @@ end
 
 function CLISession:create(account, online_session)
     local auth_type
-    if account.AccountType == iam_enum.AccountType.Local then
+    if account.AccountType == iam_enum.AccountType.Local 
+        or account.AccountType == iam_enum.AccountType.InterChassis then
         auth_type = iam_enum.AuthType.Local
     else
         auth_type = iam_enum.AuthType.ldap_auto_match
@@ -47,6 +48,9 @@ function CLISession:create(account, online_session)
     new_session.system_id = 0 --目前默认0
     table.insert(self.m_session_collection, new_session)
     self.m_create_session:emit(new_session)
+    if account.AccountType == iam_enum.AccountType.InterChassis then
+        return new_session
+    end
     local initiator_info = initiator.new(new_session.m_session_type_name, new_session.m_username, new_session.m_ip)
     log:operation(initiator_info, 'iam', 'User %s(%s) login successfully', new_session.m_username, new_session.m_ip)
     return new_session
