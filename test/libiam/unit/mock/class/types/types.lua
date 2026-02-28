@@ -24,6 +24,8 @@ ENewSessionBrowserType.default = ENewSessionBrowserType.new(2147483647)
 ENewSessionBrowserType.struct = nil
 ENewSessionBrowserType.MutualAuth = ENewSessionBrowserType.new(0)
 ENewSessionBrowserType.InterChassis = ENewSessionBrowserType.new(1)
+ENewSessionBrowserType.InterChassisRest = ENewSessionBrowserType.new(2)
+ENewSessionBrowserType.InterChassisSsh = ENewSessionBrowserType.new(3)
 
 def_types.NewSessionBrowserType = ENewSessionBrowserType
 

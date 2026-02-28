@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.23] - 2026-2-28
+feat:扩展证书认证的会话管理,区分redfish和rest
 
 ## [1.110.22] - 2026-2-28
 feat:支持框内通信白名单策略
