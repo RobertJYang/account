@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.24] - 2026-3-1
+feat:支持配置框内通信账户的pam_access限制
+
 ## [1.110.23] - 2026-2-28
 feat:扩展证书认证的会话管理,区分redfish和rest
 

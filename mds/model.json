@@ -1752,6 +1752,13 @@
                 "usage": [
                     "CSR"
                 ]
+            },
+            "Visible": {
+                "baseType": "Boolean",
+                "description": "框内通信账户是否可见",
+                "usage": [
+                    "CSR"
+                ]
             }
         }
     }

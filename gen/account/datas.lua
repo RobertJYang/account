@@ -178,7 +178,7 @@ M.t_account_policy = {
         AccountType = 9,
         NamePattern = [=[]=],
         AllowedLoginInterfaces = 153,
-        Visible = true,
+        Visible = false,
         Deletable = false,
         OnlineDeletable = true
     }

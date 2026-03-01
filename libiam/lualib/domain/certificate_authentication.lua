@@ -170,4 +170,39 @@ function CertificateAuthentication:manage_inter_chassis_whitelist(ctx, operation
     end
 end
 
+function CertificateAuthentication:get_ip_access_config()
+    local context = ""
+
+    if self.m_db_config.InterChassisValidation == 'LLDP' then
+        log:notice("collection inter chassis ip whitelist from LLDP Receives")
+        context = context .. "# limit config from LLDP" .. '\n'
+
+        -- 遍历LLDP发现对象收集放行策略
+        iam_client:ForeachLLDPReceiveObjects(function(obj)
+            if obj.ManagementAddressIPv4 ~= "" then
+                context = context .. '+:inter_chassis:' .. obj.ManagementAddressIPv4 .. '\n'
+            end
+            if obj.ManagementAddressIPv6 ~= "" then
+                context = context .. '+:inter_chassis:' .. obj.ManagementAddressIPv6 .. '\n'
+            end
+        end)
+
+        -- 最后增加限制配置
+        context = context .. '-:inter_chassis:ALL' .. '\n'
+    elseif self.m_db_config.InterChassisValidation == 'Static' then
+        log:notice("collection inter chassis ip whitelist from Static Configure")
+        context = context .. "# limit config from Static Configure" .. '\n'
+
+        -- 从静态配置白名单收集放行策略
+        for _, item in pairs(self.m_inter_chassis_validator:get("IP")) do
+            context = context .. '+:inter_chassis:' .. item .. '\n'
+        end
+
+        -- 最后增加限制配置
+        context = context .. '-:inter_chassis:ALL' .. '\n'
+    end
+
+    return context
+end
+
 return singleton(CertificateAuthentication)

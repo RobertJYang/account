@@ -151,6 +151,8 @@ function app:object_register()
         if class_name == 'InterChassisAuthConfig' then
             local inter_chassis_account = self.account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
             inter_chassis_account:flush_default_by_sr(object)
+
+            self.account_policy_collection:flush_inter_chassis_policy_by_sr(object)
         end
         log:notice("[account] Add object callback, class_name: %s, object_name: %s, position: %s",
             class_name, object.name, position)
