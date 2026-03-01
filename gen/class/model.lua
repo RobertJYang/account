@@ -2371,11 +2371,17 @@ local InterChassisAuthConfig = {
             ['baseType'] = 'U32',
             ['usage'] = {'CSR'},
             ['validator'] = inter_chassis_auth_config_class_types.LoginInterface
+        },
+        ['Visible'] = {
+            ['baseType'] = 'Boolean',
+            ['usage'] = {'CSR'},
+            ['validator'] = inter_chassis_auth_config_class_types.Visible
         }
     },
     ['default_props'] = {
         ['AccessRoleId'] = inter_chassis_auth_config_class_types.AccessRoleId.default[1],
-        ['LoginInterface'] = inter_chassis_auth_config_class_types.LoginInterface.default[1]
+        ['LoginInterface'] = inter_chassis_auth_config_class_types.LoginInterface.default[1],
+        ['Visible'] = inter_chassis_auth_config_class_types.Visible.default[1]
     }
 }
 

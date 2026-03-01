@@ -12,6 +12,52 @@ local utils = require 'mc.utils'
 
 local MInterChassisAuthConfig = {}
 
+---@class MInterChassisAuthConfig.Visible
+---@field Visible boolean
+local TVisible = {}
+TVisible.__index = TVisible
+TVisible.group = {}
+
+local function TVisible_from_obj(obj)
+    return setmetatable(obj, TVisible)
+end
+
+function TVisible.new(Visible)
+    return TVisible_from_obj({Visible = Visible})
+end
+---@param obj MInterChassisAuthConfig.Visible
+function TVisible:init_from_obj(obj)
+    self.Visible = obj.Visible
+end
+
+function TVisible:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TVisible.group)
+end
+
+TVisible.from_obj = TVisible_from_obj
+
+TVisible.proto_property = {'Visible'}
+
+TVisible.default = {false}
+
+TVisible.struct = {{name = 'Visible', is_array = false, struct = nil}}
+
+function TVisible:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Visible', self.Visible, 'bool', false, errs, need_convert)
+
+    TVisible:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TVisible.proto_property, errs, need_convert)
+    return self
+end
+
+function TVisible:unpack(_)
+    return self.Visible
+end
+
+MInterChassisAuthConfig.Visible = TVisible
+
 ---@class MInterChassisAuthConfig.LoginInterface
 ---@field LoginInterface integer
 local TLoginInterface = {}

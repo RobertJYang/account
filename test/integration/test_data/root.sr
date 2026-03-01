@@ -22,7 +22,8 @@
         "IpmiCore_1":{},
         "InterChassisAuthConfig": {
             "AccessRoleId": 4,
-            "LoginInterface": 153
+            "LoginInterface": 153,
+            "Visible": true
         }
     }
 }

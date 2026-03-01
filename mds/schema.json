@@ -69,6 +69,13 @@
                             "$ref": "base.json#/U32"
                         }
                     ]
+                },
+                "Visible": {
+                    "allOf": [
+                        {
+                            "$ref": "base.json#/Boolean"
+                        }
+                    ]
                 }
             },
             "type": "object",

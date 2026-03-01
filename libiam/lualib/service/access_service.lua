@@ -120,7 +120,7 @@ local function check_lock_changed(last_status, cur_status)
 end
 
 local function collect_ip_lock_access(records)
-    local context = ""
+    local context = "# limit config from ip lock" .. '\n'
     for ip, record in pairs(records) do
         if record.lock_status then
             context = context .. "-:ALL:" .. ip .. "\n"
@@ -206,7 +206,7 @@ function AccessService:get_ip_lock_access()
 end
 
 function AccessService:get_inter_chassis_access()
-    return nil
+    return self.cert_auth_service:get_ip_access_config()
 end
 
 return singleton(AccessService)

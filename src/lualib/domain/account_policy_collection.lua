@@ -135,4 +135,15 @@ function AccountPolicyCollection:set_online_deletable(account_type, value)
     self.m_config_changed:emit(account_type, 'OnlineDeletable', value)
 end
 
+function AccountPolicyCollection:flush_inter_chassis_policy_by_sr(inter_chassis_config)
+    if inter_chassis_config.Visible == nil then
+        return
+    end
+    local account_type = enum.AccountType.InterChassis:value()
+    local inter_chassis_policy = self.collection[account_type]
+    inter_chassis_policy.data.Visible = inter_chassis_config.Visible
+    inter_chassis_policy.data:save()
+    self.m_config_changed:emit(account_type, 'Visible', inter_chassis_policy.data.Visible)
+end
+
 return singleton(AccountPolicyCollection)
