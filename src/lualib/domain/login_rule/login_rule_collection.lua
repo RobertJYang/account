@@ -15,6 +15,7 @@ local base_msg = require 'messages.base'
 local account_core = require 'account_core'
 local login_rule_manager = require 'domain.login_rule.login_rule_manager'
 local user_config = require 'common_config'
+local file_proxy = require 'infrastructure.file_proxy'
 
 local LoginRuleCollection = class()
 
@@ -187,7 +188,7 @@ function LoginRuleCollection:flush_loginrules_file()
     tmp_file:close()
 
     -- 执行替换动作
-    file_utils.move_file_s(self.tmp_file_path, self.file_path)
+    file_proxy.proxy_move(self.tmp_file_path, self.file_path, user_config.SECBOX_USER_UID, user_config.SECBOX_USER_GID)
 end
 
 return singleton(LoginRuleCollection)

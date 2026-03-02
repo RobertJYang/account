@@ -19,6 +19,7 @@ local custom_msg = require 'messages.custom'
 local skynet_ready, skynet = pcall(require, 'skynet')
 local config = require 'common_config'
 local operation_logger = require 'interface.operation_logger'
+local file_proxy = require 'infrastructure.file_proxy'
 local service = require 'account.service'
 
 local INTERFACE_ACCOUNT_SERVICE = 'bmc.kepler.AccountService'
@@ -249,7 +250,9 @@ function account_service_mdb:_import_remote_weak_pwd_dictionary(ctx, path)
         local ok, err_msg = self.file_transfer:is_file_transfer_completed(file_trans_task_id)
         if ok then
             ok, err_msg = pcall(function (...)
-                self.m_account_config:import_weak_pwd_dictionary(file_path)
+                file_proxy.proxy_delete(config.WEAK_PWDDICT_FILE_SHM_PATH)
+                file_proxy.proxy_move(file_path, config.WEAK_PWDDICT_FILE_SHM_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
+                self.m_account_config:import_weak_pwd_dictionary(config.WEAK_PWDDICT_FILE_SHM_PATH)
             end)
         end
         if not ok then
@@ -275,7 +278,9 @@ function account_service_mdb:import_weak_pwd_dictionary(ctx, path)
         return self:_import_remote_weak_pwd_dictionary(ctx, path)
     end
     -- 本地路径执行导入
-    self.m_account_config:import_weak_pwd_dictionary(path)
+    file_proxy.proxy_delete(config.WEAK_PWDDICT_FILE_SHM_PATH)
+    file_proxy.proxy_move(path, config.WEAK_PWDDICT_FILE_SHM_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
+    self.m_account_config:import_weak_pwd_dictionary(config.WEAK_PWDDICT_FILE_SHM_PATH)
     -- 本地任务返回taskid为0
     return 0
 end

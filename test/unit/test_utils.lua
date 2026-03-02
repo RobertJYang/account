@@ -12,6 +12,7 @@ local utils = require 'infrastructure.utils'
 local file_proxy = require 'infrastructure.file_proxy'
 local file_utils = require 'utils.file'
 local config = require 'common_config'
+local core = require 'account_core'
 
 local function touch_temp_file(file_path, source_file)
     os.execute('touch ' .. file_path)
@@ -60,13 +61,14 @@ end
 
 -- 导入公钥等文件路径校验
 function TestAccount:test_when_import_is_permitted_should_success()
-    local path = touch_temp_file('/tmp/ssh_rsa.pub', nil)
+    local test_data_dir, _ = core.format_realpath('account.test_temp_data')
+    local path = touch_temp_file(test_data_dir .. '/tmp/ssh_rsa.pub', nil)
     lu.assertIsTrue(utils.is_import_permitted('URI', path, 'pub', 'content', file_proxy.proxy_ispermitted))
-    path = touch_temp_file('/tmp/ssh_rsa.cert', nil)
+    path = touch_temp_file(test_data_dir .. '/tmp/ssh_rsa.cert', nil)
     lu.assertIsTrue(utils.is_import_permitted('URI', path, 'cert', 'content', file_proxy.proxy_ispermitted))
-    path = touch_temp_file('/tmp/ssh_rsa.tab', nil)
+    path = touch_temp_file(test_data_dir .. '/tmp/ssh_rsa.tab', nil)
     lu.assertIsTrue(utils.is_import_permitted('URI', path, 'tab', 'content', file_proxy.proxy_ispermitted))
-    path = touch_temp_file('/tmp/weak', nil)
+    path = touch_temp_file(test_data_dir .. '/tmp/weak', nil)
     lu.assertIsTrue(utils.is_import_permitted('URI', path, 'weakpwddic', 'content', file_proxy.proxy_ispermitted))
     path = "https://127.0.0.1/data/text\\.pub"
     lu.assertIsTrue(utils.is_import_permitted('URI', path, 'pub', 'content', file_proxy.proxy_ispermitted))
@@ -84,4 +86,24 @@ function TestAccount:test_when_import_is_not_permitted_should_faild()
     lu.assertIsFalse(pcall(utils.is_import_permitted, 'URI', path, 'cert', 'content', file_proxy.proxy_ispermitted))
     path = '/tmp/ssh_rsa.pub'
     lu.assertIsFalse(pcall(utils.is_import_permitted, 'URI', path, 'pub', 'content', proxy_ispermitted_false))
+end
+
+function TestAccount:test_get_dac_override_success()
+    local path = touch_temp_file(config.TMP_PATH .. 'secbox.cfg', nil)
+    lu.assertIsFalse(utils.check_cap_dac_override_supported(path))
+    local file = file_utils.open_s(path, 'w+')
+    file:write('CAP_DAC_OVERRIDE')
+    file:close()
+    lu.assertIsTrue(utils.check_cap_dac_override_supported(path))
+end
+
+function TestAccount:test_file_proxy()
+    local path = touch_temp_file(config.TMP_PATH .. 'test_proxy.txt', nil)
+    file_proxy.has_cap_dac = true
+    lu.assertIsTrue(file_proxy.proxy_copy(path, config.TMP_PATH .. '/test_dst.txt',
+        config.SECBOX_USER_UID, config.SECBOX_USER_GID))
+    lu.assertIsTrue(file_proxy.proxy_move(path, config.TMP_PATH .. '/test_dst2.txt',
+        config.SECBOX_USER_UID, config.SECBOX_USER_GID))
+    lu.assertIsTrue(file_proxy.proxy_mkdir(config.TMP_PATH .. '/test_dir', 777,
+        config.SECBOX_USER_UID, config.SECBOX_USER_GID))
 end

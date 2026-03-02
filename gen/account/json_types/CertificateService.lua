@@ -54,6 +54,8 @@ ECertificateUsageType.ManagerSSLCertificate = ECertificateUsageType.new(1)
 ECertificateUsageType.ManagerAccountCertificate = ECertificateUsageType.new(2)
 ECertificateUsageType.ManagerCMPCertificate = ECertificateUsageType.new(3)
 ECertificateUsageType.ManagerFirmwareCertificate = ECertificateUsageType.new(4)
+ECertificateUsageType.TrustedComponentCertificate = ECertificateUsageType.new(5)
+ECertificateUsageType.InterChassisAuthCertificate = ECertificateUsageType.new(6)
 
 CertificateService.CertificateUsageType = ECertificateUsageType
 
@@ -2004,7 +2006,8 @@ CertificateService.interface = mdb.register_interface('bmc.kepler.CertificateSer
     CRLOverdueWarnDays = {'u', nil, false, 90},
     CRLEnabled = {'b', nil, false, true},
     IsDefaultSSLCert = {'b', nil, true, false},
-    SSLCertAlgorithm = {'y', nil, false, 0}
+    SSLCertAlgorithm = {'y', nil, false, 0},
+    InterChassisCertificateAuthEnabled = {'b', nil, false, false}
 }, {
     GetCertPath = {'a{ss}i', 's', TGetCertPathReq, TGetCertPathRsp},
     ImportCert = {'a{ss}issu', 'uu', TImportCertReq, TImportCertRsp},

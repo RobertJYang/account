@@ -28,13 +28,6 @@ utils.queue = skynet_queue()
 local MIN_USER_NUM = 2
 local MAX_USER_NUM = 17
 
-local pattern_collection = {
-    ['pub'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.pub$",
-    ['cert'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.(crt|cer|cert|pem|p12|pfx|crl|der)$",
-    ['tab'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,246})\\.tab$",
-    ['weakpwddic'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|/tmp/.{1,251})$"
-}
-
 function utils:ctor()
     self.last_time_map = {}
 end
@@ -283,11 +276,12 @@ function utils.is_import_permitted(type, content, file_type, property_name, resu
         return true
     end
 
-    local error_collection = {
-        ['pub'] = custom_msg.PublicKeyImportFailed(),
-        ['cert'] = custom_msg.CertImportFailed(),
-        ['tab'] = custom_msg.InvalidPath("******", property_name),
-        ['weakpwddic'] = custom_msg.WeakPWDDictImportFailed()
+    
+    local pattern_collection = {
+        ['pub'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|" .. config.TMP_PATH .. "/.{1,246})\\.pub$",
+        ['cert'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|" .. config.TMP_PATH .. "/.{1,246})\\.(crt|cer|cert|pem|p12|pfx|crl|der)$",
+        ['tab'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|" .. config.TMP_PATH .. "/.{1,246})\\.tab$",
+        ['weakpwddic'] = "^((https|sftp|nfs|cifs|scp)://.{1,1000}|" .. config.TMP_PATH .. "/.{1,251})$"
     }
 
     if not utils_core.g_regex_match(pattern_collection[file_type], content) then
@@ -296,14 +290,6 @@ function utils.is_import_permitted(type, content, file_type, property_name, resu
 
     if content:sub(1,1) ~= '/' then
         return true
-    end
-
-    if not utils_core.is_file(content) then
-        error(error_collection[file_type])
-    end
-
-    if file_utils.check_real_path_s(content, "/tmp") ~= 0 then
-        error(error_collection[file_type])
     end
 
     if result(content, 'rw') then
@@ -714,6 +700,23 @@ function utils.string_equal_without_space_and_case(str1, str2)
     s2 = string.upper(s2)
     -- 比较字符串是否相等
     return s1 == s2
+end
+
+ -- 判断系统是否支持CAP_DAC_OVERRIDE能力
+ function utils.check_cap_dac_override_supported(cfg_path)
+    local ok, file = pcall(file_utils.open_s, cfg_path, 'r')
+    if not ok or not file then
+        return false
+    end
+
+    local content = file:read('*a')
+    file:close()
+
+    if not content or content == '' then
+        return false
+    end
+
+    return string.find(content, 'CAP_DAC_OVERRIDE', 1, true) ~= nil
 end
 
 function utils.topo_sort(deps)

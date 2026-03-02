@@ -8,17 +8,19 @@
 -- See the Mulan PSL v2 for more details.
 local log = require 'mc.logging'
 local class = require 'mc.class'
+local base_msg = require 'messages.base'
 local Singleton = require 'mc.singleton'
 local client = require 'account.client'
 local context = require 'mc.context'
+local utils_core = require 'utils.core'
+local file_utils = require 'utils.file'
+local account_utils = require 'infrastructure.utils'
+local config = require 'common_config'
 
 local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
 
-local file_proxy = class()
-
-function file_proxy:ctor()
-    self.last_time_map = {}
-end
+local file_proxy = {}
+file_proxy.has_cap_dac = account_utils.check_cap_dac_override_supported()
 
 local function get_file_proxy_obj()
     local objs = client:GetFileObjects()
@@ -66,6 +68,12 @@ function file_proxy.proxy_delete(dst_path)
 end
 
 function file_proxy.proxy_move(src_path, dst_path, uid, gid)
+    -- 有特权直接执行命令
+    if file_proxy.has_cap_dac then
+        file_utils.move_file_s(src_path, dst_path)
+        utils_core.chown_s(dst_path, uid, gid)
+        return true
+    end
     local file_obj = get_file_proxy_obj()
     if not file_obj then
         return false
@@ -84,6 +92,12 @@ function file_proxy.proxy_move(src_path, dst_path, uid, gid)
 end
 
 function file_proxy.proxy_copy(src_path, dst_path, uid, gid)
+    -- 有特权直接执行命令
+    if file_proxy.has_cap_dac then
+        file_utils.copy_file_s(src_path, dst_path)
+        utils_core.chown_s(dst_path, uid, gid)
+        return true
+    end
     local file_obj = get_file_proxy_obj()
     if not file_obj then
         return false
@@ -154,4 +168,46 @@ function file_proxy.proxy_ispermitted(dst_path, permission)
     return true
 end
 
-return Singleton(file_proxy)
+function file_proxy.proxy_access(dst_path, mode)
+    local file_obj = get_file_proxy_obj()
+    if not file_obj then
+        return false
+    end
+    local ctx = context.get_context()
+    local ok, result = pcall(function()
+        return file_obj:Access(ctx, dst_path, mode)
+    end)
+    if not ok then
+        log:error("Access check failed")
+        error(base_msg.InternalError())
+    end
+
+    return result
+end
+
+function file_proxy.proxy_mkdir(dst_path, dir_mod, uid, gid)
+    -- 有特权直接执行命令
+    if file_proxy.has_cap_dac then
+        utils_core.mkdir(dst_path, dir_mod)
+        utils_core.chown_s(dst_path, uid, gid)
+        return true
+    end
+
+    local file_obj = get_file_proxy_obj()
+    if not file_obj then
+        return false
+    end
+
+    local ok, err_info = pcall(function()
+        file_obj:Mkdir({}, dst_path, dir_mod, uid, gid)
+    end)
+
+    if not ok then
+        log:error("Mkdir failed, error is %s", err_info)
+        return false
+    end
+
+    return true
+end
+
+return file_proxy

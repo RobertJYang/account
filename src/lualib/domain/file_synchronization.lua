@@ -22,12 +22,12 @@ local trace = require 'telemetry.trace'
 
 -- 文件同步管理，将passwd/shadow/group/ipmi几个文件的同步和刷新机制放在此处处理
 local file_synchronization = class()
-function file_synchronization:ctor(db, account_collection, linux_file_path, skynet_queue)
+function file_synchronization:ctor(db, account_collection, account_linux_file_path, skynet_queue)
     self.db = db
-    self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
-    self.shadow_path = linux_file_path['shadow'] or config.SHADOW_FILE
-    self.group_path = linux_file_path['group'] or config.GROUP_FILE
-    self.ipmi_path = linux_file_path['ipmi'] or config.IPMI_FILE
+    self.passwd_path = account_linux_file_path['passwd'] or config.PASSWD_FILE
+    self.shadow_path = account_linux_file_path['shadow'] or config.SHADOW_FILE
+    self.group_path = account_linux_file_path['group'] or config.GROUP_FILE
+    self.ipmi_path = account_linux_file_path['ipmi'] or config.IPMI_FILE
     self.linux_files = {
         passwd_path = self.passwd_path,
         shadow_path = self.shadow_path,
@@ -87,11 +87,21 @@ end
 
 function file_synchronization:set_file_owner()
     local la = account_linux.new(self.linux_files, true, true)
-    if vos_utils.get_file_accessible(config.PRESERVE_CONFIG_FILE) then
+    if file_proxy.proxy_access(config.PRESERVE_CONFIG_FILE, 0) then
+        -- 修改文件属主权限确保能解压访问
+        file_proxy.proxy_chown(config.PRESERVE_CONFIG_FILE, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
+        file_proxy.proxy_chmod(config.PRESERVE_CONFIG_FILE, mc_utils.S_IRUSR | mc_utils.S_IWUSR)
+        -- 解压目录
         mc_utils.secure_tar_unzip(config.PRESERVE_CONFIG_FILE, config.SHM_PATH,
             config.FILE_MAX_SIZE, config.FILE_MAX_NUM)
+        -- 删除原目录残留
         file_proxy.proxy_delete(config.DATA_HOME_PATH)
-        file_utils.move_file_s(config.SHM_PATH .. '/home', config.PRESERVE_CONFIG_PATH)
+        -- 将解压后的目录移动到目标目录并赋权
+        file_proxy.proxy_move(config.SHM_PATH .. '/home', config.PRESERVE_CONFIG_PATH,
+            config.ROOT_USER_UID, config.ROOT_USER_GID)
+        file_proxy.proxy_chmod(config.DATA_HOME_PATH,
+            mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH)
+        -- 删除残留压缩包
         file_proxy.proxy_delete(config.PRESERVE_CONFIG_FILE)
     end
     for _, file_name in pairs(utils_core.dir(config.DATA_HOME_PATH)) do

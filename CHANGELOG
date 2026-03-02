@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.25] - 2026-3-2
+feat:支持om进程权限消减
 
 ## [1.110.24] - 2026-3-1
 feat:支持配置框内通信账户的pam_access限制

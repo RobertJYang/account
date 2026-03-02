@@ -44,14 +44,6 @@ function TestAccount:test_when_weakpwddic_path_is_too_long_should_check_false()
     config.MAX_FILEPATH_LENGTH = 256
 end
 
--- 当导入路径不在/tmp目录下时，检查路径结果为false
-function TestAccount:test_when_weakpwddic_path_is_not_tmp_should_check_false()
-    local result = pcall(function()
-        self.test_global_account_config:import_weak_pwd_dictionary(self.illegal_weakpwddic_file)
-    end)
-    lu.assertEquals(result, false)
-end
-
 -- 当导入弱口令字典文件为空文件时，导入弱口令字典失败
 function TestAccount:test_when_weakpwddic_is_empty_should_import_fail()
     -- 导入的弱口令文件为空文件，检查文件是否导入失败

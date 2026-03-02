@@ -10,7 +10,6 @@ local class = require 'mc.class'
 local mc_utils = require 'mc.utils'
 local log = require 'mc.logging'
 local file_utils = require 'utils.file'
-local utils_core = require 'utils.core'
 local custom_msg = require 'messages.custom'
 local base_msg = require 'messages.base'
 local config = require 'common_config'
@@ -126,14 +125,15 @@ function ssh_publickey.generate_authentication_public_key_file(key_path, home_pa
 
     -- .ssh与/data/trust/home拼接
     local ssh_dir_path = table.concat({ home_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME }, '/')
-    utils_core.mkdir(ssh_dir_path, mc_utils.S_IRWXU)
+    file_proxy.proxy_mkdir(ssh_dir_path, mc_utils.S_IRWXU, uid, gid)
     file_proxy.proxy_chown(ssh_dir_path, uid, gid)
     file_proxy.proxy_chmod(ssh_dir_path, mc_utils.S_IRWXU)
 
     local auth_file_path = ssh_dir_path .. '/authorized_keys'
-    file_utils.copy_file_s(key_path, auth_file_path)
-    file_proxy.proxy_chown(auth_file_path, uid, gid)
+    file_proxy.proxy_copy(key_path, auth_file_path, uid, gid)
     file_proxy.proxy_chmod(auth_file_path, mc_utils.S_IRUSR | mc_utils.S_IWUSR)
+    file_proxy.proxy_chown(ssh_dir_path, uid, gid)
+    file_proxy.proxy_chmod(ssh_dir_path, mc_utils.S_IRWXU)
 end
 
 return ssh_publickey

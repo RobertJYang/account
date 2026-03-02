@@ -16,6 +16,7 @@ local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local ssh_public_key = require 'infrastructure.ssh_public_key'
 local manager_account = require 'domain.manager_account.manager_account'
+local file_proxy = require 'infrastructure.file_proxy'
 
 local inter_chassis_account = class(manager_account)
 
@@ -114,7 +115,7 @@ end
 function inter_chassis_account:delete_ssh_public_key(home_path)
     local ssh_path = table.concat({ home_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME }, '/')
 
-    mc_utils.remove_file(ssh_path)
+    file_proxy.proxy_delete(ssh_path)
     self.m_account_data.SshPublicKeyHash = ''
     self.m_account_data:save()
     self.m_account_update_signal:emit('SshPublicKeyHash', '')

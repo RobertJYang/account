@@ -38,6 +38,8 @@ local function test_when_import_remote_ssh_key_then_success(bus, test_data_dir)
     while test_case_utils.check_remote_task_completed(bus, rpc_path) == false do
         skynet.sleep(50)
     end
+    -- 等待任务执行完成
+    skynet.sleep(100 * 2)
     log:notice('================ test_when_import_remote_ssh_key_then_success end ================')
 end
 
@@ -51,6 +53,8 @@ local function test_when_import_remote_weakdictionary_then_success(bus, test_dat
     while test_case_utils.check_remote_task_completed(bus, rpc_path) == false do
         skynet.sleep(50)
     end
+    -- 等待任务执行完成
+    skynet.sleep(100 * 2)
     log:notice('================ test_when_import_remote_weakdictionary_then_success end ================')
 end
 

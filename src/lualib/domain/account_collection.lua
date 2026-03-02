@@ -8,7 +8,7 @@
 -- See the Mulan PSL v2 for more details.
 local singleton = require 'mc.singleton'
 local class = require 'mc.class'
-local signal = require 'mc.signal'
+local mc_signal = require 'mc.signal'
 local log = require 'mc.logging'
 local mc_context = require 'mc.context'
 local mdb_service = require 'mc.mdb.mdb_service'
@@ -56,13 +56,13 @@ local DEFAULT_MAX_USER_NUM = 17
 
 local AccountCollection = class()
 function AccountCollection:ctor(persist, db, global_account_config, role_collection, host_privilege_limit,
-    password_validator_collection, account_policy_collection, ipmi_channel_config, linux_file_path, skynet_queue)
+    password_validator_collection, account_policy_collection, ipmi_channel_config, account_linux_file_path, skynet_queue)
     self.persist = persist
     self.db = db
-    self.passwd_path = linux_file_path['passwd'] or config.PASSWD_FILE
-    self.shadow_path = linux_file_path['shadow'] or config.SHADOW_FILE
-    self.group_path = linux_file_path['group'] or config.GROUP_FILE
-    self.ipmi_path = linux_file_path['ipmi'] or config.IPMI_FILE
+    self.passwd_path = account_linux_file_path['passwd'] or config.PASSWD_FILE
+    self.shadow_path = account_linux_file_path['shadow'] or config.SHADOW_FILE
+    self.group_path = account_linux_file_path['group'] or config.GROUP_FILE
+    self.ipmi_path = account_linux_file_path['ipmi'] or config.IPMI_FILE
     self.linux_files = {
         passwd_path = self.passwd_path,
         shadow_path = self.shadow_path,
@@ -96,20 +96,20 @@ AccountCollection.operation_type_check = {
 }
 
 function AccountCollection:signals_init()
-    self.m_account_added = signal.new()
-    self.m_account_removed = signal.new()
-    self.m_account_changed = signal.new()
-    self.m_snmp_info_changed = signal.new()
+    self.m_account_added = mc_signal.new()
+    self.m_account_removed = mc_signal.new()
+    self.m_account_changed = mc_signal.new()
+    self.m_snmp_info_changed = mc_signal.new()
     -- 四个文件信号标志位，用于刷新文件
-    self.m_account_file_added = signal.new()
-    self.m_account_file_removed = signal.new()
-    self.m_account_file_flush = signal.new()
-    self.m_account_file_changed = signal.new()
-    self.m_account_ipmi_changed = signal.new()
-    self.m_account_security_changed = signal.new() -- 某些涉及安全的属性变更，如用户名密码等，触发该信号需要清理用户会话
-    self.m_ipmi_crypt_password_update = signal.new() -- 当kmc密钥更新时更新存储的密码密文
+    self.m_account_file_added = mc_signal.new()
+    self.m_account_file_removed = mc_signal.new()
+    self.m_account_file_flush = mc_signal.new()
+    self.m_account_file_changed = mc_signal.new()
+    self.m_account_ipmi_changed = mc_signal.new()
+    self.m_account_security_changed = mc_signal.new() -- 某些涉及安全的属性变更，如用户名密码等，触发该信号需要清理用户会话
+    self.m_ipmi_crypt_password_update = mc_signal.new() -- 当kmc密钥更新时更新存储的密码密文
     -- 持久化属性信号
-    self.m_account_permanent_changed = signal.new()
+    self.m_account_permanent_changed = mc_signal.new()
 end
 
 function AccountCollection:init_account_collection(db)
@@ -1427,7 +1427,7 @@ function AccountCollection:import_ssh_public_key(ctx, account_id, path)
     local key_temp_file_path = table.concat({ config.SSH_PUBLIC_KEY_CONF_TEMP_FILE, '_', account_id })
     local hash_temp_file_path = table.concat({ config.SSH_PUBLIC_KEY_HASH_TEMP_FILE, '_', account_id })
     -- 导入路径校验
-    if not utils.check_import_path(path, config.SHM_TMP_PATH) then
+    if not utils.check_import_path(path, config.SHM_TMP_PATH) and not utils.check_import_path(path, config.TMP_PATH) then
         log:error('file path is illegal!')
         error(custom_msg.PublicKeyImportFailed())
     end
@@ -1461,7 +1461,7 @@ function AccountCollection:delete_ssh_public_key(ctx, account_id)
     end)
     local ssh_path = table.concat({ home_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME }, '/')
     -- 公钥不存在, 删除失败
-    if not vos_utils.get_file_accessible(ssh_path) then
+    if not file_proxy.proxy_access(ssh_path, 0) then
         error(custom_msg.PublicKeyNotExist())
     end
 

@@ -565,4 +565,18 @@ function AccountCases.test_set_local_account_allowed_login_interface_invalid_sho
     assert(not ok and err.name == base_msg.PropertyValueNotInListMessage.Name)
 end
 
+--- 测试导入ssh公钥
+function AccountCases.test_when_import_local_ssh_key_then_success(bus, test_data_dir)
+    local task_id = test_case_utils.call_account_import_ssh_public_key(bus, 2,
+        'URI', test_data_dir .. '/tmp/ssh2_key.pub')
+    assert(task_id == 0)
+end
+
+--- 测试导入弱密码字典
+function AccountCases.test_when_import_remote_weakdictionary_then_success(bus, test_data_dir)
+    local task_id = test_case_utils.call_account_service_import_weakpwd_dict(bus,
+        test_data_dir .. '/tmp/weakdictionary')
+    assert(task_id == 0)
+end
+
 return AccountCases

@@ -51,6 +51,9 @@ local WEAK_PWDDICT_FILE_EXPORT_PATH = '/tmp/weakdictionary'
 -- 证书目录
 local CERT_INTER_DIR = '/dev/shm/ca-bundle.crt'
 
+-- OM进程环境变量
+local OM_CONFIG_PATH = '/opt/bmc/apps/hica/subsys/om/secbox.cfg'
+
 -- KSF文件
 local ACCOUNT_KSF_FILE_NAME = 'datatocheck_account.dat'
 local ACCOUNT_KSF_BACK_NAME = "datatocheck_account_bak.dat"
@@ -205,6 +208,8 @@ return {
   HOST_CHAN_IP = HOST_CHAN_IP,
 
   CERT_INTER_DIR = CERT_INTER_DIR,
+
+  OM_CONFIG_PATH = OM_CONFIG_PATH,
 
   -- 天数秒数转换
   DAY_SECOND_COUNT = DAY_SECOND_COUNT,

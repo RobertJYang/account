@@ -15,8 +15,6 @@ local base_msg = require 'messages.base'
 local client = require 'iam.client'
 local iam_core = require 'iam_core'
 
-require 'bmc_network.json_types.EthernetInterfaces'
-
 local PATH_ETHERNET<const> = '/bmc/kepler/Managers/1/EthernetInterfaces'
 
 local mac_rule = class()

@@ -18,7 +18,7 @@ local base_msg = require 'messages.base'
 local custom_msg = require 'messages.custom'
 local skynet_ready, skynet = pcall(require, 'skynet')
 local service = require 'account.service'
-local enum = require 'class.types.types'
+local account_enum = require 'class.types.types'
 local config = require 'common_config'
 local utils = require 'infrastructure.utils'
 local file_proxy = require 'infrastructure.file_proxy'
@@ -208,7 +208,7 @@ function account_mdb:new_account_to_mdb_tree(user_info, snmp_info, account_updat
         account.SshPublicKeyHash = user_info.SshPublicKeyHash
         account.LastLoginTime = user_info.LastLoginTime
         account.LastLoginIP = user_info.LastLoginIP
-        account.LastLoginInterface = tostring(enum.LoginInterface.new(user_info.LastLoginInterface))
+        account.LastLoginInterface = tostring(account_enum.LoginInterface.new(user_info.LastLoginInterface))
         account.FirstLoginPolicy = user_info.FirstLoginPolicy:value()
         account.LoginInterface = utils.convert_num_to_interface_str(user_info.LoginInterface, true)
         account.LoginRuleIds = utils.covert_num_to_login_rule_ids_str(user_info.LoginRuleIds)
@@ -263,31 +263,31 @@ local function _privilege_check(ctx, account_id, collection)
     end
 
     -- 本地用户是否具有管理员权限
-    if handler and handler:get_role_id() == enum.RoleType.Administrator:value() then
+    if handler and handler:get_role_id() == account_enum.RoleType.Administrator:value() then
         return true, handler_id
     end
 
     -- 通过ctx.Privilege校验是否具有管理员权限
     if ctx.Privilege and
-        utils.privilege_validator(privilege:num_to_array(ctx.Privilege), enum.PrivilegeType.UserMgmt) then
+        utils.privilege_validator(privilege:num_to_array(ctx.Privilege), account_enum.PrivilegeType.UserMgmt) then
         return true, handler_id
     end
     return false, handler_id
 end
 
-function account_mdb:change_password(ctx, account_id, password)
-    if account_id == config.INTER_CHASSIS_ACCOUNT_ID then
+function account_mdb:change_password(ctx, user_id, password)
+    if user_id == config.INTER_CHASSIS_ACCOUNT_ID then
         ctx.operation_log.params = {operate = 'Modify', name = 'inter_chassis', id = config.INTER_CHASSIS_ACCOUNT_ID}
         error(base_msg.ActionNotSupported(string.format("change password for inter chassis account")))
     end
-    local privilege_ok, handle_account_id = _privilege_check(ctx, account_id, self.m_account_collection)
+    local privilege_ok, handle_account_id = _privilege_check(ctx, user_id, self.m_account_collection)
     if not privilege_ok then
         ctx.operation_log.operation = 'ConfigureSelfAuthFailed'
         ctx.operation_log.params.operation = 'change password'
         error(base_msg.InsufficientPrivilege())
     end
-    self.m_account_service:set_account_password(ctx, handle_account_id, account_id, password)
-    self:password_changed_signal_emit(account_id)
+    self.m_account_service:set_account_password(ctx, handle_account_id, user_id, password)
+    self:password_changed_signal_emit(user_id)
 end
 
 function account_mdb:change_snmp_password(ctx, account_id, password)
@@ -306,12 +306,6 @@ function account_mdb:change_snmp_password(ctx, account_id, password)
 end
 
 function account_mdb:_import_remote_ssh_public_key(ctx, account_id, path)
-    local ok, uid, gid = pcall(utils_core.get_uid_gid_by_name, ctx.UserName)
-    if not ok then
-        log:error("get %s uid gid failed", ctx.UserName)
-        uid = config.APACHE_UID
-        gid = config.APACHE_GID
-    end
     -- 远程文件，先生成任务，然后执行本地导入
     local file_trans_task_id, file_path = self.file_transfer:get_file_from_url(ctx, path, true)
     if skynet_ready == false then
@@ -323,7 +317,7 @@ function account_mdb:_import_remote_ssh_public_key(ctx, account_id, path)
         local ok, err_msg = self.file_transfer:is_file_transfer_completed(file_trans_task_id)
         if ok then
             ok, err_msg = pcall(function (...)
-                file_proxy.proxy_move(file_path, config.SSH_PUBLIC_KEY_PARSE_PATH, uid, gid)
+                file_proxy.proxy_move(file_path, config.SSH_PUBLIC_KEY_PARSE_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
                 self.m_account_collection:import_ssh_public_key(ctx, account_id, config.SSH_PUBLIC_KEY_PARSE_PATH)
             end)
         end
@@ -338,20 +332,12 @@ function account_mdb:_import_remote_ssh_public_key(ctx, account_id, path)
 end
 
 local function parse_content_with_type(user_name, type, content)
-    local ok, uid, gid = pcall(utils_core.get_uid_gid_by_name, user_name)
-    if not ok then
-        log:error("get %s uid gid failed", user_name)
-        uid = config.APACHE_UID
-        gid = config.APACHE_GID
-    end
-
     -- 若是URI类型则校验文件格式
     if type == "URI" then
         -- 本地文件路径场景，若非/tmp目录下，直接抛出失败，不能删除文件
-        if string.sub(content, 1, 1) == '/' and
-            file_utils.check_realpath_before_open_s(content, config.TMP_PATH) ~= 0 then
-            log:error("invalid local file path")
-            error(base_msg.PropertyValueFormatError('******', 'Content'))
+        if string.sub(content, 1, 1) == '/' then
+            file_proxy.proxy_move(content, config.SSH_PUBLIC_KEY_PARSE_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
+            content = config.SSH_PUBLIC_KEY_PARSE_PATH
         end
 
         -- 走到这里的只会是本地/tmp路径或者远程路径
@@ -361,11 +347,6 @@ local function parse_content_with_type(user_name, type, content)
                 mc_utils.remove_file(content)
             end
             error(base_msg.PropertyValueFormatError('******', 'Content'))
-        end
-        -- 本地导入直接使用内部路径
-        if string.sub(content, 1, 1) == '/' then
-            file_proxy.proxy_move(content, config.SSH_PUBLIC_KEY_PARSE_PATH, uid, gid)
-            content = config.SSH_PUBLIC_KEY_PARSE_PATH
         end
 
         return content
@@ -389,7 +370,7 @@ local function parse_content_with_type(user_name, type, content)
     file:close()
 
     file_proxy.proxy_delete(config.SSH_PUBLIC_KEY_TEMP_FILE)
-    file_proxy.proxy_chown(config.SSH_PUBLIC_KEY_PARSE_PATH, uid, gid)
+    file_proxy.proxy_chown(config.SSH_PUBLIC_KEY_PARSE_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
     return config.SSH_PUBLIC_KEY_PARSE_PATH
 end
 
@@ -451,7 +432,7 @@ function account_mdb:set_authentication_protocol(ctx, account_id, protocol, auth
         error(base_msg.InsufficientPrivilege())
     end
 
-    protocol = enum.SNMPAuthenticationProtocols.new(protocol)
+    protocol = account_enum.SNMPAuthenticationProtocols.new(protocol)
     self.m_account_service:set_user_auth_protocol(ctx, handle_account_id, account_id,
         protocol, auth_password, encry_password)
     self:password_changed_signal_emit(account_id)
@@ -468,7 +449,7 @@ function account_mdb:set_encryption_protocol(ctx, account_id, protocol)
         error(base_msg.InsufficientPrivilege())
     end
 
-    protocol = enum.SNMPEncryptionProtocols.new(protocol)
+    protocol = account_enum.SNMPEncryptionProtocols.new(protocol)
     self.m_account_service:set_user_encrypt_protocol(ctx, account_id, protocol)
 end
 
