@@ -40,7 +40,14 @@ end
 
 function file_synchronization:init()
     self:regist_file_sync_signals()
+    self:init_tally_log()
     self:set_file_owner()
+end
+
+function file_synchronization:init_tally_log()
+    file_proxy.proxy_mkdir(config.PAM_TALLY_LOG_DIR, mc_utils.S_IRWXU | mc_utils.S_IRWXG, config.SECBOX_USER_UID, config.APPS_USER_GID)
+    file_proxy.proxy_chmod(config.PAM_TALLY_LOG_DIR, mc_utils.S_IRWXU | mc_utils.S_IRWXG)
+    file_proxy.proxy_chown(config.PAM_TALLY_LOG_DIR, config.SECBOX_USER_UID, config.APPS_USER_GID)
 end
 
 function file_synchronization:regist_file_sync_signals()
