@@ -1299,7 +1299,7 @@ function SessionService:new_inter_chassis_session(browser_type, ctx, serial_numb
     local current_session_type = self.m_session_service_collection[iam_enum.SessionType.INTER_CHASSIS:value()]
     local session_type = browser_type_to_session_type[browser_type]
     local validation = self.m_certificate_authtication:get_inter_chassis_validation()
-    if validation == "LLDP" then
+    if validation ~= "None" then
         local old_session = current_session_type:get_session_by_ip(ip, session_type)
         if old_session then
             return old_session.m_token, old_session.m_csrf_token, old_session.m_session_id
