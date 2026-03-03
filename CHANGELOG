@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.26] - 2026-3-3
+fix:修复校验类型为Static时，同一个ip获取会话时创建新会话的问题
+
 ## [1.110.25] - 2026-3-2
 feat:支持om进程权限消减
 
