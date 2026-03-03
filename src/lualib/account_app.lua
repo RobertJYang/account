@@ -56,7 +56,7 @@ local password_validator_ipmi = require 'interface.ipmi.password_validator_ipmi'
 local account_service_snmp = require 'interface.snmp.account_service_snmp'
 local config_handle = require 'interface.config_mgmt.config_handle'
 local core    = require 'account_core'
-local queue = require 'skynet.queue'
+local skynet_queue = require 'skynet.queue'
 -- 保底碎片回收策略5分钟一次即可
 local INTERVAL = 5 * 60 * 100
 
@@ -127,7 +127,7 @@ function app:ctor()
     -- 持久化数据恢复注册
     self.db_upgrade = db_upgrade.new({['db'] = self.db, ['backup_db'] = self.local_db})
     -- 用户文件队列
-    self.linux_account_queue = queue()
+    self.linux_account_queue = skynet_queue()
 end
 
 function app:patch()
@@ -226,14 +226,13 @@ function app:init()
     return 0
 end
 
-local linux_file_path = {
-    ['passwd'] = skynet.getenv('PASSWD_FILE'),
-    ['shadow'] = skynet.getenv('SHADOW_FILE'),
-    ['group'] = skynet.getenv('GROUP_FILE'),
-    ['ipmi'] = skynet.getenv('IPMI_FILE')
-}
-
 function app:service_init()
+    local account_linux_file_path = {
+        ['passwd'] = skynet.getenv('PASSWD_FILE'),
+        ['shadow'] = skynet.getenv('SHADOW_FILE'),
+        ['group'] = skynet.getenv('GROUP_FILE'),
+        ['ipmi'] = skynet.getenv('IPMI_FILE')
+    }
     -- 基础设施
     log:notice("infrastructure init start")
     self.ipmi_running_record = ipmi_running_record.new()
@@ -265,12 +264,12 @@ function app:service_init()
     self.ipmi_channel_config = ipmi_channel_config.new(self.db)
     self.account_collection = account_collection.new(self.persist, self.db, self.global_account_config,
         self.role_collection, self.host_privilege_limit, self.password_validator_collection,
-        self.account_policy_collection, self.ipmi_channel_config, linux_file_path, self.linux_account_queue)
+        self.account_policy_collection, self.ipmi_channel_config, account_linux_file_path, self.linux_account_queue)
     self.account_permanent_backup = account_permanent_backup.new(self.db, self.account_collection)
     log:notice("account manager init end, linux file manager init start")
     self:bmcuptime()
     -- 文件管理
-    self.file_synchronization = file_synchronization.new(self.db, self.account_collection, linux_file_path,
+    self.file_synchronization = file_synchronization.new(self.db, self.account_collection, account_linux_file_path,
         self.linux_account_queue)
     log:notice("linux file manager init end, account service init start")
     -- 用户服务

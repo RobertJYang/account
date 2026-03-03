@@ -42,9 +42,11 @@ function global_account_config:ctor(db, file_transfer)
 end
 
 function global_account_config:init()
-    if not vos.get_file_accessible(config.WEAK_PWDDICT_FILE_PATH) then
-        file_utils.copy_file_s(config.WEAK_PWDDICT_FILE_PATH_INIT, config.WEAK_PWDDICT_FILE_PATH)
+    if not file_proxy.proxy_access(config.WEAK_PWDDICT_FILE_PATH, 0) then
+        file_proxy.proxy_copy(config.WEAK_PWDDICT_FILE_PATH_INIT, config.WEAK_PWDDICT_FILE_PATH,
+            config.SECBOX_USER_UID, config.SECBOX_USER_GID)
     end
+    file_proxy.proxy_chmod(config.WEAK_PWDDICT_FILE_PATH, mc_utils.S_IRUSR | mc_utils.S_IWUSR | mc_utils.S_IRGRP)
     file_proxy.proxy_chown(config.WEAK_PWDDICT_FILE_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
 
     self.m_weak_password_dictionary = {}
@@ -160,19 +162,6 @@ function global_account_config:get_password_complexity_lock()
     return self.m_db_account_service.PasswordComplexityIsLock
 end
 
-function global_account_config:update_pam_faillock(duration, threshold)
-    local data = string.format("#%%PAM-1.0\n" ..
-    "auth        requisite       pam_faillock.so  preauth silent deny=%u fail_interval=%u " ..
-    "unlock_time=%u even_deny_root root_unlock_time=%u\n" ..
-    "auth        requisite       pam_faillock.so  authfail silent deny=%u fail_interval=%u " ..
-    "unlock_time=%u even_deny_root root_unlock_time=%u",
-    threshold, duration + config.TALLY_FAIL_INTERVAL_ADD_SECONDS, duration, duration,
-    threshold, duration + config.TALLY_FAIL_INTERVAL_ADD_SECONDS, duration, duration)
-    flash_sync.write_flash_with_content(config.PAM_FAILLOCK, config.TEMP_PAM_FAILLOCK, data)
-    file_proxy.proxy_chmod(config.PAM_FAILLOCK,
-        mc_utils.S_IRUSR | mc_utils.S_IWUSR | mc_utils.S_IRGRP | mc_utils.S_IROTH)
-end
-
 function global_account_config:get_max_password_valid_days()
     return self.m_db_account_service.MaxPasswordValidDays
 end
@@ -240,15 +229,9 @@ function global_account_config:import_weak_pwd_dictionary(path)
     end
     local list_count = 0
     local tmp_weak_password_dictionary = {}
-    if not utils.check_import_path(path, config.TMP_PATH) then
+    if not utils.check_import_path(path, config.TMP_PATH) and not utils.check_import_path(path, config.TMP_PATH) then
         error(custom_msg.WeakPWDDictImportFailed())
     end
-
-    --转义至内部路径
-    file_proxy.proxy_delete(config.WEAK_PWDDICT_FILE_SHM_PATH)
-    file_proxy.proxy_move(path, config.WEAK_PWDDICT_FILE_SHM_PATH, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
-    file_proxy.proxy_delete(path)
-    path = config.WEAK_PWDDICT_FILE_SHM_PATH
 
     local file = file_utils.open_s(path, "r")
     if not file then

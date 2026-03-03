@@ -22,6 +22,7 @@
 #define FAILLOCK_SOURCE_RHOST 0x2
 #define MAX_RECORDS           1024
 #define SNMPD_USER_GROUP      95
+#define APPS_USER_GROUP       103
 #define SECBOX_UID            104
 /* 用户名转换 */
 #define ACTUAL_ROOT_USER_NAME   "root"
@@ -51,11 +52,11 @@ LOCAL FILE *open_tally(const gchar *user, const gchar *dir)
         return NULL;
     }
     if (access_s(dir, F_OK) != 0) {
-        if (mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP) < 0) {
+        if (mkdir(dir, S_IRWXU | S_IRWXG) < 0) {
             debug_log(DLOG_ERROR, "create tallylog dir failed.");
             return NULL;
         }
-        if (chown_s(dir, SECBOX_UID, SNMPD_USER_GROUP) < 0) {
+        if (chown_s(dir, SECBOX_UID, APPS_USER_GROUP) < 0) {
             debug_log(DLOG_ERROR, "change tallylog dir owner and group failed.");
             return NULL;
         }
@@ -81,7 +82,7 @@ LOCAL FILE *open_tally(const gchar *user, const gchar *dir)
     // 改文件权限
     (void)fchmod(fd, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     // 保证snmp接口调用时能读到faillock文件
-    if (fchown(fd, -1, SNMPD_USER_GROUP) != 0) {
+    if (fchown(fd, -1, APPS_USER_GROUP) != 0) {
         debug_log(DLOG_DEBUG, "change faillock file group failed.");
     }
     while (flock(fd, LOCK_EX) == -1 && errno == EINTR) {

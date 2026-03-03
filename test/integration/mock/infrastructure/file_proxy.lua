@@ -31,6 +31,11 @@ function file_proxy.proxy_delete(dst_path)
     return true
 end
 
+function file_proxy.proxy_copy(src_path, dst_path, uid, gid)
+    file_utils.copy_file_s(src_path, dst_path)
+    return true
+end
+
 function file_proxy.proxy_move(src_path, dst_path, uid, gid)
     file_utils.move_file_s(src_path, dst_path)
     return true
@@ -44,6 +49,24 @@ end
 function file_proxy.proxy_chown(dst_path, uid, gid)
     utils_core.chown(dst_path, uid, gid)
     return true
+end
+
+function file_proxy.proxy_access(dst_path, mode)
+    return vos.get_file_accessible(dst_path)
+end
+
+function file_proxy.proxy_mkdir(dst_path, dir_mod, uid, gid)
+    utils_core.mkdir(dst_path, dir_mod)
+    utils_core.chown(dst_path, uid, gid)
+    return true
+end
+
+function file_proxy.proxy_ispermitted(dst_path, mode)
+    if vos.get_file_accessible(dst_path) then
+        return true
+    else
+        return false
+    end
 end
 
 return Singleton(file_proxy)

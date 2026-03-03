@@ -24,6 +24,7 @@ ECertificateUsageType.ManagerAccountCertificate = ECertificateUsageType.new(2)
 ECertificateUsageType.ManagerCMPCertificate = ECertificateUsageType.new(3)
 ECertificateUsageType.ManagerFirmwareCertificate = ECertificateUsageType.new(4)
 ECertificateUsageType.TrustedComponentCertificate = ECertificateUsageType.new(5)
+ECertificateUsageType.InterChassisAuthCertificate = ECertificateUsageType.new(6)
 
 Certificate.CertificateUsageType = ECertificateUsageType
 

@@ -101,7 +101,7 @@ function M.prepare_test_data(test_data_dir)
     copy_file_real_path('test/unit/test_data/ipmi', test_data_dir .. '/ipmi')
     copy_file_real_path('test/unit/test_data/datatocheck_default.dat',
         test_data_dir .. '/datatocheck_default.dat')
-    copy_file_real_path('test/unit/test_data/weakdictionary', test_data_dir .. '/weakdictionary')
+    copy_file_real_path('test/unit/test_data/weakdictionary', test_data_dir .. '/tmp/weakdictionary')
     copy_file_real_path('test/unit/test_data/dsa_openssh_key.pub', test_data_dir .. '/tmp/dsa_openssh_key.pub')
     copy_file_real_path('test/unit/test_data/openssh_key.pub', test_data_dir .. '/tmp/openssh_key.pub')
     copy_file_real_path('test/unit/test_data/ssh2_key.pub', test_data_dir .. '/tmp/ssh2_key.pub')

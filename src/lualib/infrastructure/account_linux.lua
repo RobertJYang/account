@@ -560,18 +560,9 @@ local HomeDir = class()
 function HomeDir:ctor()
     if not vos.get_file_accessible(config.DATA_HOME_PATH) then
         log:info('Home directory does not exist, create one now')
-        local ret = mc_utils.mkdir(config.DATA_HOME_PATH,
-            mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH)
-        if ret ~= 0 then
-            log:error("mkdir home dir failed, ret %d", ret)
-            return
-        end
-        if not file_proxy.proxy_chown(config.DATA_HOME_PATH, config.ROOT_USER_GID, config.ROOT_USER_GID) then
-            log:error("chown home path failed")
-        end
-        if not file_proxy.proxy_chmod(config.DATA_HOME_PATH,
-            mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH) then
-            log:error("chmod home path failed")
+        local home_path_mod = mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH
+        if not file_proxy.proxy_mkdir(config.DATA_HOME_PATH, home_path_mod, config.ROOT_USER_GID, config.ROOT_USER_GID) then
+            log:error("mkdir home path failed")
         end
     end
 end
@@ -583,7 +574,9 @@ end
 function HomeDir:create(user_name, uid, gid)
     local home_dir_path = self:get(user_name)
     if file_utils.check_real_path_s(home_dir_path) ~= 0 then
-        utils_core.mkdir(home_dir_path, mc_utils.S_IRWXU)
+        if not file_proxy.proxy_mkdir(home_dir_path, mc_utils.S_IRWXU, uid, gid) then
+            log:error("mkdir home path failed")
+        end
 
         if not file_proxy.proxy_chown(home_dir_path, uid, gid) then
             log:error("chown home path failed")
@@ -602,7 +595,7 @@ function HomeDir:update(old_user_name, new_user_name, uid, gid)
     -- 若存在改名，才需要进行根目录名变更，否则可能被识别为将目录mv到自己的子目录
     if old_user_name ~= new_user_name then
         local old_home_dir_path = self:get(old_user_name)
-        file_utils.move_file_s(old_home_dir_path, new_home_dir_path)
+        file_proxy.proxy_move(old_home_dir_path, new_home_dir_path, uid, gid)
     end
     file_proxy.proxy_chown(new_home_dir_path, uid, gid)
 end
@@ -611,7 +604,7 @@ end
 ---@param user_name string
 function HomeDir:delete(user_name)
     local home_dir_path = self:get(user_name)
-    mc_utils.remove_file(home_dir_path)
+    file_proxy.proxy_delete(home_dir_path)
 end
 
 --- 获取用户根目录
@@ -625,7 +618,7 @@ end
 local file_mod = {
     ['.ssh'] = mc_utils.S_IRWXU,
     ['.ash_history'] = mc_utils.S_IRUSR | mc_utils.S_IWUSR,
-    ['authorized_keys'] = mc_utils.S_IRUSR | mc_utils.S_IWUSR
+    ['.ssh/authorized_keys'] = mc_utils.S_IRUSR | mc_utils.S_IWUSR
 }
 
 function HomeDir:set_home_file_owner(base_path, file_name, uid, gid)
@@ -633,12 +626,9 @@ function HomeDir:set_home_file_owner(base_path, file_name, uid, gid)
         return
     end
     local file_path = base_path .. '/' .. file_name
-    file_proxy.proxy_chown(file_path, uid, gid)
-    file_proxy.proxy_chmod(file_path, file_mod[file_name])
-    if utils_core.is_dir(file_path) then
-        for _, child in pairs(utils_core.dir(file_path)) do
-            self:set_home_file_owner(file_path, child, uid, gid)
-        end
+    if file_proxy.proxy_access(file_path, 0) then
+        file_proxy.proxy_chown(file_path, uid, gid)
+        file_proxy.proxy_chmod(file_path, file_mod[file_name])
     end
 end
 
@@ -671,9 +661,9 @@ function LinuxUserMgr:recover_file_owner(path, file_name, uid, gid)
     local file_path = path .. '/' .. file_name
     file_proxy.proxy_chown(file_path, uid, gid)
     file_proxy.proxy_chmod(file_path, mc_utils.S_IRWXU)
-    for _, file in pairs(utils_core.dir(file_path)) do
-        self.home_dir:set_home_file_owner(file_path, file, uid, gid)
-    end
+    self.home_dir:set_home_file_owner(file_path, '.ash_history', uid, gid)
+    self.home_dir:set_home_file_owner(file_path, '.ssh', uid, gid)
+    self.home_dir:set_home_file_owner(file_path, '.ssh/authorized_keys', uid, gid)
 end
 
 function LinuxUserMgr:prepare_user(account, uid, gid, groupname)
@@ -736,32 +726,11 @@ local TALLY_LOG_PATH = '/dev/shm/tallylog/'
 
 local function process_tallylog(account, uid)
     -- 支持snmp用户登录失败锁定功能
-    -- 初始化tallylog
-    local ok, file_stat = pcall(utils_core.stat, TALLY_LOG_PATH)
-    if not ok then
-        utils_core.mkdir(TALLY_LOG_PATH,  mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
-        file_proxy.proxy_chmod(TALLY_LOG_PATH, mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
-        file_proxy.proxy_chown(TALLY_LOG_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
-    elseif file_stat.st_gid ~= config.SNMPD_USER_GID or
-        file_stat.st_mode ~= mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP then
-        file_proxy.proxy_chmod(TALLY_LOG_PATH, mc_utils.S_IRWXU| mc_utils.S_IRGRP | mc_utils.S_IXGRP)
-        file_proxy.proxy_chown(TALLY_LOG_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
-    end
-
+    core.reset_pam_tally(account.user_name, TALLY_LOG_PATH)
     local file_path = TALLY_LOG_PATH .. account.user_name
-    if file_utils.check_realpath_before_open_s(file_path, TALLY_LOG_PATH) ~= 0 then
-        return
-    end
     local mode = mc_utils.S_IRUSR| mc_utils.S_IWUSR | mc_utils.S_IRGRP| mc_utils.S_IWGRP
-    ok, file_stat = pcall(utils_core.stat, file_path)
-    if not ok then
-        -- 文件不存在，创建文件
-        local tmp_file_path = TALLY_LOG_PATH .. account.user_name
-        file_proxy.proxy_create(tmp_file_path, "w+", mode, uid, config.SNMPD_USER_GID)
-    elseif file_stat.st_gid ~= config.SNMPD_USER_GID or file_stat.st_mode ~= mode then
-        file_proxy.proxy_chmod(file_path, mode)
-        file_proxy.proxy_chown(file_path, uid, config.SNMPD_USER_GID)
-    end
+    file_proxy.proxy_chmod(file_path, mode)
+    file_proxy.proxy_chown(file_path, uid, config.APPS_USER_GID)
 end
 
 local function remove_tallylog(username)

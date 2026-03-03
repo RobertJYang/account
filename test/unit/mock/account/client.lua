@@ -11,6 +11,7 @@ local class = require 'mc.class'
 local utils_core = require 'utils.core'
 local file_utils = require 'utils.file'
 local mc_utils = require 'mc.utils'
+local vos = require 'utils.vos'
 
 local EMPYT_HASH<const> = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 
@@ -27,6 +28,25 @@ function FileObjects:Create(self, dst_path, open_mode, file_mode, uid, gid)
     file:close()
     utils_core.chmod(dst_path, file_mode)
     utils_core.chown(dst_path, uid, gid)
+    return true
+end
+
+function FileObjects:Copy(self, src_path, dst_path, uid, gid)
+    local file_name = dst_path:gsub(".*%/", "")
+    local idx = string.len(dst_path) - string.len(file_name) - 1
+    if idx <= 0 then
+        return false
+    end
+    local dir = string.sub(dst_path, 1, idx)
+    utils_core.mkdir(dir, mc_utils.S_IRWXU)
+    file_utils.copy_file_s(src_path, dst_path)
+    utils_core.chown(dst_path, uid, gid)
+    return true
+end
+
+function FileObjects:Mkdir(self, dst_path, dir_mod, uid, gid)
+    utils_core.mkdir(dst_path, dir_mod)
+    utils_core.chown_s(dst_path, uid, gid)
     return true
 end
 
@@ -51,7 +71,17 @@ function FileObjects:Chown(self, dst_path, uid, gid)
 end
 
 function FileObjects:IsPermitted(ctx, dst_path, permission)
-    return true    
+    if not utils_core.is_file(dst_path) then
+        error()
+    end
+    if file_utils.check_real_path_s(dst_path, "/") ~= 0 then
+        error()
+    end
+    return true
+end
+
+function FileObjects:Access(ctx, dst_path, mode)
+    return vos.get_file_accessible(dst_path)
 end
 
 local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
