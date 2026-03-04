@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.28] - 2026-3-4
+fix:basic认证计算时间的debug日志打印优化
+
 ## [1.110.27] - 2026-3-3
 feat:支持om进程权限消减
 
