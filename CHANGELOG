@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.29] - 2026-3-4
+fix:修复板间通信redfish会话被当成普通redfish会话进行保活的问题
+
 ## [1.110.28] - 2026-3-4
 fix:basic认证计算时间的debug日志打印优化
 
