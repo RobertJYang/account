@@ -163,7 +163,7 @@ function AuthenticationMdb:authenticate(ctx, username, password, domain)
         role_id = role_id[1]
     end
     local ts_end = vos_utils.vos_tick_get()
-    log:debug("Authenticate time, start:%s, end:%s, usage:%d", ts_start, ts_end - ts_start)
+    log:debug("Authenticate time, start:%s, end:%s, usage:%d", ts_start, ts_end, ts_end - ts_start)
     span:finish()
     return auth_account_info.Id, privileges, role_id, extra_data
 end
