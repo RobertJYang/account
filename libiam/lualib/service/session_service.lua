@@ -844,6 +844,7 @@ function SessionService:validate_session(session_type, token, csrf_token)
     if (not session) and (session_type == iam_enum.SessionType.Redfish or session_type == iam_enum.SessionType.GUI)  then
         session = self.m_session_service_collection[iam_enum.SessionType.INTER_CHASSIS:value()]:
             get_session_by_token(token, csrf_token, session_type)
+        session_type = iam_enum.SessionType.INTER_CHASSIS
     end
 
     if not session then
