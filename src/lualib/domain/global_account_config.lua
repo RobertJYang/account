@@ -229,7 +229,7 @@ function global_account_config:import_weak_pwd_dictionary(path)
     end
     local list_count = 0
     local tmp_weak_password_dictionary = {}
-    if not utils.check_import_path(path, config.TMP_PATH) and not utils.check_import_path(path, config.TMP_PATH) then
+    if not utils.check_import_path(path, config.SHM_PATH) and not utils.check_import_path(path, config.TMP_PATH) then
         error(custom_msg.WeakPWDDictImportFailed())
     end
 
