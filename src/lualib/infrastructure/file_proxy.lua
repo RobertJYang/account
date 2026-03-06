@@ -13,6 +13,7 @@ local Singleton = require 'mc.singleton'
 local client = require 'account.client'
 local context = require 'mc.context'
 local utils_core = require 'utils.core'
+local vos = require 'utils.vos'
 local file_utils = require 'utils.file'
 local account_utils = require 'infrastructure.utils'
 local config = require 'common_config'
@@ -20,7 +21,7 @@ local config = require 'common_config'
 local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
 
 local file_proxy = {}
-file_proxy.has_cap_dac = account_utils.check_cap_dac_override_supported()
+file_proxy.has_cap_dac = account_utils.check_cap_dac_override_supported(config.OM_CONFIG_PATH)
 
 local function get_file_proxy_obj()
     local objs = client:GetFileObjects()
@@ -169,6 +170,10 @@ function file_proxy.proxy_ispermitted(dst_path, permission)
 end
 
 function file_proxy.proxy_access(dst_path, mode)
+    -- 有特权直接执行命令
+    if file_proxy.has_cap_dac then
+        return vos.get_file_accessible(dst_path)
+    end
     local file_obj = get_file_proxy_obj()
     if not file_obj then
         return false

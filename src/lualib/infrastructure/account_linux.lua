@@ -726,9 +726,13 @@ local TALLY_LOG_PATH = '/dev/shm/tallylog/'
 
 local function process_tallylog(account, uid)
     -- 支持snmp用户登录失败锁定功能
-    core.reset_pam_tally(account.user_name, TALLY_LOG_PATH)
     local file_path = TALLY_LOG_PATH .. account.user_name
     local mode = mc_utils.S_IRUSR| mc_utils.S_IWUSR | mc_utils.S_IRGRP| mc_utils.S_IWGRP
+    local res = file_proxy.proxy_access(file_path, 0)
+    if not res then
+        -- 文件不存在，创建文件
+        core.reset_pam_tally(account.user_name, TALLY_LOG_PATH)
+    end
     file_proxy.proxy_chmod(file_path, mode)
     file_proxy.proxy_chown(file_path, uid, config.APPS_USER_GID)
 end
