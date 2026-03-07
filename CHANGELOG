@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.31] - 2026-3-7
+fix:修复ip锁定后双因素认证未被拦截的问题
+
 ## [1.110.30] - 2026-3-5
 fix:修复account与老版本sdk兼容性问题
 

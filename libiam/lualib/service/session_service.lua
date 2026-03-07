@@ -1316,6 +1316,11 @@ end
 
 ---@function 通过证书信息新建对话
 function SessionService:new_session_by_cert(ctx, serial_number, issuer, subject, ip, browser_type)
+    -- 在认证之前判断本ip是否锁定
+    if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
+        log:error("ip %s is locked by auth failed", ctx.ClientAddr)
+        error(custom_msg.AuthorizationFailed())
+    end
     -- 参数校验
     if serial_number == nil or issuer == nil or subject == nil or ip == nil or browser_type == nil then
         error(base_msg.PropertyMissing(""))
