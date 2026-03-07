@@ -59,6 +59,7 @@ function ManagerAccount:ctor(db, account, account_policy, password_validator, ip
     self.account_policy_obj = account_policy
     self.password_validator_obj = password_validator
     self.m_ipmi_channel_config = ipmi_channel_config
+    self.tmp_last_login_info = {}
 end
 
 -- 获取用户当前锁定状态
@@ -109,16 +110,23 @@ function ManagerAccount:new_account_snmp_info(snmp_user_info_data)
     self.m_snmp_user_info_data = snmp_user_info_data
 end
 
+-- 由于开了orm自动刷数据库，每次更新属性都会实时刷数据库
 function ManagerAccount:record_login_time_ip(timestamp, ip, flush_flag)
     if timestamp then
-        self.m_account_data.LastLoginTime = timestamp
+        self.tmp_last_login_info.LastLoginTime = timestamp
         self.login_record_flush_flag = true
     end
     if ip then
-        self.m_account_data.LastLoginIP = ip
+        self.tmp_last_login_info.LastLoginIP = ip
         self.login_record_flush_flag = true
     end
     if flush_flag then
+        if self.tmp_last_login_info.LastLoginTime then
+            self.m_account_data.LastLoginTime = self.tmp_last_login_info.LastLoginTime
+        end
+        if self.tmp_last_login_info.LastLoginIP then
+            self.m_account_data.LastLoginIP = self.tmp_last_login_info.LastLoginIP
+        end
         self.m_account_data:save()
         self.login_record_flush_flag = false
     end
@@ -126,10 +134,13 @@ end
 
 function ManagerAccount:record_last_login_interface(interface, flush_flag)
     if interface then
-        self.m_account_data.LastLoginInterface = interface
+        self.tmp_last_login_info.LastLoginInterface = interface
         self.login_record_flush_flag = true
     end
     if flush_flag then
+        if self.tmp_last_login_info.LastLoginInterface then
+            self.m_account_data.LastLoginInterface = self.tmp_last_login_info.LastLoginInterface
+        end
         self.m_account_data:save()
         self.login_record_flush_flag = false
     end
