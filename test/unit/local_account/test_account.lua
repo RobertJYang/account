@@ -65,3 +65,19 @@ function TestAccount:test_add_noaccess_account_then_account_privileges_should_be
     -- 恢复环境
     self.test_account_collection:delete_account(self.ctx, account_info.id)
 end
+
+-- 测试上次登录信息正常存储
+function TestAccount:test_record_last_login_info_success()
+    -- 写临时变量
+    self.test_account:record_last_login_interface(enum.LoginInterface.IPMI, false)
+    self.test_account:record_login_time_ip(20260307, "127.0.0.1", false)
+    assert(self.test_account.tmp_last_login_info.LastLoginIP == "127.0.0.1")
+    assert(self.test_account.tmp_last_login_info.LastLoginInterface == enum.LoginInterface.IPMI)
+    assert(self.test_account.tmp_last_login_info.LastLoginTime == 20260307)
+    -- 写内存数据
+    self.test_account:record_last_login_interface(nil, true)
+    self.test_account:record_login_time_ip(nil, nil, true)
+    assert(self.test_account.m_account_data.LastLoginIP == "127.0.0.1")
+    assert(self.test_account.m_account_data.LastLoginInterface == enum.LoginInterface.IPMI)
+    assert(self.test_account.m_account_data.LastLoginTime == 20260307)
+end
