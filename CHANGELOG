@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.32] - 2026-3-7
+fix:弱字典权限删除
+
 ## [1.110.33] - 2026-3-7
 fix:上次登录信息刷新数据库优化
 
