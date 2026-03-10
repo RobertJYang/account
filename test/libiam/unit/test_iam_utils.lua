@@ -11,6 +11,7 @@
 local lu = require 'luaunit'
 local iam_utils = require 'infrastructure.iam_utils'
 local utils = require 'utils'
+local custom_msg = require 'messages.custom'
 local user_config = require 'user_config'
 
 --- 导入文件路径不合法，应该检查失败
@@ -102,4 +103,16 @@ function TestIam:test_ip_addr_normalize_success()
     lu.assertEquals(utils.normalize_ip("192.0.2.01"), "192.0.2.1")
     lu.assertEquals(utils.normalize_ip("2001:db8::8a2e:370:7334"), "2001:0db8:0000:0000:0000:8a2e:0370:7334")
     lu.assertEquals(utils.normalize_ip("2001:db8::"), "2001:0db8:0000:0000:0000:0000:0000:0000")
+end
+
+-- 测试认证失败获取最高优先级错误码
+function TestIam:test_get_best_match_error()
+    local err_info = {{["name"] = custom_msg.UserLockedMessage.Name}}
+    assert(utils.get_best_match_error(err_info).name == custom_msg.UserLockedMessage.Name)
+
+    local err_info2 = {{["name"] = "nil"}}
+    assert(utils.get_best_match_error(err_info2).name == "nil")
+
+    local err_info3 = {{["name"] = custom_msg.UserLockedMessage.Name}, {["name"] = "nil"}}
+    assert(utils.get_best_match_error(err_info3).name == custom_msg.UserLockedMessage.Name)
 end

@@ -372,7 +372,7 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
     end
     local interface = session_utils.parse_login_interface(session_type, ctx.Interface)
     local server_id, func, ok, auth_account_info
-    local is_no_access = false
+    local err_info = {}
 
     -- 在认证之前判断本ip是否锁定
     if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
@@ -399,10 +399,7 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
             ip_lock.clean_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
             return auth_account_info, auth_type
         end
-        -- 异常场景下auth_account_info为抛出的错误，无权限用户认证失败后优先抛错NoAccess
-        if auth_account_info.name == custom_msg.NoAccessMessage.Name then
-            is_no_access = true
-        end
+        table.insert(err_info, auth_account_info)
     end
 
     -- IP锁定无关用户，各种方式认证失败均记录，所以在此处判断增加记录（仅非DT模式下使用,SSH不记录，由openssh记录）
@@ -411,8 +408,8 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
     end
     collectgarbage('collect')
     span:finish()
-    -- 若不ok，第二个参数为错误信息
-    error(is_no_access and custom_msg.NoAccess() or auth_account_info)
+    -- 若不成功,返回最匹配错误码
+    error(utils.get_best_match_error(err_info))
 end
 
 -- @function 通过account或者session来封装会话创建的必要信息
