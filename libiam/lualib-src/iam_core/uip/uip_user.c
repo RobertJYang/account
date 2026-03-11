@@ -974,3 +974,105 @@ gint32 uip_get_local_account_auth_mode(gchar **out_val)
     dbus_message_unref(reply);
     return RET_OK;
 }
+
+/**
+ * Description : 判断用户是否具有登录权限
+ */
+gint32 uip_get_privilege(const gchar* user_name, guchar* user_privilege)
+{
+    // 获取用户id
+    uid_t uid = 0;
+    uid_t gid = 0;
+    // 调用记录接口
+    gint32 ret = get_uid_gid_by_name(user_name, &uid, &gid);
+    if (ret != RET_OK) {
+        *user_privilege = 15;
+        debug_log(DLOG_ERROR, "[uip user] get_uid_gid_by_name failed");
+        return RET_ERR;
+    }
+
+    // 若不是ipmi文件中存在的本地用户，则失败
+    if (!check_uid_is_local_user(uid)) {
+        *user_privilege = 15;
+        return RET_ERR;
+    } else { // 若是ipmi文件中存在的本地用户，获取bmc业务id
+        uid -= IMANA_UID_BASE;
+    }
+    
+    // 初始化DBus连接
+    ret = init_dbus_connection();
+    if (ret != RET_OK || g_dbus_conn == NULL) {
+        *user_privilege = 15;
+        debug_log(DLOG_ERROR, "[uip user] init DBus failed, ret: %d", ret);
+        return RET_ERR;
+    }
+    
+    // 拼接资源树path
+    gchar account_path[BUFF_LEN] = {0};
+    ret = sprintf_s(account_path, sizeof(account_path), "%s%d", ACCOUNT_PATH, uid);
+    if (ret <= 0) {
+        *user_privilege = 15;
+        debug_log(DLOG_ERROR, "[uip user] sprintf_s failed, ret = %d", ret);
+        return RET_ERR;
+    }
+    
+    // 获取用户是否禁用属性
+    DBusMessage *reply = NULL;
+    const gchar *property_name_enabled = "Enabled";
+    reply = get_msg_from_mdb(ACCOUNT_SERVICE, account_path, ACCOUNT_INTF, property_name_enabled);
+    if (reply == NULL) {
+        *user_privilege = 15;
+        debug_log(DLOG_ERROR, "Get property from mdb failed.");
+        return RET_ERR;
+    }
+
+     // 拿到结果的迭代器
+    DBusMessageIter args_iter = {0};
+    DBusMessageIter sub_iter  = {0};
+    dbus_message_iter_init(reply, &args_iter);
+    dbus_message_iter_recurse(&args_iter, &sub_iter);
+    // 从迭代器中获取返回结果
+    if (dbus_message_iter_get_arg_type(&sub_iter) != DBUS_TYPE_BOOLEAN) {
+        *user_privilege = 15;
+        dbus_message_unref(reply);
+        debug_log(DLOG_ERROR, "[uip user] get return param (result) type failed.");
+        return RET_ERR;
+    }
+    
+    gboolean value = FALSE; /* 由dbus_message_unref释放 */
+    dbus_message_iter_get_basic(&sub_iter, &value);
+    if (value == FALSE) {
+        *user_privilege = 15;
+        dbus_message_unref(reply);
+        debug_log(DLOG_ERROR, "[uip user] the user(%s) has been disabled.", user_name);
+        return RET_ERR;
+    }
+    
+    // 获取用户RoleId
+    const gchar *property_name_role_id = "RoleId";
+    reply = get_msg_from_mdb(ACCOUNT_SERVICE, account_path, ACCOUNT_INTF, property_name_role_id);
+    if (reply == NULL) {
+        *user_privilege = 15;
+        debug_log(DLOG_ERROR, "Get property from mdb failed.");
+        return RET_ERR;
+    }
+
+    dbus_message_iter_init(reply, &args_iter);
+    dbus_message_iter_recurse(&args_iter, &sub_iter);
+    // 从迭代器中获取返回结果
+    if (dbus_message_iter_get_arg_type(&sub_iter) != DBUS_TYPE_BYTE) {
+        *user_privilege = 15;
+        dbus_message_unref(reply);
+        debug_log(DLOG_ERROR, "[uip user] get return param (result) type failed.");
+        return RET_ERR;
+    }
+    
+    dbus_message_iter_get_basic(&sub_iter, user_privilege);
+    if (user_privilege == NULL || *user_privilege == 0) {
+        *user_privilege = 15;
+        debug_log(DLOG_INFO, "[uip user] role id is 0, set to 15 (no access)");
+    }
+    // 对消息通道解引用
+    dbus_message_unref(reply);
+    return RET_OK;
+}

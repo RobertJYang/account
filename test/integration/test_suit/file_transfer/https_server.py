@@ -9,85 +9,79 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 import logging
-from io import BytesIO
-import re
+import json
 import os
 import ssl
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 
-class FileServer(SimpleHTTPRequestHandler):
+class FileServer(SimpleHTTPRequestHandler):    
     def do_POST(self):
-        ret, info = self.deal_post_data()
-        logging.info((ret, info, "by: ", self.client_address))
-        file = BytesIO()
-        file.write(b'<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">')
-        file.write(b"<html>\n<title>Upload Result Page</title>\n")
-        file.write(b"<body>\n<h2>Upload Result Page</h2>\n")
-        file.write(b"<hr>\n")
-        if ret:
-            file.write(b"<strong>Success:</strong>")
-        else:
-            file.write(b"<strong>Failed:</strong>")
-        file.write(info.encode())
-        file.write(('<br><a href="%s">back</a>' % self.headers["referer"]).encode())
-        file.write(b"</body>\n</html>\n")
-        length = file.tell()
-        file.seek(0)
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.send_header("Content-Length", str(length))
+        # 仅处理multipart/form-data类型
+        if "multipart/form-data" not in self.headers.get("Content-Type", ""):
+            self._send_resp(400, {"status": "failed", "msg": "Only multipart/form-data supported"})
+            return
+
+        # 读取请求数据
+        content_len = int(self.headers.get("Content-Length", 0))
+        raw_data = self.rfile.read(content_len) if content_len > 0 else b""
+        if not raw_data:
+            self._send_resp(400, {"status": "failed", "msg": "Empty request body"})
+            return
+
+        # 解析边界符并处理文件
+        boundary = f"--{self.headers['Content-Type'].split('boundary=')[1]}".encode("utf-8")
+        for segment in raw_data.split(boundary):
+            if not segment.strip() or segment.endswith(b"--"):
+                continue
+
+            # 拆分头部和内容
+            header, content = segment.split(b"\r\n\r\n", 1)
+            # 提取文件名
+            filename = self._get_filename(header)
+            if not filename:
+                continue
+
+            # 核心：通过translate_path获取写入路径
+            output_path = self.translate_path(self.path)
+            # 路径处理：目录则拼接文件名，文件则直接使用
+            if os.path.isdir(output_path) or not os.path.splitext(output_path)[1]:
+                output_path = os.path.join(output_path, os.path.basename(filename))
+            
+            # 确保目录存在并写入文件（测试场景简化，仅基础异常）
+            os.makedirs(os.path.dirname(output_path), exist_ok=True)
+            with open(output_path, "wb") as f:
+                f.write(content.rstrip(b"\r\n--"))
+
+            # 返回成功响应
+            self._send_resp(200, {
+                "status": "success",
+                "filename": filename,
+                "save_path": output_path,
+                "size": len(content.rstrip(b"\r\n--"))
+            })
+            return
+
+        # 未找到文件
+        self._send_resp(400, {"status": "failed", "msg": "No file found in request"})
+
+    def _get_filename(self, header_bytes):
+        """极简版文件名提取"""
+        header_str = header_bytes.decode("utf-8", errors="ignore")
+        for line in header_str.split("\r\n"):
+            if "filename=" in line.lower():
+                filename = line.split("filename=")[-1].strip('"\' ')
+                return filename if filename else None
+        return None
+
+    def _send_resp(self, code, data):
+        """极简响应发送"""
+        resp = json.dumps(data).encode()
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(resp)))
         self.end_headers()
-        self.copyfile(file, self.wfile)
-        file.close()
-
-    def deal_post_data(self):
-        content_type = self.headers["content-type"]
-        if not content_type:
-            return (False, "Content-Type header doesn't contain boundary")
-        boundary = content_type.split("=")[1].encode()
-        remain_bytes = int(self.headers["content-length"])
-        line = self.rfile.readline()
-        remain_bytes -= len(line)
-        if boundary not in line:
-            return (False, "Content NOT begin with boundary")
-        line = self.rfile.readline()
-        remain_bytes -= len(line)
-        find = re.findall(
-            r'Content-Disposition.*name="file"; filename="(.*)"', line.decode()
-        )
-        if not find:
-            return (False, "Can't find out file name...")
-        path = self.translate_path(self.path)
-        line = self.rfile.readline()
-        remain_bytes -= len(line)
-        line = self.rfile.readline()
-        remain_bytes -= len(line)
-        try:
-            out = open(path, "wb")
-        except IOError:
-            return (
-                False,
-                "Can't create file to write, do you have permission to write?",
-            )
-
-        rfile_line = self.rfile.readline()
-        remain_bytes -= len(rfile_line)
-        while remain_bytes > 0:
-            line = self.rfile.readline()
-            remain_bytes -= len(line)
-            if boundary in line:
-                rfile_line = rfile_line[0:-1]
-                if rfile_line.endswith(b"\r"):
-                    rfile_line = rfile_line[0:-1]
-                out.write(rfile_line)
-                out.close()
-                return (True, "File '%s' upload success!" % find)
-            else:
-                out.write(rfile_line)
-                rfile_line = line
-        return (False, "Unexpect Ends of data.")
-
+        self.wfile.write(resp)
 
 if __name__ == "__main__":
     https = HTTPServer(("0.0.0.0", 8443), FileServer)
