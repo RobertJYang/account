@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.33] - 2026-3-10
+fix:修复使用自动匹配认证错误码不对的问题
+
 ## [1.110.32] - 2026-3-7
 fix:弱字典权限删除
 

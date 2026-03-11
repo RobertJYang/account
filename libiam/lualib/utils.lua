@@ -18,6 +18,7 @@ local iam_enum = require 'class.types.types'
 local user_config = require 'user_config'
 local bs = require 'mc.bitstring'
 local log = require 'mc.logging'
+local custom_msg = require 'messages.custom'
 local s_pack = string.pack
 
 local MAX_USER_NUM = 17
@@ -469,6 +470,32 @@ end
 
 function utils.check_ip_valid(ip)
     return network_core.verify_ipv4_address(ip) == 0 or network_core.verify_ipv6_address(ip) == 0
+end
+
+-- 错误码优先级
+local ERROR_PRIORITY = {
+    [custom_msg.AuthorizationFailedMessage.Name] = 1,
+    [custom_msg.NoAccessMessage.Name] = 2,
+    [custom_msg.AuthorizationUserPasswordExpiredMessage.Name] = 3,
+    [custom_msg.UserLoginRestrictedMessage.Name] = 4,
+    [custom_msg.UserLockedMessage.Name] = 5
+}
+
+function utils.get_best_match_error(err_info)
+    local max_priority = 0
+    local result
+    for _, err in pairs(err_info) do
+        if ERROR_PRIORITY[err.name] and ERROR_PRIORITY[err.name] > max_priority then
+            max_priority = ERROR_PRIORITY[err.name]
+            result = err
+        end
+    end
+    -- 不在优先级列表中则返回最后一个错误
+    if result then
+        return result
+    else
+        return err_info[#err_info]
+    end
 end
 
 return utils
