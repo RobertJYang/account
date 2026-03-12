@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.37] - 2026-3-12
+fix:修复pam_access白名单采集日志刷屏
+
 ## [1.110.36] - 2026-3-11
 fix:加固公钥认证登录ssh
 

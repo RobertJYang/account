@@ -174,7 +174,7 @@ function CertificateAuthentication:get_ip_access_config()
     local context = ""
 
     if self.m_db_config.InterChassisValidation == 'LLDP' then
-        log:info("collection inter chassis ip whitelist from LLDP Receives")
+        log:debug("collection inter chassis ip whitelist from LLDP Receives")
         context = context .. "# limit config from LLDP" .. '\n'
 
         -- 遍历LLDP发现对象收集放行策略
@@ -190,7 +190,7 @@ function CertificateAuthentication:get_ip_access_config()
         -- 最后增加限制配置
         context = context .. '-:inter_chassis:ALL' .. '\n'
     elseif self.m_db_config.InterChassisValidation == 'Static' then
-        log:info("collection inter chassis ip whitelist from Static Configure")
+        log:debug("collection inter chassis ip whitelist from Static Configure")
         context = context .. "# limit config from Static Configure" .. '\n'
 
         -- 从静态配置白名单收集放行策略
