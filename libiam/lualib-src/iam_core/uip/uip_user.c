@@ -1009,7 +1009,7 @@ gint32 uip_get_privilege(const gchar* user_name, guchar* user_privilege)
     
     // 拼接资源树path
     gchar account_path[BUFF_LEN] = {0};
-    ret = sprintf_s(account_path, sizeof(account_path), "%s%d", ACCOUNT_PATH, uid);
+    ret = sprintf_s(account_path, sizeof(account_path), "%s%u", ACCOUNT_PATH, uid);
     if (ret <= 0) {
         *user_privilege = 15;
         debug_log(DLOG_ERROR, "[uip user] sprintf_s failed, ret = %d", ret);
