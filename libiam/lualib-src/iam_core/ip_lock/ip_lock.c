@@ -93,7 +93,7 @@ LOCAL void close_ip_fail_record(FILE *fp)
 LOCAL gint32 read_ip_fail_record(FILE *fp, guint8 *record_cnt, IpFailRecord *records)
 {
     (void)fseek(fp, 0, SEEK_END);
-    gsize size = ftell(fp);
+    glong size = ftell(fp);
     if (size < 0) {
         debug_log(DLOG_ERROR, "get ip record log size failed.");
         return RET_ERR;
@@ -175,6 +175,7 @@ LOCAL gint32 check_if_increase_record_cnt(const gchar *ip)
 
 LOCAL gint32 remove_port_from_ip(const gchar *ip, gchar *clean_ip, size_t clean_ip_len)
 {
+    gint32 ret;
     if (!ip || !clean_ip) {
         debug_log(DLOG_ERROR, "invalid paramter");
         return RET_ERR;
@@ -195,7 +196,11 @@ LOCAL gint32 remove_port_from_ip(const gchar *ip, gchar *clean_ip, size_t clean_
             debug_log(DLOG_ERROR, "format ip %s err", ip);
             return RET_ERR;
         } else { // 其他场景都不关注 ']' 后面有什么内容，只取 '[' 和 ']' 中间的部分
-            (void)strncpy_s(clean_ip, clean_ip_len, ip + 1, end_barcket - ip - 1);
+            ret = strncpy_s(clean_ip, clean_ip_len, ip + 1, end_barcket - ip - 1);
+            if (ret != RET_OK) {
+                debug_log(DLOG_ERROR, "strncpy_s fail, ret = %d", ret);
+                return RET_ERR;
+            }
             return RET_OK;
         }
     }
@@ -206,12 +211,20 @@ LOCAL gint32 remove_port_from_ip(const gchar *ip, gchar *clean_ip, size_t clean_
 
     // 找到有且仅有1个':'的场景，即为 ipv4 带端口号
     if (first_colon != NULL && last_colon != NULL && first_colon == last_colon) {
-        (void)strncpy_s(clean_ip, clean_ip_len, ip, last_colon - ip);
+        ret = strncpy_s(clean_ip, clean_ip_len, ip, last_colon - ip);
+        if (ret != RET_OK) {
+            debug_log(DLOG_ERROR, "strncpy_s fail, ret = %d", ret);
+            return RET_ERR;
+        }
         return RET_OK;
     }
 
     // ipv4 无端口号或者 ipv6 无端口号
-    (void)strncpy_s(clean_ip, clean_ip_len, ip, strlen(ip));
+    ret = strncpy_s(clean_ip, clean_ip_len, ip, strlen(ip));
+    if (ret != RET_OK) {
+        debug_log(DLOG_ERROR, "strncpy_s fail, ret = %d", ret);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -598,7 +611,14 @@ gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
-        (void)strcpy_s(data[i].ip, sizeof(data[i].ip), entry->d_name);
+        gint32 ret = strcpy_s(data[i].ip, sizeof(data[i].ip), entry->d_name);
+        if (ret != RET_OK) {
+            g_free(data);
+            data = NULL;
+            closedir(cur_dir);
+            debug_log(DLOG_ERROR, "strcpy_s fail, ret = %d", ret);
+            return RET_ERR;
+        }
         (void)get_one_lock_status(dir, entry->d_name, lock_threshold, fail_interval, unlock_time, &data[i]);
         i++;
     }
