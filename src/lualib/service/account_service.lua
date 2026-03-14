@@ -23,6 +23,7 @@ local utils = require 'infrastructure.utils'
 local privilege = require 'domain.privilege'
 local trace = require 'telemetry.trace'
 local core = require 'account_core'
+local local_account = require 'domain.manager_account.local_account'
 
 -- AccountService
 local AccountService = class()
@@ -565,6 +566,10 @@ end
 ---@param account_id number
 function AccountService:set_emergency_account(ctx, account_id)
     if account_id ~= 0 then
+        if account_id < local_account.MIN_USER_NUM or account_id > local_account.MAX_USER_NUM then
+            log:error("Set emergency account failed, invalid account id: %d", account_id)
+            error(custom_msg.EmergencyLoginUserSettingFail())
+        end
         local account = self.m_account_collection:get_account_by_account_id(account_id)
         if not account then
             log:error("set_emergency_account failed, account_id %d does not exist.", account_id)

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.39] - 2026-3-14
+fix: 配置导入紧急用户时校验id范围为2-17
+
 ## [1.110.38] - 2026-3-13
 cleancode清理
 
