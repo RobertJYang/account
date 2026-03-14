@@ -621,6 +621,12 @@ function TestAccount:test_set_emergency_user()
     value = self.test_global_account_config:get_emergency_account()
     lu.assertEquals(value, emergency_user)
 
+    lu.assertErrorMsgContains(custom_msg.EmergencyLoginUserSettingFailMessage.Name, function()
+        self.test_account_service:set_emergency_account(self.ctx, 23)
+    end)
+    value = self.test_global_account_config:get_emergency_account()
+    lu.assertEquals(value, emergency_user)
+
     local la1 = account_linux.new(config.LINUX_FILES, true)
     lu.assertEquals(la1.ipmi_file.datas["test4"].is_exclude_user, 1)
 
