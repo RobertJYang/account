@@ -281,7 +281,9 @@ function SessionService:session_monitor()
     skynet.fork_loop({ count = 0 }, function()
         log:info('Start session monitor.')
         local ok, err
+        local start_time, end_time, sleep_time
         while true do
+            start_time = skynet.now()
             ok, err = pcall(function()
                 self:process_timeout_sessions()
             end)
@@ -297,7 +299,10 @@ function SessionService:session_monitor()
                 loop_count = 0
             end
             loop_count = loop_count + 1
-            skynet.sleep(500) -- 等待5秒钟
+            end_time = skynet.now()
+            end_time = end_time > start_time and end_time or start_time
+            sleep_time = math.max(500 - (end_time - start_time), 0) -- 范围 0-5秒
+            skynet.sleep(sleep_time)
         end
     end)
 end
