@@ -592,40 +592,35 @@ gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail
         return RET_ERR;
     }
 
-    // 第一次循环拿到数量
-    guint32 ip_count = 0;
-    while((entry = readdir(cur_dir)) != NULL) {
-        // 跳过 "." 和 ".."
-        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-            continue;
-        }
-        ip_count++;
-    }
-
-    // 第二次循环拿内容
-    IpLockStatus *data = (IpLockStatus *)g_malloc0(ip_count * sizeof(IpLockStatus));
-    rewinddir(cur_dir);
     guint32 i = 0;
+    GArray *result_data = g_array_new(FALSE, TRUE, sizeof(IpLockStatus));
     while((entry = readdir(cur_dir)) != NULL) {
         // 跳过 "." 和 ".."
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
             continue;
         }
-        gint32 ret = strcpy_s(data[i].ip, sizeof(data[i].ip), entry->d_name);
+        IpLockStatus data = {0};
+        gint32 ret = strcpy_s(&data.ip, sizeof(data.ip), entry->d_name);
         if (ret != RET_OK) {
-            g_free(data);
-            data = NULL;
+            (void)g_array_free(result_data, TRUE);
             closedir(cur_dir);
             debug_log(DLOG_ERROR, "strcpy_s fail, ret = %d", ret);
             return RET_ERR;
         }
-        (void)get_one_lock_status(dir, entry->d_name, lock_threshold, fail_interval, unlock_time, &data[i]);
+        ret = get_one_lock_status(dir, entry->d_name, lock_threshold, fail_interval, unlock_time, &data);
+        if (ret != RET_OK) {
+            (void)g_array_free(result_data, TRUE);
+            closedir(cur_dir);
+            debug_log(DLOG_ERROR, "get lock status failed, ret = %d", ret);
+            return RET_ERR;
+        }
+        g_array_append_val(result_data, data);
         i++;
     }
     closedir(cur_dir);
 
-    records->records = data;
-    records->count   = ip_count;
+    records->records = (IpLockStatus *)g_array_free(result_data, FALSE);
+    records->count   = i;
     return RET_OK;
 }
 
