@@ -281,7 +281,7 @@ function TestAccount:test_inter_chassis_account_policy_set_forbid()
     end)
 
     -- get_visible 默认值
-    lu.assertIsTrue(self.test_account_policy_collection:get_visible(account_type))
+    lu.assertIsFalse(self.test_account_policy_collection:get_visible(account_type))
 
     -- set_online_deletable 不允许，但是不抛错，避免上游处理失败
     -- mock emit行为

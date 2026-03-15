@@ -1,6 +1,7 @@
 All notable changes to this project will be documented in this file.
 ## [1.110.41] - 2026-3-15
 fix:修复配置导入设置web会话类型日志
+fix:板间通信ssh用户默认不启用
 
 ## [1.110.40] - 2026-3-14
 fix:优化超时会话监控任务的时间精度
