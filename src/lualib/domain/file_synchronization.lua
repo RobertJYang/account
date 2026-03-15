@@ -205,7 +205,7 @@ function file_synchronization:flush_account()
             goto continue
         end
         local visible = self.m_account_collection.account_policy_collection:get_visible(account_type)
-        if account_type == enum.AccountType.InterChassis:value() and not visible then 
+        if account_type == enum.AccountType.InterChassis:value() and not visible then
             goto continue
         end
         cur_account = self:get_account_file_line(account.m_account_data.Id, false)
