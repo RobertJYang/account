@@ -204,6 +204,10 @@ function file_synchronization:flush_account()
         if not self.m_account_collection.operation_type_check.LOCAL_OEM_INTERCHASSIS[account_type] then
             goto continue
         end
+        local visible = self.m_account_collection.account_policy_collection:get_visible(account_type)
+        if account_type == enum.AccountType.InterChassis:value() and not visible then 
+            goto continue
+        end
         cur_account = self:get_account_file_line(account.m_account_data.Id, false)
         user_map[cur_account.user_name] = true
         la:update_user(cur_account)
