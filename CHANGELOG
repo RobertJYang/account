@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.50] - 2026-3-18
+fix:支持初始化时根据双因素认证使能状态更新CA证书是否可以删除状态
 
 ## [1.110.49] - 2026-3-18
 fix:支持限制框内通信SSH/SFTP会话数量
