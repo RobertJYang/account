@@ -86,7 +86,7 @@ local profile_adapter = {
             import = operation_logger.proxy(function(self, ctx, value)
                 local session_mode = iam_enum.OccupationMode.new(value)
                 local session_mode_name = session_mode == iam_enum.OccupationMode.Shared and 'share' or 'exclusive'
-                ctx.operation_log.params = { mode = session_mode_name }
+                ctx.operation_log.params = { type = tostring(iam_enum.SessionType.GUI), mode = session_mode_name }
                 SessionServiceProfile.set_web_mode(self, ctx, value)
             end, 'SessionMode'),
             export = SessionServiceProfile.get_web_mode
