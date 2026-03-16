@@ -139,8 +139,8 @@ function account_cache_mdb:sync_account_info_by_id_username(account_id, user_nam
 end
 
 function account_cache_mdb:foreach_check_account_cache()
-    -- 每5分钟主动同步一次
-    local TIME_INTERVAL = 5 * 60 * 100
+    -- 每15分钟主动同步一次
+    local TIME_INTERVAL = 15 * 60 * 100
     skynet.fork_loop({count = 0}, function()
         while true do
             self:sync_account_info()

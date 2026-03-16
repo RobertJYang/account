@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.43] - 2026-3-16
+fix:调整account缓存主动同步周期
+
 ## [1.110.42] - 2026-3-15
 fix:修复ip_lock导致的coredump问题
 

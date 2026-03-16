@@ -52,8 +52,8 @@ function account_service_cache_mdb:signal_register()
 end
 
 function account_service_cache_mdb:foreach_check_cache()
-    -- 每5分钟主动同步一次
-    local TIME_INTERVAL = 5 * 60 * 100
+    -- 每15分钟主动同步一次
+    local TIME_INTERVAL = 15 * 60 * 100
     skynet.fork_loop({ count = 0 }, function()
         while true do
             self:sync_account_service_config_info()
