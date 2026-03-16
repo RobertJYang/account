@@ -21,6 +21,7 @@ local base_msg = require 'messages.base'
 local client = require 'iam.client'
 local account_cache = require 'domain.cache.account_cache'
 local authentication_config = require 'domain.authentication_config'
+local account_policy_cache = require 'interface.mdb.account_policy_cache_mdb'
 local account_service = require 'service.account_service'
 local cjson = require 'cjson'
 local mc_utils = require 'mc.utils'
@@ -39,12 +40,20 @@ function Authentication:ctor()
     self.m_account_cache = account_cache.get_instance()
     self.m_auth_config = authentication_config.get_instance()
     self.m_account_service = account_service.get_instance()
+    self.m_account_policy_cache = account_policy_cache.get_instance()
     self.m_delete_username_session = signal.new()
     self.m_lock_threshold_changed = signal.new()
 end
 
 -- 本地认证，通过linux shadow形式认证
 function Authentication:local_authenticate(user_name, password, ip, interface, server_id, ext_config)
+    local _, account_cache = self.m_account_cache:get_account_by_name(user_name)
+    if account_cache then
+        if account_cache.AccountType == iam_enum.AccountType.InterChassis and
+            not self.m_account_policy_cache:get_visible(account_cache.AccountType) then
+            error(custom_msg.AuthorizationFailed())
+        end
+    end
     -- 自己判断pam锁定
     if self:get_user_lock_state(user_name) then
         error(custom_msg.AuthorizationFailed()) -- 如果是登录失败之后锁定的，则用"无效密码"模糊提示错误
@@ -66,8 +75,9 @@ function Authentication:local_authenticate(user_name, password, ip, interface, s
         error(account_info)
     end
     local auth_type = account_info.AccountType
-    -- 认证成功,重置失败锁定计数(仅针对本地用户)
-    if auth_type == tostring(iam_enum.AccountType.Local) or auth_type == tostring(iam_enum.AccountType.OEM) then
+    -- 认证成功,重置失败锁定计数(仅针对本地和OEM/InterChassis用户)
+    if auth_type == tostring(iam_enum.AccountType.Local) or auth_type == tostring(iam_enum.AccountType.OEM) or
+        auth_type == tostring(iam_enum.AccountType.InterChassis) then
         iam_core.reset_pam_tally(user_name, self.m_pam_tally_log_dir)
     end
 
@@ -177,7 +187,8 @@ function Authentication:check_user_lock_status()
     for id, account in pairs(self.m_account_cache.cache_collection) do
         if account.AccountType == iam_enum.AccountType.Local or
             account.AccountType == iam_enum.AccountType.VNC or
-            account.AccountType == iam_enum.AccountType.InterChassis then
+            (account.AccountType == iam_enum.AccountType.InterChassis and
+                self.m_account_policy_cache:get_visible(account.AccountType)) then
             lock_state = self:get_user_lock_state(account.UserName)
             state, lock_start_time = self.m_account_lock:get_account_lock_state(id)
             is_locked = (state == iam_enum.UserLocked.USER_LOCK) and true or false

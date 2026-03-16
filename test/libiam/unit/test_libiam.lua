@@ -58,6 +58,7 @@ local test_common = require 'test_common.utils'
 local vos_utils = require 'utils.vos'
 local authentication_config = require 'domain.authentication_config'
 local account_cache = require 'domain.cache.account_cache'
+local account_policy_cache = require 'interface.mdb.account_policy_cache_mdb'
 local login_time_rule_cache = require 'domain.cache.login_rule.login_time_rule_cache'
 local access_service = require 'service.access_service'
 local inter_chassis_validator = require 'domain.inter_chassis_whitelist.inter_chassis_validator'
@@ -142,6 +143,7 @@ function TestIam:setupClass()
     self.IamDB = open_iam_db(test_data_dir .. '/iam.test.db', datas)
     KmcClient.new(nil, nil, true)
     self.test_account_cache = account_cache.new()
+    self.account_policy_cache = account_policy_cache.new()
     self.authentication_config = authentication_config.new(self.IamDB)
     self.test_authentication = authentication.new(self.IamDB)
     self.test_inter_chassis_validator = inter_chassis_validator.new(self.IamDB)
@@ -247,6 +249,7 @@ require 'authentication.testcase_kerberos_keytab'
 require 'authentication.testcase_ldap'
 require 'test_iam_utils'
 require 'test_session_ipmi'
+require 'test_account_policy_cache'
 require 'test_login_time_rule_cache'
 require 'authentication.test_authentication_config'
 require 'config_mgmt.test_config'

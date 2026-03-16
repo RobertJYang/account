@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.110.44] - 2026-3-16
+fix:板间通信用户不可见时不锁定
 
 ## [1.110.43] - 2026-3-16
 fix:调整account缓存主动同步周期
