@@ -137,7 +137,7 @@ LOCAL gint32 read_tally(FILE *fp, TallyData *tallies)
     return RET_OK;
 }
 
-LOCAL gint32 get_user_info(const gchar *user, const gchar *dir, guint64 unlock_time, gint64 interval,
+gint32 get_user_info(const gchar *user, const gchar *dir, guint64 unlock_time, gint64 interval,
     TallyLog *tally)
 {
     time_t now = 0;

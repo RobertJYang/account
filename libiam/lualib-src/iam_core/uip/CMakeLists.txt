@@ -1,6 +1,10 @@
 set(UIP libuip)
 
-file(GLOB SOURCES "*.c" "../common/*.c")
+file(GLOB_RECURSE SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../common/*.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../pam_tally_ext.c"
+)
 add_library(${UIP} SHARED ${SOURCES})
 
 target_include_directories(${UIP}

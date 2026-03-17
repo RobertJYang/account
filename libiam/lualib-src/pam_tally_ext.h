@@ -34,6 +34,8 @@ typedef struct tallylog_ext_t {
     guint64 fail_time; /* time of last failure */
 } TallyLog;
 
+gint32 get_user_info(const gchar *user, const gchar *dir, guint64 unlock_time, gint64 interval,
+    TallyLog *tally);
 gint32 get_pam_tally(const gchar *user, const gchar *tally_dir, guint64 fail_interval, TallyLog *tally);
 gint32 get_pam_tally_with_fail_interval(const gchar *user, const gchar *tally_dir, guint64 unlock_time,
     gint64 fail_interval, TallyLog *tally);

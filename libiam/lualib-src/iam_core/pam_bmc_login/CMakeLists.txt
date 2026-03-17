@@ -6,9 +6,11 @@ add_library(${PAM_BMC_LOGIN} SHARED ${SOURCES})
 
 target_include_directories(${PAM_BMC_LOGIN}
     PUBLIC ${GLIB_INCLUDE_DIRS}
+    PUBLIC ${DBUS_INCLUDE_DIRS}
 )
 target_link_libraries(${PAM_BMC_LOGIN}
     PUBLIC ${GLIB_LIBRARIES}
+    PUBLIC ${DBUS_LIBRARIES}
     PUBLIC libmc4lua::libcutils
     PUBLIC liblogger::liblogger
 )

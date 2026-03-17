@@ -31,16 +31,6 @@
 #define NO_CHECK 0
 
 #define DEFAULT_RECORD_DIR "/dev/shm/ip_lock"
-
-#define IAM_SERVICE                    "bmc.kepler.iam"
-#define ACCOUNT_SERVICE                "bmc.kepler.account"
-#define AUTHENTICATION_PATH            "/bmc/kepler/AccountService/Authentication"
-#define AUTHENTICATION_INTF            "bmc.kepler.AccountService.Authentication"
-#define PROPERTIES_INTF                "org.freedesktop.DBus.Properties"
-#define PROPERTY_LOCKOUT_DURATION      "AccountLockoutDuration"
-#define PROPERTY_LOCKOUT_THRESHOLD     "AccountLockoutThreshold"
-#define PROPERTY_LOCKOUT_TIME_INTERVAL "AccountLockoutCounterResetAfter"
-
 typedef struct ip_fail_record {
     gchar   record_name[MAX_NAME_LENGTH];
     guint64 timestamp;

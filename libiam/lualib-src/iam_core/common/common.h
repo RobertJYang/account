@@ -70,6 +70,15 @@ extern "C" {
 #define DECIMAL_NUM             10
 #define HEX_NUM                 16
 
+#define IAM_SERVICE                    "bmc.kepler.iam"
+#define ACCOUNT_SERVICE                "bmc.kepler.account"
+#define AUTHENTICATION_PATH            "/bmc/kepler/AccountService/Authentication"
+#define AUTHENTICATION_INTF            "bmc.kepler.AccountService.Authentication"
+#define PROPERTIES_INTF                "org.freedesktop.DBus.Properties"
+#define PROPERTY_LOCKOUT_DURATION      "AccountLockoutDuration"
+#define PROPERTY_LOCKOUT_THRESHOLD     "AccountLockoutThreshold"
+#define PROPERTY_LOCKOUT_TIME_INTERVAL "AccountLockoutCounterResetAfter"
+
 /* 结构体 */
 // ipmi用户结构
 typedef struct {
@@ -101,6 +110,9 @@ gint32 check_uid_is_local_user(uid_t uid);
 gint32 is_ip_in_subnet(const gchar *ip_str, const gchar *subnet_str);
 // 判断ipv6地址是否在子网中
 gint32 is_ipv6_in_subnet(const gchar *ip_str, const gchar *subnet_str);
+#ifndef G_ENABLE_TEST
+gint32 dbus_get_auth_lockout_conf(gint32 *duration, gint32 *threshold, gint32 *time_interval);
+#endif // G_ENABLE_TEST
 
 #ifdef __cplusplus
 }
