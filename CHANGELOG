@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.48] - 2026-3-17
+支持会话最大生命周期
+
 ## [1.110.47] - 2026-3-17
 fix:板间通信用户可见时锁定
 

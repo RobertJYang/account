@@ -459,6 +459,14 @@ local operation_log_map = {
         success = '{state} Web Rest Single Sign-On successfully',
         fail = '{state} Web Rest Single Sign-On failed'
     },
+    AbsoluteSessionTimeoutEnabled = {
+        success = '{state} Absolute Session Timeout successfully',
+        fail = '{state} Absolute Session Timeout failed'
+    },
+    AbsoluteSessionTimeout = {
+        success = 'Change Absolute Session Timeout to {timeout_value} seconds successfully',
+        fail = 'Change Absolute Session Timeout to {timeout_value} seconds failed'
+    },
     UserNamePasswordPrefixCompareEnabled = {
         success = '{state} username password check successfully',
         fail = '{state} username password check failed'

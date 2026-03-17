@@ -187,11 +187,9 @@ function InterChassisSession:get_session_by_ip(ip, session_type)
 end
 
 --- 获取超时会话
-function InterChassisSession:get_timeout_session_list()
+function InterChassisSession:get_timeout_session_list(absolute_timeout)
     local timeout_session_list = {}
-    if self.m_session_service_config.SessionTimeout == 0 then
-        return timeout_session_list
-    end
+    local session_timeout = self.m_session_service_config.SessionTimeout
 
     local now = vos.vos_get_cur_time_stamp()
     local cur_session
@@ -200,11 +198,11 @@ function InterChassisSession:get_timeout_session_list()
             cur_session = session_collection[index]
             -- 每5秒检查一次会话超时时间
             cur_session.m_last_active_time = cur_session.m_last_active_time + 5
-            if cur_session.m_last_active_time >= self:get_session_timeout() then
+            if session_timeout ~= 0 and cur_session.m_last_active_time >= self:get_session_timeout() then
                 table.insert(timeout_session_list, cur_session)
                 goto continue
             end
-            if cur_session.m_created_time < now - user_config.SESSION_EXIPRES_SEC then
+            if absolute_timeout ~= 0 and cur_session.m_created_time < now - absolute_timeout then
                 table.insert(timeout_session_list, cur_session)
             end
             ::continue::

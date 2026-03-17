@@ -144,18 +144,14 @@ function CLISession:delete_by_ip(ip, logout_type)
     return deleted_session_list
 end
 
-function CLISession:get_timeout_session_list()
+function CLISession:get_timeout_session_list(absolute_timeout)
     local timeout_session_list = {}
-
-    if self.m_session_service_config.SessionTimeout == 0 then
-        return timeout_session_list
-    end
 
     local now = vos.vos_get_cur_time_stamp()
     local cur_session
     for index = #self.m_session_collection, 1, -1 do
          cur_session = self.m_session_collection[index]
-        if cur_session.m_created_time < now - user_config.SESSION_EXIPRES_SEC then
+        if absolute_timeout ~= 0 and cur_session.m_created_time < now - absolute_timeout then
             table.insert(timeout_session_list, cur_session)
         end
     end

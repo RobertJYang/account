@@ -262,10 +262,10 @@ function SessionService:init()
 end
 
 -- 新增的独立方法：处理超时会话
-function SessionService:process_timeout_sessions()
+function SessionService:process_timeout_sessions(absolute_timeout)
     for _, session_service in pairs(self.m_session_service_collection) do
         local ok, err = pcall(function()
-            local timeout_session_list = session_service:get_timeout_session_list()
+            local timeout_session_list = session_service:get_timeout_session_list(absolute_timeout)
             self:delete_timeout_session_list(timeout_session_list)
         end)
         if not ok then
@@ -282,10 +282,12 @@ function SessionService:session_monitor()
         log:info('Start session monitor.')
         local ok, err
         local start_time, end_time, sleep_time
+        local absolute_timeout
         while true do
+            absolute_timeout = self.m_sessions_db.AbsoluteSessionTimeoutEnabled and self.m_sessions_db.AbsoluteSessionTimeout or 0
             start_time = skynet.now()
             ok, err = pcall(function()
-                self:process_timeout_sessions()
+                self:process_timeout_sessions(absolute_timeout)
             end)
             if not ok then
                 log:error('process timeout sessions error %s', err.name)
@@ -1198,6 +1200,16 @@ end
 
 function SessionService:set_sso_enabled(enable)
     self.m_sessions_db.SsoEnabled = enable
+    self.m_sessions_db:save()
+end
+
+function SessionService:set_absolute_session_timeout_enabled(enable)
+    self.m_sessions_db.AbsoluteSessionTimeoutEnabled = enable
+    self.m_sessions_db:save()
+end
+
+function SessionService:set_absolute_session_timeout(value)
+    self.m_sessions_db.AbsoluteSessionTimeout = value
     self.m_sessions_db:save()
 end
 
