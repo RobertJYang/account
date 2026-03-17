@@ -260,6 +260,10 @@ function MockClient:GetCertificateServiceObjects()
     return {}
 end
 
+function MockClient:OnAccountPolicyInterfacesAdded()
+    return {}
+end
+
 function MockClient:OnAccountPolicyPropertiesChanged()
     return {}
 end
