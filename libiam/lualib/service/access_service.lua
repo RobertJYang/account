@@ -37,12 +37,8 @@ local function create_access_file()
     utils_core.chmod_s(config.ACCESS_CONFIG_FILE, mode)
 end
 
-local function write_access_config(ip_lock_config, inter_chassis_config)
+local function write_access_config(_, inter_chassis_config)
     local total_config = ""
-
-    if ip_lock_config then
-        total_config = ip_lock_config
-    end
 
     if inter_chassis_config then
         total_config = total_config .. "\n" .. inter_chassis_config
