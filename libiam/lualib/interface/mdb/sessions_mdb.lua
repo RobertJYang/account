@@ -87,14 +87,22 @@ end
 
 -- 属性监听钩子
 SessionsMdb.watch_property_hook = {
-    ValidateSsoClient =  operation_logger.proxy(function(self, ctx, enabled)
+    ValidateSsoClient = operation_logger.proxy(function(self, ctx, enabled)
         ctx.operation_log.params = { state = enabled and 'Enable' or 'Disable' }
         self.m_session_service:set_validate_sso_client_addr(enabled)
     end, 'ValidateSsoClient'),
-    SsoEnabled =  operation_logger.proxy(function(self, ctx, enabled)
+    SsoEnabled = operation_logger.proxy(function(self, ctx, enabled)
         ctx.operation_log.params = { state = enabled and 'Enable' or 'Disable' }
         self.m_session_service:set_sso_enabled(enabled)
-    end, 'SsoEnabled')
+    end, 'SsoEnabled'),
+    AbsoluteSessionTimeoutEnabled = operation_logger.proxy(function(self, ctx, enabled)
+        ctx.operation_log.params = { state = enabled and 'Enable' or 'Disable' }
+        self.m_session_service:set_absolute_session_timeout_enabled(enabled)
+    end, 'AbsoluteSessionTimeoutEnabled'),
+    AbsoluteSessionTimeout = operation_logger.proxy(function(self, ctx, value)
+        ctx.operation_log.params = { timeout_value = value }
+        self.m_session_service:set_absolute_session_timeout(value)
+    end, 'AbsoluteSessionTimeout')
 }
 
 -- ip变更后，踢出会话的业务处理
