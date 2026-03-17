@@ -152,6 +152,7 @@ gint32 uip_record_login_info(gchar *user_name, const gchar *ip_addr, const gchar
 gint32 init_dbus_connection(void);
 gint32 uip_get_local_account_auth_mode(gchar **out_val);
 gint32 uip_get_privilege(const gchar* user_name, guchar* user_privilege);
+gboolean uip_get_user_is_lock_by_username(const gchar *dir, const gchar *username);
 
 #ifdef __cplusplus
 }

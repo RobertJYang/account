@@ -24,6 +24,7 @@
 #include "utils/vos.h"
 #include "utils/file_securec.h"
 #include "uip_user.h"
+#include "../../pam_tally_ext.h"
 
 #define DBUS_CONNECTION_TIMEOUT (20000)
 static DBusConnection *g_dbus_conn = NULL;
@@ -1075,4 +1076,27 @@ gint32 uip_get_privilege(const gchar* user_name, guchar* user_privilege)
     // 对消息通道解引用
     dbus_message_unref(reply);
     return RET_OK;
+}
+
+gboolean uip_get_user_is_lock_by_username(const gchar *dir, const gchar *username)
+{
+    gint32 duration      = 0;
+    gint32 threshold     = 0;
+    gint32 time_interval = 0;
+    gint32 ret = dbus_get_auth_lockout_conf(&duration, &threshold, &time_interval);
+    if (ret != RET_OK) {
+        debug_log(DLOG_ERROR, "[ip lock] get dbus prop failed");
+        // 失败时不阻塞认证行为
+        return FALSE;
+    }
+
+    TallyLog record = {0};
+    ret = get_pam_tally_with_fail_interval(username, dir, (guint64)duration, (guint64)time_interval, &record);
+    if (ret != RET_OK) {
+        debug_log(DLOG_ERROR, "[ip lock] get lock record failed");
+        // 失败时不阻塞认证行为
+        return FALSE;
+    }
+
+    return threshold != 0 ? (record.fail_cnt >= threshold) : FALSE;
 }

@@ -946,15 +946,7 @@ end
 
 function SessionService:delete_session_by_ip(ip, logout_type)
     for session_type, session_collection in pairs(self.m_session_service_collection) do
-        if session_type == iam_enum.SessionType.CLI:value() and skynet_ready then
-            skynet.fork_once(function()
-                -- 协程等待，防止CLI回显失败
-                skynet.sleep(50)
-                local del_session_list = session_collection:delete_by_ip(ip, logout_type)
-                self:record_logout_session(del_session_list, logout_type)
-            end
-            )
-        else
+        if session_type ~= iam_enum.SessionType.CLI:value() then
             local del_session_list = session_collection:delete_by_ip(ip, logout_type)
             self:record_logout_session(del_session_list, logout_type)
         end

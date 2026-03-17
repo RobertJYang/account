@@ -1,4 +1,10 @@
 All notable changes to this project will be documented in this file.
+## [1.110.46] - 2026-3-17
+fix:加固账户锁定公钥认证登录ssh
+
+## [1.110.45] - 2026-3-17
+fix:SSH和SFTP都不支持IP锁定和踢出
+
 ## [1.110.44] - 2026-3-16
 fix:板间通信用户不可见时不锁定
 
