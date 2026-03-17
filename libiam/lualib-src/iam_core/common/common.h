@@ -52,6 +52,7 @@ extern "C" {
 #define IMANA_UID_BASE 500
 #define IMANA_UID_MIN 1
 #define IMANA_UID_MAX 17
+#define INTER_CHASSIS_UID 23
 #define OEM_UID_MIN 101
 #define OEM_UID_MAX 115
 #define IMANNA_ROOT_UID 2

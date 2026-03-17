@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.49] - 2026-3-18
+fix:支持限制框内通信SSH/SFTP会话数量
+
 ## [1.110.48] - 2026-3-17
 支持会话最大生命周期
 
