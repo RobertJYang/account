@@ -43,6 +43,10 @@ function account_policy_cache_mdb:init()
 end
 
 function account_policy_cache_mdb:signal_register()
+    client:OnAccountPolicyInterfacesAdded(function()
+        self:sync_account_policy()
+    end)
+
     client:OnAccountPolicyPropertiesChanged(function(properties, path, _)
         local account_type = string.match(path or '', ACCOUNT_POLICY_PATH_PATTERN)
         if not account_type then
