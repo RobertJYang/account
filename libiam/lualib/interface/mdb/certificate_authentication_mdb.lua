@@ -16,6 +16,7 @@ local base_msg = require 'messages.base'
 local class = require 'mc.class'
 local context = require 'mc.context'
 local operation_logger = require 'interface.operation_logger'
+local object_manage = require 'mc.mdb.object_manage'
 
 local cls_mng = require 'mc.class_mgnt'
 local INTERFACE_CERT_AUTH<const> = 'bmc.kepler.AccountService.CertificateAuthentication'
@@ -28,15 +29,6 @@ function CertificateAuthenticationMdb:ctor(bus)
     self.m_cert_auth_ipmi = certificate_authentication_ipmi.get_instance()
     self.m_bus = bus
     self.m_mdb_config = {}
-end
-
-
-function CertificateAuthenticationMdb:init()
-    self.m_cert_auth_ipmi.m_update_config:on(function(...)
-        self:cert_config_mdb_update(...)
-    end)
-    self:new_cert_config_to_mdb_tree(self.m_cert_auth.m_db_config)
-    self:update_ca_deletable_status(self.m_mdb_config)
 end
 
 function CertificateAuthenticationMdb:update_ca_deletable_status(config)
@@ -70,6 +62,27 @@ CertificateAuthenticationMdb.watch_config_property_hook = {
         self.m_cert_auth:set_inter_chassis_validation(value)
     end, "InterChassisValidation"),
 }
+
+function CertificateAuthenticationMdb:init()
+    self.m_cert_auth_ipmi.m_update_config:on(function(...)
+        self:cert_config_mdb_update(...)
+    end)
+    self:new_cert_config_to_mdb_tree(self.m_cert_auth.m_db_config)
+    self:update_ca_deletable_status(self.m_mdb_config)
+    -- 添加自发现对象属性监听
+    object_manage.on_add_object(self.m_bus, function(class_name, object, position)
+        if class_name == "CertificateAuthentication" then
+            object:get_mdb_object(INTERFACE_CERT_AUTH).property_changed:on(function(name, value, sender)
+                if not self.watch_config_property_hook[name] then
+                    return
+                end
+                local ctx = context.get_context() or context.new('WEB', 'NA', 'NA')
+                self.watch_config_property_hook[name](self, ctx, value)
+                self:cert_config_mdb_update(name, value)
+            end)
+        end
+    end)
+end
 
 function CertificateAuthenticationMdb:watch_config_property(service)
     service[INTERFACE_CERT_AUTH].property_before_change:on(function(name, value, sender)
