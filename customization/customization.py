@@ -38,5 +38,7 @@ class Customization(object):
             f'{self.rootfs_path}/usr/lib64/libaccount_core_c.so'], check=True)
         subprocess.run(['/usr/bin/sudo', '/usr/bin/mv', f'{self.rootfs_path}/opt/bmc/luaclib/account/pam_bmc_login.so',
             f'{self.rootfs_path}/lib64/security/pam_bmc_login.so'], check=True)
+        subprocess.run(['/usr/bin/sudo', '/usr/bin/mv', f'{self.rootfs_path}/opt/bmc/luaclib/account/pam_bmc_session.so',
+            f'{self.rootfs_path}/lib64/security/pam_bmc_session.so'], check=True)
         subprocess.run(['/usr/bin/sudo', '/usr/bin/mv', f'{self.rootfs_path}/opt/bmc/luaclib/account/libuip.so',
             f'{self.rootfs_path}/usr/lib64/libuip.so'], check=True)

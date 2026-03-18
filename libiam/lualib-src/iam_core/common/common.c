@@ -113,12 +113,19 @@ gint32 get_uid_gid_by_name(const gchar *user_name, uid_t *uid, uid_t *gid)
  */
 gint32 check_uid_is_local_user(uid_t uid)
 {
-    if (uid < IMANA_UID_BASE + IMANA_UID_MIN ||
-        (uid > IMANA_UID_BASE + IMANA_UID_MAX && uid < IMANA_UID_BASE + OEM_UID_MIN) ||
-        uid > IMANA_UID_BASE + OEM_UID_MAX) {
-        return FALSE;
+    if (uid > IMANA_UID_BASE + IMANA_UID_MIN && uid <= IMANA_UID_BASE + IMANA_UID_MAX) {
+        return TRUE;
     }
-    return TRUE;
+
+    if (uid == IMANA_UID_BASE + INTER_CHASSIS_UID) {
+        return TRUE;
+    }
+
+    if (uid >= IMANA_UID_BASE + OEM_UID_MIN && uid <= IMANA_UID_BASE + OEM_UID_MAX) {
+         return TRUE;
+    }
+
+    return FALSE;
 }
 
 /*
