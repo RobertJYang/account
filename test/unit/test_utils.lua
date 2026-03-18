@@ -106,4 +106,13 @@ function TestAccount:test_file_proxy()
         config.SECBOX_USER_UID, config.SECBOX_USER_GID))
     lu.assertIsTrue(file_proxy.proxy_mkdir(config.TMP_PATH .. '/test_dir', 777,
         config.SECBOX_USER_UID, config.SECBOX_USER_GID))
+    lu.assertIsTrue(file_proxy.proxy_tar('Compress', 'z', config.PRESERVE_CONFIG_FILE,
+        config.PRESERVE_CONFIG_PATH, {'home'}))
+    lu.assertIsTrue(file_proxy.proxy_tar('Decompress', 'z', config.PRESERVE_CONFIG_FILE,
+        config.SHM_PATH, {}))
+    file_proxy.has_cap_dac = false
+    lu.assertIsTrue(file_proxy.proxy_tar('Compress', 'z', config.PRESERVE_CONFIG_FILE,
+        config.PRESERVE_CONFIG_PATH, {'home'}))
+    lu.assertIsTrue(file_proxy.proxy_tar('Decompress', 'z', config.PRESERVE_CONFIG_FILE,
+        config.SHM_PATH, {}))
 end

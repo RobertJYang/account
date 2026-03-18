@@ -12,6 +12,7 @@ local utils_core = require 'utils.core'
 local file_utils = require 'utils.file'
 local mc_utils = require 'mc.utils'
 local vos = require 'utils.vos'
+local config = require 'common_config'
 
 local EMPYT_HASH<const> = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 
@@ -82,6 +83,15 @@ end
 
 function FileObjects:Access(ctx, dst_path, mode)
     return vos.get_file_accessible(dst_path)
+end
+
+function FileObjects:Tar(ctx, mode, options, archive, workdir, files)
+    if mode == "Compress" then
+        mc_utils.tar_zip(workdir, files[1], archive)
+    else
+        mc_utils.secure_tar_unzip(archive, workdir, config.FILE_MAX_SIZE, config.FILE_MAX_NUM)
+    end
+    return true
 end
 
 local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'

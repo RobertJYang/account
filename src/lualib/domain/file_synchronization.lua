@@ -45,7 +45,9 @@ function file_synchronization:init()
 end
 
 function file_synchronization:init_tally_log()
-    file_proxy.proxy_mkdir(config.PAM_TALLY_LOG_DIR, mc_utils.S_IRWXU | mc_utils.S_IRWXG, config.SECBOX_USER_UID, config.APPS_USER_GID)
+    if not file_proxy.proxy_access(config.PAM_TALLY_LOG_DIR, 0) then
+        file_proxy.proxy_mkdir(config.PAM_TALLY_LOG_DIR, mc_utils.S_IRWXU | mc_utils.S_IRWXG, config.SECBOX_USER_UID, config.APPS_USER_GID)
+    end
     file_proxy.proxy_chmod(config.PAM_TALLY_LOG_DIR, mc_utils.S_IRWXU | mc_utils.S_IRWXG)
     file_proxy.proxy_chown(config.PAM_TALLY_LOG_DIR, config.SECBOX_USER_UID, config.APPS_USER_GID)
 end
@@ -99,13 +101,12 @@ function file_synchronization:set_file_owner()
         file_proxy.proxy_chown(config.PRESERVE_CONFIG_FILE, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
         file_proxy.proxy_chmod(config.PRESERVE_CONFIG_FILE, mc_utils.S_IRUSR | mc_utils.S_IWUSR)
         -- 解压目录
-        mc_utils.secure_tar_unzip(config.PRESERVE_CONFIG_FILE, config.SHM_PATH,
-            config.FILE_MAX_SIZE, config.FILE_MAX_NUM)
+        file_proxy.proxy_tar('Decompress', 'z', config.PRESERVE_CONFIG_FILE, config.SHM_PATH, {})
         -- 删除原目录残留
         file_proxy.proxy_delete(config.DATA_HOME_PATH)
         -- 将解压后的目录移动到目标目录并赋权
-        file_proxy.proxy_move(config.SHM_PATH .. '/home', config.PRESERVE_CONFIG_PATH,
-            config.ROOT_USER_UID, config.ROOT_USER_GID)
+        file_proxy.proxy_move(config.SHM_PATH .. '/home', config.PRESERVE_CONFIG_PATH, config.ROOT_USER_UID, config.ROOT_USER_GID)
+        file_proxy.proxy_chown(config.DATA_HOME_PATH, config.ROOT_USER_UID, config.ROOT_USER_GID)
         file_proxy.proxy_chmod(config.DATA_HOME_PATH,
             mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH)
         -- 删除残留压缩包
@@ -121,6 +122,20 @@ function file_synchronization:set_file_owner()
         end
 
         la:recover_file_owner(config.DATA_HOME_PATH, file_name, uid, gid)
+        ::continue::
+    end
+end
+
+function file_synchronization:backup_user_file(backup_path)
+    local la = account_linux.new(self.linux_files, false, false)
+    for _, file_name in pairs(utils_core.dir(config.DATA_HOME_PATH)) do
+        local ok, uid, gid = pcall(function ()
+            return self.m_account_collection:get_uid_gid_by_username(self.ctx, file_name)
+        end)
+        if not ok then
+            goto continue
+        end
+        la:backup_user_file(backup_path, file_name, uid, gid)
         ::continue::
     end
 end

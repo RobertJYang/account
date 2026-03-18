@@ -98,6 +98,8 @@ local function redirect_path(test_data_dir)
     config.SSH_PUBLIC_KEY_PARSE_PATH = test_data_dir .. config.SSH_PUBLIC_KEY_PARSE_PATH
     config.WEAK_PWDDICT_FILE_SHM_PATH = test_data_dir .. config.WEAK_PWDDICT_FILE_SHM_PATH
     config.SHM_TMP_PATH = test_data_dir .. config.SHM_TMP_PATH
+    config.PRESERVE_CONFIG_PATH = test_data_dir .. config.PRESERVE_CONFIG_PATH
+    config.PRESERVE_CONFIG_FILE = test_data_dir .. config.PRESERVE_CONFIG_FILE
 end
 
 local function gen_linux_user_file(test_data_dir)
@@ -187,6 +189,10 @@ function TestAccount:PrepareFile(test_data_dir)
     mc_utils.mkdir(test_data_dir .. '/dev/', mc_utils.S_IRWXU)
     mc_utils.mkdir(test_data_dir .. '/dev/shm', mc_utils.S_IRWXU)
     mc_utils.mkdir(test_data_dir .. '/dev/shm/tmp', mc_utils.S_IRWXU)
+    mc_utils.mkdir(config.PRESERVE_CONFIG_PATH,  mc_utils.S_IRWXU)
+    mc_utils.mkdir(config.DATA_HOME_PATH,  mc_utils.S_IRWXU)
+    mc_utils.mkdir(test_data_dir .. '/data/trust/opt', mc_utils.S_IRWXU)
+    mc_utils.mkdir(test_data_dir .. '/data/trust/opt/bmc', mc_utils.S_IRWXU)
 end
 
 function TestAccount:mock()

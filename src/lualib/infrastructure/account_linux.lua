@@ -632,6 +632,31 @@ function HomeDir:set_home_file_owner(base_path, file_name, uid, gid)
     end
 end
 
+function HomeDir:backup(backup_path, user_name, uid, gid)
+    local home_dir_path = self:get(user_name)
+    local backup_home_dir_path = backup_path .. '/' .. user_name
+    file_proxy.proxy_mkdir(backup_home_dir_path, mc_utils.S_IRWXU, uid, gid)
+
+    -- 复制.ash_history文件
+    local ash_path = home_dir_path .. '/.ash_history'
+    local backup_ash_path = backup_home_dir_path .. '/.ash_history'
+    if file_proxy.proxy_access(ash_path, 0) then
+        file_proxy.proxy_copy(ash_path, backup_ash_path, uid, gid)
+        file_proxy.proxy_chmod(ash_path, mc_utils.S_IRUSR | mc_utils. S_IWUSR)
+    end
+
+    -- 复制.ssh/authorrized_keys目录
+    local ssh_keys_path = table.concat({home_dir_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME, 'authorized_keys'}, '/')
+    local backup_ssh_dir_path = table.concat({backup_home_dir_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME}, '/')
+    local backup_ssh_key_path = table.concat({backup_home_dir_path, config.SSH_PUBLIC_KEY_SUB_DIR_NAME, 'authorized_keys'}, '/')
+
+    if file_proxy.proxy_access(ssh_keys_path, 0) then
+        file_proxy.proxy_mkdir(backup_ssh_dir_path, mc_utils.S_IRWXU, uid, gid)
+        file_proxy.proxy_copy(ssh_keys_path, backup_ssh_key_path, uid, gid)
+        file_proxy.proxy_chmod(backup_ssh_key_path, mc_utils.S_IRUSR | mc_utils. S_IWUSR)
+    end
+end
+
 -- 用户管理
 -- @class LinuxUserMgr
 local LinuxUserMgr = class()
@@ -664,6 +689,10 @@ function LinuxUserMgr:recover_file_owner(path, file_name, uid, gid)
     self.home_dir:set_home_file_owner(file_path, '.ash_history', uid, gid)
     self.home_dir:set_home_file_owner(file_path, '.ssh', uid, gid)
     self.home_dir:set_home_file_owner(file_path, '.ssh/authorized_keys', uid, gid)
+end
+
+function LinuxUserMgr:backup_user_file(backup_path, user_name, uid, gid)
+    self.home_dir:backup(backup_path, user_name, uid, gid)
 end
 
 function LinuxUserMgr:prepare_user(account, uid, gid, groupname)
