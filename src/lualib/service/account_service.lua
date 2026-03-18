@@ -152,7 +152,14 @@ function AccountService:set_user_auth_protocol(ctx, handler_account_id, account_
         log:error('set_user_authentication_protocol failed, protocol_num(%d) is wrong', auth_protocol:value())
         error(base_msg.InternalError())
     end
-    ctx.operation_log.params.protocol = tostring(auth_protocol)
+    -- 鉴权算法值2和3，实际使用的算法是SHA
+    if auth_protocol == enum.SNMPAuthenticationProtocols.SHA96 or
+       auth_protocol == enum.SNMPAuthenticationProtocols.SHA224 then
+        ctx.operation_log.params.protocol = "SHA"
+    else
+        ctx.operation_log.params.protocol = tostring(auth_protocol)
+    end
+    
     if utils.str_is_empty(auth_passwd) or utils.str_is_empty(encrypt_password) then
         log:error('set_user_authentication_protocol failed, auth_passwd or encrypt_password is empty')
         error(base_msg.InternalError())

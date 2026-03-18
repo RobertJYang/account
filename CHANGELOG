@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.53] - 2026-3-18
+fix:修复鉴权算法设置值和打印值不一致问题
+
 ## [1.110.52] - 2026-3-16
 fix:修复恢复出厂设置保留用户数据失败的问题
 
