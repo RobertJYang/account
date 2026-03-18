@@ -12,6 +12,7 @@ local inter_chassis_session = require 'domain.session_type.session_inter_chassis
 local custom_msg = require 'messages.custom'
 local iam_enum = require 'class.types.types'
 local lu = require 'luaunit'
+local cert_auth_mdb = require 'interface.mdb.certificate_authentication_mdb'
 
 local TEST_IP = "127.0.0.1"
 
@@ -263,4 +264,23 @@ function TestIam:test_new_inter_rest_chassis_and_validate()
     local collection =  self.test_session_service.m_session_service_collection[session_type_num]
     collection:delete(session_id)
     self.test_account_cache.cache_collection[23] = nil
+end
+
+function TestIam:test_update_ca_deletable_status()
+    local INTERFACE_CERT_AUTH = 'bmc.kepler.AccountService.CertificateAuthentication'
+    local cert_config = {
+        [INTERFACE_CERT_AUTH] = {
+            Enabled = false
+        }
+    }
+    local ok = pcall(function()
+        cert_auth_mdb:update_ca_deletable_status(cert_config)
+    end)
+    lu.assertEquals(ok, true)
+
+    cert_config[INTERFACE_CERT_AUTH].Enabled = false
+    ok = pcall(function()
+        cert_auth_mdb:update_ca_deletable_status(cert_config)
+    end)
+    lu.assertEquals(ok, true)
 end

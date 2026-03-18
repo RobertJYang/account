@@ -36,6 +36,20 @@ function CertificateAuthenticationMdb:init()
         self:cert_config_mdb_update(...)
     end)
     self:new_cert_config_to_mdb_tree(self.m_cert_auth.m_db_config)
+    self:update_ca_deletable_status(self.m_mdb_config)
+end
+
+function CertificateAuthenticationMdb:update_ca_deletable_status(config)
+    local skynet = require 'skynet'
+    skynet.fork_once(function()
+        -- 等待5秒后更新CA证书是否可删除状态
+        skynet.sleep(500)
+        self.m_cert_auth:_modify_ca_privilege(config[INTERFACE_CERT_AUTH].Enabled)
+
+        -- 防止certificate组件资源树未完成上树导致设置CA证书是否可删除状态失败，20秒后再次进行设置
+        skynet.sleep(2000)
+        self.m_cert_auth:_modify_ca_privilege(config[INTERFACE_CERT_AUTH].Enabled)
+    end)
 end
 
 CertificateAuthenticationMdb.watch_config_property_hook = {
