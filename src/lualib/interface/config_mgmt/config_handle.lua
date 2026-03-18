@@ -23,6 +23,8 @@ local config_dump = require 'interface.config_mgmt.security_config.config_dump'
 local kmc_client = require 'infrastructure.kmc_client'
 local utils = require 'mc.utils'
 local config = require 'common_config'
+local file_proxy = require 'infrastructure.file_proxy'
+local file_synchronization = require 'domain.file_synchronization'
 
 local ConfigHandle = class()
 
@@ -84,18 +86,24 @@ function ConfigHandle:on_backup(ctx, filepath)
     end
     local res = {
         {'weakdictionary', '/data/trust/weakdictionary'},
-        {'pam_faillock', '/data/trust/pam_faillock'},
-        {'home', '/data/trust/'}
+        {'pam_faillock', '/data/trust/pam_faillock'}
     }
+
+    -- 备份用户目录
+    local m_file_synchronization = file_synchronization.get_instance()
+    local backup_home_path = filepath .. '/home'
+    local dir_mode = utils.S_IRWXU | utils.S_IRGRP | utils.S_IXGRP | utils.S_IROTH | utils.S_IXOTH
+    if file_proxy.proxy_mkdir(backup_home_path, dir_mode, config.ROOT_USER_UID, config.ROOT_USER_GID) then
+        m_file_synchronization:backup_user_file(backup_home_path)
+    end
 
     for _, f in ipairs(res) do
         local name = f[1]
-        local src_path = (name == 'home') and (f[2] .. '/home/') or f[2]
+        local src_path = f[2]
         local dest_path = filepath .. '/' .. name
-        local ok, err = pcall(vos.check_before_system_s, '/bin/cp', '-rpf', src_path , dest_path)
+        local ok = file_proxy.proxy_copy(src_path, dest_path, config.SECBOX_USER_UID, config.SECBOX_USER_GID)
         if not ok then
-            pcall(vos.check_before_system_s, '/bin/rm', '-rf', dest_path)
-            log:error('check_before_system_s failed, err: %s', err)
+            file_proxy.proxy_delete(dest_path)
             log:mcf_error('[config_manage] Backup %s to destination path failed', name)
             log:operation(ctx:get_initiator(), 'account',
                 'Set persistence manufacturer default configuration failed')
@@ -116,15 +124,10 @@ function ConfigHandle:on_recover(ctx, preserve_list)
     end
 
     if preserve_list.PreserveUsers == "true" then
-        utils.tar_zip(config.PRESERVE_CONFIG_PATH, 'home', config.PRESERVE_CONFIG_FILE)
+        file_proxy.proxy_tar('Compress', 'z', config.PRESERVE_CONFIG_FILE, config.PRESERVE_CONFIG_PATH, {'home'})
     end
-    
-    for _, file_name in pairs(utils_core.dir(TRUST_HOME_DIR_PATH)) do
-        ok, err = pcall(vos.check_before_system_s, '/bin/rm', '-rf', TRUST_HOME_DIR_PATH .. file_name)
-        if not ok then
-            log:error('check_before_system_s failed, err: %s', err)
-        end
-    end
+
+    file_proxy.proxy_delete(TRUST_HOME_DIR_PATH)
     log:operation(ctx:get_initiator(), 'account', 'Recover manufacturer default configuration successfully')
 end
 

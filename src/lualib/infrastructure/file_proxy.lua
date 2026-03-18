@@ -16,6 +16,7 @@ local utils_core = require 'utils.core'
 local vos = require 'utils.vos'
 local file_utils = require 'utils.file'
 local account_utils = require 'infrastructure.utils'
+local mc_utils = require 'mc.utils'
 local config = require 'common_config'
 
 local FILE_OBJ_PATH<const> = '/bmc/kepler/Managers/1/Security/File'
@@ -204,11 +205,39 @@ function file_proxy.proxy_mkdir(dst_path, dir_mod, uid, gid)
     end
 
     local ok, err_info = pcall(function()
-        file_obj:Mkdir({}, dst_path, dir_mod, uid, gid)
+        file_obj:Mkdir({}, dst_path, dir_mod, uid, gid, false)
     end)
 
     if not ok then
         log:error("Mkdir failed, error is %s", err_info)
+        return false
+    end
+
+    return true
+end
+
+function file_proxy.proxy_tar(mode, options, archive, workdir, files)
+    -- 有特权直接执行命令
+    if file_proxy.has_cap_dac then
+        if mode == "Compress" then
+            mc_utils.tar_zip(workdir, files[1], archive)
+        else
+            mc_utils.secure_tar_unzip(archive, workdir, config.FILE_MAX_SIZE, config.FILE_MAX_NUM)
+        end
+        return true
+    end
+
+    local file_obj = get_file_proxy_obj()
+    if not file_obj then
+        return false
+    end
+
+    local ok, err_info = pcall(function()
+        file_obj:Tar({}, mode, options, archive, workdir, files)
+    end)
+
+    if not ok then
+        log:error("Tar failed, error is %s", err_info)
         return false
     end
 

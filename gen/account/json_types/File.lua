@@ -13,6 +13,110 @@ local mdb = require 'mc.mdb'
 
 local File = {}
 
+---@class File.TarRsp
+local TTarRsp = {}
+TTarRsp.__index = TTarRsp
+TTarRsp.group = {}
+
+local function TTarRsp_from_obj(obj)
+    return setmetatable(obj, TTarRsp)
+end
+
+function TTarRsp.new()
+    return TTarRsp_from_obj({})
+end
+---@param obj File.TarRsp
+function TTarRsp:init_from_obj(obj)
+
+end
+
+function TTarRsp:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TTarRsp.group)
+end
+
+TTarRsp.from_obj = TTarRsp_from_obj
+
+TTarRsp.proto_property = {}
+
+TTarRsp.default = {}
+
+TTarRsp.struct = {}
+
+function TTarRsp:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    TTarRsp:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TTarRsp.proto_property, errs, need_convert)
+    return self
+end
+
+function TTarRsp:unpack(_)
+end
+
+File.TarRsp = TTarRsp
+
+---@class File.TarReq
+---@field Mode string
+---@field Options string
+---@field Archive string
+---@field WorkDir string
+---@field Files string[]
+local TTarReq = {}
+TTarReq.__index = TTarReq
+TTarReq.group = {}
+
+local function TTarReq_from_obj(obj)
+    return setmetatable(obj, TTarReq)
+end
+
+function TTarReq.new(Mode, Options, Archive, WorkDir, Files)
+    return TTarReq_from_obj({Mode = Mode, Options = Options, Archive = Archive, WorkDir = WorkDir, Files = Files})
+end
+---@param obj File.TarReq
+function TTarReq:init_from_obj(obj)
+    self.Mode = obj.Mode
+    self.Options = obj.Options
+    self.Archive = obj.Archive
+    self.WorkDir = obj.WorkDir
+    self.Files = obj.Files
+end
+
+function TTarReq:remove_error_props(errs, obj)
+    utils.remove_obj_error_property(obj, errs, TTarReq.group)
+end
+
+TTarReq.from_obj = TTarReq_from_obj
+
+TTarReq.proto_property = {'Mode', 'Options', 'Archive', 'WorkDir', 'Files'}
+
+TTarReq.default = {'', '', '', '', {}}
+
+TTarReq.struct = {
+    {name = 'Mode', is_array = false, struct = nil}, {name = 'Options', is_array = false, struct = nil},
+    {name = 'Archive', is_array = false, struct = nil}, {name = 'WorkDir', is_array = false, struct = nil},
+    {name = 'Files', is_array = true, struct = nil}
+}
+
+function TTarReq:validate(prefix, errs, need_convert)
+    prefix = prefix or ''
+
+    validate.Optional(prefix .. 'Mode', self.Mode, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'Options', self.Options, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'Archive', self.Archive, 'string', false, errs, need_convert)
+    validate.Optional(prefix .. 'WorkDir', self.WorkDir, 'string', false, errs, need_convert)
+    validate.OptionalArray(prefix .. 'Files', self.Files, 'string', false, errs, need_convert)
+
+    TTarReq:remove_error_props(errs, self)
+    validate.CheckUnknowProperty(self, TTarReq.proto_property, errs, need_convert)
+    return self
+end
+
+function TTarReq:unpack(_)
+    return self.Mode, self.Options, self.Archive, self.WorkDir, self.Files
+end
+
+File.TarReq = TTarReq
+
 ---@class File.MkdirRsp
 local TMkdirRsp = {}
 TMkdirRsp.__index = TMkdirRsp
@@ -60,6 +164,7 @@ File.MkdirRsp = TMkdirRsp
 ---@field DirMode integer
 ---@field Uid integer
 ---@field Gid integer
+---@field Parents boolean
 local TMkdirReq = {}
 TMkdirReq.__index = TMkdirReq
 TMkdirReq.group = {}
@@ -68,8 +173,8 @@ local function TMkdirReq_from_obj(obj)
     return setmetatable(obj, TMkdirReq)
 end
 
-function TMkdirReq.new(DstDir, DirMode, Uid, Gid)
-    return TMkdirReq_from_obj({DstDir = DstDir, DirMode = DirMode, Uid = Uid, Gid = Gid})
+function TMkdirReq.new(DstDir, DirMode, Uid, Gid, Parents)
+    return TMkdirReq_from_obj({DstDir = DstDir, DirMode = DirMode, Uid = Uid, Gid = Gid, Parents = Parents})
 end
 ---@param obj File.MkdirReq
 function TMkdirReq:init_from_obj(obj)
@@ -77,6 +182,7 @@ function TMkdirReq:init_from_obj(obj)
     self.DirMode = obj.DirMode
     self.Uid = obj.Uid
     self.Gid = obj.Gid
+    self.Parents = obj.Parents
 end
 
 function TMkdirReq:remove_error_props(errs, obj)
@@ -85,13 +191,14 @@ end
 
 TMkdirReq.from_obj = TMkdirReq_from_obj
 
-TMkdirReq.proto_property = {'DstDir', 'DirMode', 'Uid', 'Gid'}
+TMkdirReq.proto_property = {'DstDir', 'DirMode', 'Uid', 'Gid', 'Parents'}
 
-TMkdirReq.default = {'', 0, 0, 0}
+TMkdirReq.default = {'', 0, 0, 0, false}
 
 TMkdirReq.struct = {
     {name = 'DstDir', is_array = false, struct = nil}, {name = 'DirMode', is_array = false, struct = nil},
-    {name = 'Uid', is_array = false, struct = nil}, {name = 'Gid', is_array = false, struct = nil}
+    {name = 'Uid', is_array = false, struct = nil}, {name = 'Gid', is_array = false, struct = nil},
+    {name = 'Parents', is_array = false, struct = nil}
 }
 
 function TMkdirReq:validate(prefix, errs, need_convert)
@@ -101,6 +208,7 @@ function TMkdirReq:validate(prefix, errs, need_convert)
     validate.Optional(prefix .. 'DirMode', self.DirMode, 'uint32', false, errs, need_convert)
     validate.Optional(prefix .. 'Uid', self.Uid, 'uint32', false, errs, need_convert)
     validate.Optional(prefix .. 'Gid', self.Gid, 'uint32', false, errs, need_convert)
+    validate.Optional(prefix .. 'Parents', self.Parents, 'bool', false, errs, need_convert)
 
     TMkdirReq:remove_error_props(errs, self)
     validate.CheckUnknowProperty(self, TMkdirReq.proto_property, errs, need_convert)
@@ -108,7 +216,7 @@ function TMkdirReq:validate(prefix, errs, need_convert)
 end
 
 function TMkdirReq:unpack(_)
-    return self.DstDir, self.DirMode, self.Uid, self.Gid
+    return self.DstDir, self.DirMode, self.Uid, self.Gid, self.Parents
 end
 
 File.MkdirReq = TMkdirReq
@@ -993,7 +1101,8 @@ File.interface = mdb.register_interface('bmc.kepler.Managers.Security.File', {},
     ChangeOwner = {'a{ss}s', 'b', TChangeOwnerReq, TChangeOwnerRsp},
     IsPermitted = {'a{ss}ss', 'b', TIsPermittedReq, TIsPermittedRsp},
     Access = {'a{ss}sy', 'b', TAccessReq, TAccessRsp},
-    Mkdir = {'a{ss}suuu', '', TMkdirReq, TMkdirRsp}
+    Mkdir = {'a{ss}suuub', '', TMkdirReq, TMkdirRsp},
+    Tar = {'a{ss}ssssas', '', TTarReq, TTarRsp}
 }, {})
 
 return File

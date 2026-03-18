@@ -284,3 +284,21 @@ function TestAccount:test_when_import_empty_config_success()
     local handler = config_handle.new()
     handler:on_import(ctx, config_data, "configuration")
 end
+
+function TestAccount:test_backup_account_info()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    local handler = config_handle.new()
+    local PROJECT_DIR = os.getenv('PROJECT_DIR')
+    -- 打包ssh公钥文件
+    os.execute('touch ' .. PROJECT_DIR .. '/test/unit/account/test_temp_data/data/trust/home/Administrator/.ash_history')
+    os.execute('mkdir ' .. PROJECT_DIR .. '/test/unit/account/test_temp_data/data/trust/home/Administrator/.ssh')
+    os.execute('touch ' .. PROJECT_DIR .. '/test/unit/account/test_temp_data/data/trust/home/Administrator/.ssh/authorized_keys')
+    handler:on_backup(ctx, PROJECT_DIR .. "/test/unit/account.test_temp_data")
+end
+
+function TestAccount:test_recover_account_info()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+    local handler = config_handle.new()
+    handler:on_recover(ctx, {["PreserveUsers"] = "true"})
+end
