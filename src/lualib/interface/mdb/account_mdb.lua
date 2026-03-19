@@ -31,7 +31,7 @@ local ipmi_user_info_obj = c_object('IpmiUserInfo')
 local snmp_user_info_obj = c_object('SNMPUserInfo')
 local history_password_obj = c_object('HistoryPassword')
 local account_backup_obj = c_object('AccountBackup')
-
+local manager_account_backup_db_obj = c_object('ManagerAccountBackup')
 
 -- ORM会尝试调用create_mdb_object将模型类上库
 -- 手动实现用户的各模型类create_mdb_object, 避免刷日志
@@ -48,6 +48,9 @@ function history_password_obj.create_mdb_object(value)
     return value
 end
 function account_backup_obj.create_mdb_object(value)
+    return value
+end
+function manager_account_backup_db_obj.create_mdb_object(value)
     return value
 end
 
