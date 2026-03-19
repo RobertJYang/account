@@ -72,10 +72,17 @@ function FileObjects:Chown(self, dst_path, uid, gid)
 end
 
 function FileObjects:IsPermitted(ctx, dst_path, permission)
+    if permission == 'c' then
+        local dst_dir = dst_path:match("(.*[/\\])")
+        if file_utils.check_real_path_s(dst_dir, config.TMP_PATH) ~= 0 then
+            error()
+        end
+    end
     if not utils_core.is_file(dst_path) then
         error()
     end
-    if file_utils.check_real_path_s(dst_path, "/") ~= 0 then
+    if file_utils.check_real_path_s(dst_path, config.TMP_PATH) ~= 0 and
+        file_utils.check_real_path_s(dst_path, config.SHM_PATH) ~= 0 then
         error()
     end
     return true

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.54] - 2026-3-19
+fix:修复导出弱密码文件到/tmp子目录失败的问题
+
 ## [1.110.53] - 2026-3-18
 fix:修复鉴权算法设置值和打印值不一致问题
 

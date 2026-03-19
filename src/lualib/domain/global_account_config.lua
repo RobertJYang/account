@@ -275,7 +275,9 @@ function global_account_config:export_weak_pwd_dictionary(ctx, path)
         log:error('Importing or exporting the weak password dictionary is in progress.')
         error(custom_msg.OperationInProcess())
     end
-    if file_utils.check_realpath_before_open_s(path, config.TMP_PATH) ~= 0 or #path > config.MAX_FILEPATH_LENGTH then
+    if (#path > config.MAX_FILEPATH_LENGTH) or
+        (file_proxy.has_cap_dac and file_utils.check_realpath_before_open_s(path, config.TMP_PATH) ~= 0) or
+        (not file_proxy.has_cap_dac and not file_proxy.proxy_ispermitted(path, 'c')) then
         error(custom_msg.InvalidPath('******', 'Export Path'))
     end
     -- 先copy到/dev/shm赋权后再导出给tmp
