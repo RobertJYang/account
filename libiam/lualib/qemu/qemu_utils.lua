@@ -9,6 +9,7 @@
 -- PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local utils_core = require 'utils.core'
+local log = require 'mc.logging'
 
 local utils = {}
 
