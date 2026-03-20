@@ -461,7 +461,7 @@ gint32 get_all_lock_status(const gchar *dir, guint8 lock_threshold, guint64 fail
             continue;
         }
         IpLockStatus data = {0};
-        gint32 ret = strcpy_s(&(data.ip), sizeof(data.ip), entry->d_name);
+        gint32 ret = strcpy_s(data.ip, sizeof(data.ip), entry->d_name);
         if (ret != RET_OK) {
             (void)g_array_free(result_data, TRUE);
             closedir(cur_dir);
