@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.110.57] - 2026-3-20
+fix:qemu当前只支持单主机
+
 ## [1.110.56] - 2026-3-20
 fix:明确IP锁定接口范围
 
