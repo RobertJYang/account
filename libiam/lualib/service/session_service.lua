@@ -48,6 +48,7 @@ local account_service_cache = require 'domain.cache.account_service_cache'
 local trace = require 'telemetry.trace'
 local session = require 'domain.session'
 local ip_lock = require 'ip_lock'
+local qemu_utils = require 'qemu.qemu_utils'
 
 -- 历史登出会话记录最大数
 local MAX_LOGOUT_SESSION<const> = 32
@@ -79,6 +80,11 @@ local SessionService = class()
 
 -- 获取区分多系统主机的对象
 local function get_chip_env_obj(manager_id)
+    local chip_env_obj = qemu_utils.get_chip_env_obj(manager_id)
+    if chip_env_obj then
+        return chip_env_obj
+    end
+
     local path_params = {}
     path_params.ManagerId = manager_id
     local ok, obj = pcall(function()
