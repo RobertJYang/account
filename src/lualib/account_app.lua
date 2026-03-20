@@ -274,7 +274,7 @@ function app:service_init()
     log:notice("linux file manager init end, account service init start")
     -- 用户服务
     self.account_service = account_service.new(self.global_account_config, self.account_collection,
-        self.file_synchronization, self.role_collection, self.account_policy_collection)
+        self.file_synchronization, self.role_collection, self.account_policy_collection, self.account_permanent_backup)
     self.account_recover = account_recover.new(self.db, self.account_backup_db, self.account_service)
     self.local_authentication = local_authentication.new(self.account_collection, self.global_account_config)
     log:notice("account service init end, interface init start")

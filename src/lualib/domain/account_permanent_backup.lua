@@ -12,6 +12,7 @@ local log = require 'mc.logging'
 local enum = require 'class.types.types'
 local utils = require 'infrastructure.utils'
 local local_account = require 'domain.manager_account.local_account'
+local skynet = require 'skynet'
 
 local DEFAULT_MIN_USER_NUM = 2
 local DEFAULT_MAX_USER_NUM = 17
@@ -29,7 +30,9 @@ function AccountPermanentBackup:ctor(db, account_colletion)
 end
 
 function AccountPermanentBackup:init()
-    self:regist_account_signals()
+    if skynet.getenv('TEST_DATA_DIR') then
+        self:regist_account_signals()
+    end
 
     -- 业务数据正常，执行备份行为
     if self:account_data_integrity_check() then
