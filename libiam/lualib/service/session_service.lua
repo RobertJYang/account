@@ -363,6 +363,17 @@ function SessionService:get_auth_type_by_domain(domain, auth_mode)
     return auth_type
 end
 
+local IP_LOCK_INTERFACE = {
+    ['WEB']     = true,
+    ['Redfish'] = true,
+    ['CLI']     = false,
+    ['CLP']     = false,
+    ['SSH']     = false,
+    ['SFTP']    = false,
+    ['IPMI']    = true,
+    ['SNMP']    = false
+}
+
 --- 统一认证接口
 ---@param username string
 ---@param password string
@@ -382,9 +393,11 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
     local err_info = {}
 
     -- 在认证之前判断本ip是否锁定
-    if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
-        log:error("ip %s is locked by auth failed", ctx.ClientAddr)
-        error(custom_msg.AuthorizationFailed())
+    if IP_LOCK_INTERFACE[ctx.Interface] then
+        if self.m_access_service:check_ip_locked(ctx.ClientAddr) then
+            log:error("ip %s is locked by auth failed", ctx.ClientAddr)
+            error(custom_msg.AuthorizationFailed())
+        end
     end
 
     -- 遍历可用的auth_type
@@ -403,14 +416,16 @@ function SessionService:authenticate(ctx, username, password, session_type, ip, 
 
         if ok then
             -- 若有成功，无论何种形式，解锁ip
-            ip_lock.clean_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
+            if IP_LOCK_INTERFACE[ctx.Interface] then
+                ip_lock.clean_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr)
+            end
             return auth_account_info, auth_type
         end
         table.insert(err_info, auth_account_info)
     end
 
     -- IP锁定无关用户，各种方式认证失败均记录，所以在此处判断增加记录（仅非DT模式下使用,SSH不记录，由openssh记录）
-    if not skynet.getenv('TEST_DATA_DIR') and ctx.Interface ~= 'SSH' then
+    if IP_LOCK_INTERFACE[ctx.Interface] then
         ip_lock.increase_ip_fail_record(config.IP_LOCK_PATH, ctx.ClientAddr, 0)
     end
     collectgarbage('collect')

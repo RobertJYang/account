@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.110.56] - 2026-3-20
+fix:明确IP锁定接口范围
+
 ## [1.110.55] - 2026-3-20
 fix:修复cleancode问题
 
