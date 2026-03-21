@@ -29,7 +29,7 @@ local local_account = require 'domain.manager_account.local_account'
 local AccountService = class()
 
 function AccountService:ctor(global_account_config, account_collection, file_synchronization,
-    role_collection, account_policy_collection)
+    role_collection, account_policy_collection, account_permanent_backup)
     self.m_account_config = global_account_config
     self.m_account_collection = account_collection
     self.m_file_synchronization = file_synchronization
@@ -37,6 +37,7 @@ function AccountService:ctor(global_account_config, account_collection, file_syn
     self.account_policy_collection = account_policy_collection
     self.m_config_added = signal.new()
     self.m_config_changed = signal.new()
+    self.m_account_permanent_backup = account_permanent_backup
 end
 
 --- 新建用户
@@ -652,6 +653,7 @@ local BASE_TIMESTAMP = 600 -- 10分钟600秒
 local MAC_COUNT = 12 * 60 * 2 -- 最大循环计数
 local MIN_SECOND_TO_RESET = 10 * 60 -- 判断跳变时间阈值
 local MAX_TIME_ERROR_COUNT = 60 -- 2秒一次，60次为2分钟
+local PERMANENT_FLUSH = 12 * 60 * 24 -- 刷新永久持久化的间隔
 
 local function user_time_monitor_func(self, skynet)
     log:notice('Start user time info monitor.')
@@ -660,7 +662,6 @@ local function user_time_monitor_func(self, skynet)
 
     -- 2min之后再开始用户检查
     skynet.sleep(2 * 60 * 100)
-
     while true do
         ::continue::
         -- 获取系统时间同步状态
@@ -691,7 +692,7 @@ local function user_time_monitor_func(self, skynet)
         -- 每隔5秒执行一次更新相关操作
         self:loop_update_operation()
         -- 间隔1小时将用户活动记录写flash
-        if loop_count == MAC_COUNT / 2 or loop_count == MAC_COUNT then
+        if loop_count % (MAC_COUNT / 2) == 0 then
             -- 每隔1小时检测一次用户是否需要刷新登录记录（1小时周期减少nandflash写入）
             pcall(function ()
                 self.m_account_collection:flash_login_record()
@@ -701,8 +702,11 @@ local function user_time_monitor_func(self, skynet)
             end)
         end
         -- 间隔2小时检查用户:密码有效期/最短密码使用期/用户不活跃信息
-        if loop_count == MAC_COUNT then
+        if loop_count % MAC_COUNT == 0 then
             self:check_user_time_info()
+        end
+        if loop_count == PERMANENT_FLUSH then
+            self.m_account_permanent_backup:backup_permanent_account_info()
             loop_count = 0
         end
         last_timestamp = new_timestamp;
