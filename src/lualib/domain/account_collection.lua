@@ -356,15 +356,6 @@ function AccountCollection:record_last_login_interface(account_id, interface, fl
         tostring(enum.LoginInterface.new(interface:value())))
 end
 
-function AccountCollection:get_last_login_info(account_id)
-    if self.collection[account_id] == nil then
-        error(err.invalid_account_id())
-    end
-    return self.collection[account_id].m_account_data.LastLoginTime,
-        self.collection[account_id].m_account_data.LastLoginIP,
-        self.collection[account_id].m_account_data.LastLoginInterface
-end
-
 function AccountCollection:check_username_exist(user_name)
     for _, v in pairs(self.collection) do
         if v:get_user_name() == user_name then
