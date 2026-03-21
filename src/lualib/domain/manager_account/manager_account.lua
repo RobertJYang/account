@@ -81,6 +81,20 @@ function ManagerAccount:init_snmp_user_info(snmp_user_info_data)
     self.m_snmp_user_info_data:save()
 end
 
+-- tmp_last_login_info为实时刷新的数据，m_account_data中的上次登录信息是数据库对象，1hour刷新一次
+-- tmp_last_login_info只在登录刷新，若无数据使用数据库数据
+function ManagerAccount:get_account_lastlogintime()
+    return self.tmp_last_login_info.LastLoginTime or self.m_account_data.LastLoginTime
+end
+
+function ManagerAccount:get_account_lastloginip()
+    return self.tmp_last_login_info.LastLoginIP or self.m_account_data.LastLoginIP
+end
+
+function ManagerAccount:get_account_lastlogininterface()
+    return self.tmp_last_login_info.LastLoginInterface or self.m_account_data.LastLoginInterface
+end
+
 --- 使用随机盐值加密用户密码
 ---@param password string
 ---@return string sha512加密密文
@@ -853,9 +867,9 @@ function ManagerAccount:get_accoutn_data_str()
         WithinMinPasswordDays = self.m_account_data.WithinMinPasswordDays,
         LoginRuleIds = self.m_account_data.LoginRuleIds,
         InactUserRemainDays = self.m_account_data.InactUserRemainDays,
-        LastLoginTime = self.m_account_data.LastLoginTime,
-        LastLoginIP = self.m_account_data.LastLoginIP,
-        LastLoginInterface = self.m_account_data.LastLoginInterface:value(),
+        LastLoginTime = self:get_account_lastlogintime(),
+        LastLoginIP = self:get_account_lastloginip(),
+        LastLoginInterface = self:get_account_lastlogininterface():value(),
         FirstLoginPolicy = self.m_account_data.FirstLoginPolicy:value(),
         AccountType = self.m_account_data.AccountType:value(),
         LoginInterface = self.m_account_data.LoginInterface,

@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.60] - 2026-3-21
+fix:上次登录信息未获取实时数据
+
 ## [1.110.59] - 2026-3-20
 fix:永久持久化数据库写入优化
 

@@ -67,8 +67,8 @@ local function package_account_info(account)
     result['UserName']           = account_data.UserName
     result['RoleId']             = tostring(account_data.RoleId)
     result['AccountType']        = tostring(account_data.AccountType)
-    result['LastLoginIP']        = account_data.LastLoginIP
-    result['LastLoginTime']      = tostring(account_data.LastLoginTime)
+    result['LastLoginIP']        = account:get_account_lastloginip()
+    result['LastLoginTime']      = tostring(account:get_account_lastlogintime())
     result['current_privileges'] = cjson.encode(account.current_privileges)
 
     return result
