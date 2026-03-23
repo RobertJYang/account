@@ -209,6 +209,7 @@ function app:init()
     self:patch()
     self:check_dependencies()
     self:register_rpc_methods()
+    self:init_reboot()
     -- 注册用户管理IPMI接口, IPMI接口耗时较长，协程注册
     skynet.fork_once(function()
         self:register_ipmi_methods()
@@ -332,6 +333,9 @@ function app:on_reboot_prepare()
         if self.key_mgmt_client.m_key_update_done ~= true then
             -- 继承v2，重启时密钥更新未完成，延时10ms
             skynet.sleep(1)
+        else
+            log:info('key update done for reboot.')
+            break
         end
     end
     log:info('account has no extra preparation for reboot.')
