@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.61] - 2026-3-23
+fix:增加重启场景的回调注册
+
 ## [1.110.60] - 2026-3-21
 fix:上次登录信息未获取实时数据
 
