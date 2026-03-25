@@ -12,6 +12,7 @@ local singleton = require 'mc.singleton'
 local class = require 'mc.class'
 local client = require 'iam.client'
 local enum = require 'class.types.types'
+local skynet = require 'skynet'
 
 local ACCOUNT_POLICY_PATH_PATTERN = '/bmc/kepler/AccountService/Accounts/(%w+)'
 
@@ -38,8 +39,11 @@ end
 -- 信号监听（用户对象新增、删除、缓存属性变更）
 function account_policy_cache_mdb:init()
     self:signal_register()
-    -- 主动拿一次，避免account先启动
-    self:sync_account_policy()
+    -- 使用协程, 避免因超时拿不到对象导致iam启动变慢
+    skynet.fork_once(function()
+        -- 主动拿一次，适配account先启动场景
+        self:sync_account_policy()
+    end)
 end
 
 function account_policy_cache_mdb:signal_register()
