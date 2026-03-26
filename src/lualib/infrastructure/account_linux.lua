@@ -760,7 +760,7 @@ local function process_tallylog(account, uid)
     local res = file_proxy.proxy_access(file_path, 0)
     if not res then
         -- 文件不存在，创建文件
-        core.reset_pam_tally(account.user_name, TALLY_LOG_PATH)
+        file_proxy.proxy_create(file_path, 'a+', mode, uid, config.APPS_USER_GID)
     end
     file_proxy.proxy_chmod(file_path, mode)
     file_proxy.proxy_chown(file_path, uid, config.APPS_USER_GID)

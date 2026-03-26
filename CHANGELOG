@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.63] - 2026-3-26
+fix:修复tallylog目录权限不对的问题
+
 ## [1.110.62] - 2026-3-25
 fix:iam启动时间变长问题
 
