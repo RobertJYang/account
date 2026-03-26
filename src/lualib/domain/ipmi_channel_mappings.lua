@@ -10,6 +10,7 @@ local class = require 'mc.class'
 local log = require 'mc.logging'
 local client = require 'account.client'
 local singleton = require 'mc.singleton'
+local skynet = require 'skynet'
 
 local channel_number_mappings = class()
 
@@ -21,7 +22,9 @@ function channel_number_mappings:ctor()
 end
 
 function channel_number_mappings:init()
-    self:init_ch_num_maps()
+    skynet.fork_once(function()
+        self:init_ch_num_maps()
+    end)
 end
 
 function channel_number_mappings:init_ch_num_maps()
