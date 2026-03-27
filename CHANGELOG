@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.65] - 2026-3-27
+fix:关闭框内用户使能仍可操作框内用户
+
 ## [1.110.64] - 2026-3-27
 fix:修复VIDEO会话SessionType取值不对的问题
 

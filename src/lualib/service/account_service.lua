@@ -104,8 +104,13 @@ function AccountService:get_id_by_user_name(ctx, user_name)
             ctx.UserName, user_name)
         error(base_msg.InsufficientPrivilege())
     end
-    local _, account_id = self.m_account_collection:get_account_by_name(user_name)
+    local account_info, account_id = self.m_account_collection:get_account_by_name(user_name)
     if not account_id then
+        error(custom_msg.UserNotExist(user_name))
+    end
+    -- 判断框内通信的账号是否可以操作
+    if account_info.m_account_data.AccountType:value() == enum.AccountType.InterChassis:value() and
+        self.account_policy_collection:get_visible(enum.AccountType.InterChassis:value()) == false then
         error(custom_msg.UserNotExist(user_name))
     end
     return account_id
