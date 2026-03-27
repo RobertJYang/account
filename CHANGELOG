@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.64] - 2026-3-27
+fix:修复VIDEO会话SessionType取值不对的问题
+
 ## [1.110.63] - 2026-3-26
 fix:修复tallylog目录权限不对的问题
 
