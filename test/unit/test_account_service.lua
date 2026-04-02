@@ -1197,12 +1197,11 @@ function TestAccount:test_ipmi_set_user_access_when_present_channel_invalid_shou
     self.test_account_collection:delete_account(ctx, 4)
 end
 
--- 测试get_id_by_user_name with InterChassis account when not visible
-function TestAccount:test_get_id_by_user_name_with_interchassis_account_not_visible()
-    -- 测试获取不可见的InterChassis账户ID应当失败
-    lu.assertErrorMsgContains(custom_msg.UserNotExistMessage.Name, function()
-        self.test_account_service:get_id_by_user_name(self.ctx, "inter_chassis")
-    end)
+--- 测试get_id_by_user_name with InterChassis account
+function TestAccount:test_get_id_by_user_name_with_interchassis_account()
+    -- 测试获取InterChassis账户ID应当成功
+    local account_id = self.test_account_service:get_id_by_user_name(self.ctx, "inter_chassis")
+    lu.assertIsNumber(account_id)
 end
 
 --- 用户未满时，获取当前可添加的用户id应为最小的空闲id 

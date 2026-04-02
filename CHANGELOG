@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.110.66] - 2026-4-1
+fix:cli不能操作框内用户，相关限制放到北向
+
 ## [1.110.65] - 2026-3-27
 fix:关闭框内用户使能仍可操作框内用户
 
