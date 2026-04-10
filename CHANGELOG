@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.120.1] - 2026-4-10
+feat:iam与certificate依赖解耦
+
 ## [1.110.66] - 2026-4-1
 fix:cli不能操作框内用户，相关限制放到北向
 
