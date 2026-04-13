@@ -11,6 +11,8 @@
 local certificate_authentication = require 'domain.certificate_authentication'
 local certificate_authentication_ipmi = require 'interface.ipmi.certificate_authentication_ipmi'
 local singleton = require 'mc.singleton'
+local client = require 'iam.client'
+local skynet = require 'skynet'
 local log = require 'mc.logging'
 local base_msg = require 'messages.base'
 local class = require 'mc.class'
@@ -21,6 +23,9 @@ local object_manage = require 'mc.mdb.object_manage'
 local cls_mng = require 'mc.class_mgnt'
 local INTERFACE_CERT_AUTH<const> = 'bmc.kepler.AccountService.CertificateAuthentication'
 local PATH_CERT_AUTH<const> = '/bmc/kepler/AccountService/CertificateAuthentication'
+local CERTIFICATE_SERVICE_PATH<const> = '/bmc/kepler/CertificateService'
+local MAX_WAIT_COUNT<const> = 20
+local SLEEP_INTERVAL<const> = 300
 
 local CertificateAuthenticationMdb = class()
 
@@ -32,7 +37,6 @@ function CertificateAuthenticationMdb:ctor(bus)
 end
 
 function CertificateAuthenticationMdb:update_ca_deletable_status(config)
-    local skynet = require 'skynet'
     skynet.fork_once(function()
         -- 等待5秒后更新CA证书是否可删除状态
         skynet.sleep(500)
@@ -56,6 +60,7 @@ CertificateAuthenticationMdb.watch_config_property_hook = {
     InterChassisAuthEnabled = operation_logger.proxy(function(self, ctx, value)
         ctx.operation_log.params = { state = value and 'Enable' or 'Disable' }
         self.m_cert_auth:set_inter_chassis_auth_enabled(value)
+        self:sync_inter_chassis_auth_enabled(value)
     end, "InterChassisAuthEnabled"),
     InterChassisValidation = operation_logger.proxy(function(self, ctx, value)
         ctx.operation_log.params = { value = value }
@@ -68,6 +73,7 @@ function CertificateAuthenticationMdb:init()
         self:cert_config_mdb_update(...)
     end)
     self:new_cert_config_to_mdb_tree(self.m_cert_auth.m_db_config)
+    self:sync_inter_chassis_auth_enabled(self.m_cert_auth.m_db_config.InterChassisAuthEnabled)
     self:update_ca_deletable_status(self.m_mdb_config)
     -- 添加自发现对象属性监听
     object_manage.on_add_object(self.m_bus, function(class_name, object, position)
@@ -80,6 +86,27 @@ function CertificateAuthenticationMdb:init()
                 self.watch_config_property_hook[name](self, ctx, value)
                 self:cert_config_mdb_update(name, value)
             end)
+        end
+    end)
+end
+
+function CertificateAuthenticationMdb:sync_inter_chassis_auth_enabled(value)
+    skynet.fork_once(function ()
+        local count = 0
+        local obj
+        while not obj do
+            obj = client:GetCertificateServiceObjects()[CERTIFICATE_SERVICE_PATH]
+            if obj or count > MAX_WAIT_COUNT then break end
+            count = count + 1
+            skynet.sleep(SLEEP_INTERVAL)
+        end
+        if not obj then
+            log:error("get certificate service obj failed")
+            return
+        end
+        -- 判断是否有这个属性
+        if obj.InterChassisCertificateAuthEnabled ~= nil then
+            obj.InterChassisCertificateAuthEnabled = value
         end
     end)
 end

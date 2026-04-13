@@ -61,8 +61,8 @@ function AccessService:init()
     if not vos.get_file_accessible(config.IP_LOCK_PATH) then
         mc_utils.mkdir(config.IP_LOCK_PATH,
             mc_utils.S_IRWXU | mc_utils.S_IRGRP | mc_utils.S_IXGRP | mc_utils.S_IROTH | mc_utils.S_IXOTH)
-        utils_core.chown_s(config.IP_LOCK_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
     end
+    utils_core.chown_s(config.IP_LOCK_PATH, config.SECBOX_USER_UID, config.SNMPD_USER_GID)
 
     self.m_auth_service.m_lock_threshold_changed:on(function()
         self:clean_ip_lock_status()
