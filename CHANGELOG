@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.120.2] - 2026-4-14
+feat:增加tsb_user，供tsb进程及相关文件使用
+
 ## [1.120.1] - 2026-4-10
 feat:iam与certificate依赖解耦
 

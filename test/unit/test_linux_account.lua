@@ -367,9 +367,10 @@ function TestLinuxUser:test_ensure_system_base_user_exists_success1()
     table.sort(content)
 
     local ret = {
+        '<tsb_user>:x:105:<tsb_user>',
         'admin:x:204:',
         'apache:x:98:apache',
-        'apps:x:103:apache,snmpd_user,ipmi_user,kvm_user,discovery_user,comm_user,redfish_user,secbox',
+        'apps:x:103:apache,snmpd_user,ipmi_user,kvm_user,discovery_user,comm_user,redfish_user,secbox,<tsb_user>',
         'comm_user:x:101:comm_user',
         'discovery_user:x:100:discovery_user',
         'ipmi_user:x:96:ipmi_user',
@@ -381,6 +382,7 @@ function TestLinuxUser:test_ensure_system_base_user_exists_success1()
         'secbox:x:104:secbox',
         'snmpd_user:x:95:snmpd_user',
         'sshd:x:74:sshd',
+        'tpcm_device:x:106:ipmi_user,<tsb_user>',
         'user:x:201:kvm_user,redfish_user'
     }
     lu.assertEquals(content, ret)
@@ -413,7 +415,8 @@ kvm_user:x:97:97:kvm_user:/:/sbin/nologin
 discovery_user:x:100:100:discovery_user:/:/sbin/nologin
 comm_user:x:101:101:comm_user:/:/sbin/nologin
 redfish_user:x:102:102:redfish_user:/:/sbin/nologin
-secbox:x:104:104:secbox:/:/sbin/nologin]]
+secbox:x:104:104:secbox:/:/sbin/nologin
+<tsb_user>:x:105:105:<tsb_user>:/:/sbin/nologin]]
     lu.assertEquals(ret, content)
 
     local file2 = file_utils.open_s(config.GROUP_FILE, 'r')
@@ -434,10 +437,12 @@ comm_user:x:101:comm_user
 redfish_user:x:102:redfish_user
 secbox:x:104:secbox
 admin:x:204:Administrator
-apps:x:103:ipmi_user,snmpd_user,kvm_user,apache,discovery_user,comm_user,redfish_user,secbox
+apps:x:103:ipmi_user,snmpd_user,kvm_user,apache,discovery_user,comm_user,redfish_user,secbox,<tsb_user>
 test_root:x:1:test_root
 test1:x:1001:test1
-test_linux:x:200:test_linux]]
+test_linux:x:200:test_linux
+tpcm_device:x:106:ipmi_user,<tsb_user>
+<tsb_user>:x:105:<tsb_user>]]
     lu.assertEquals(ret2, content1)
     -- 环境恢复
     os.execute("rm " .. self.empty_passwd_file)
@@ -473,7 +478,8 @@ redfish_user:x:102:102:redfish_user:/:/sbin/nologin
 secbox:x:104:104:secbox:/:/sbin/nologin
 test_root:x:1:1:test_root:/test_root:/usr/bin/clp_commands
 test:x:1000:1000:,,,:/home/test:/usr/bin/zsh
-test_linux:x:610:200:operator:/:/sbin/nologin]]
+test_linux:x:610:200:operator:/:/sbin/nologin
+<tsb_user>:x:105:105:<tsb_user>:/:/sbin/nologin]]
     lu.assertEquals(ret, content)
 
     local file = file_utils.open_s(config.IPMI_FILE, 'r')
@@ -521,11 +527,13 @@ comm_user:x:101:comm_user
 redfish_user:x:102:redfish_user
 secbox:x:104:secbox
 admin:x:204:Administrator
-apps:x:103:ipmi_user,snmpd_user,kvm_user,apache,discovery_user,comm_user,redfish_user,secbox
+apps:x:103:ipmi_user,snmpd_user,kvm_user,apache,discovery_user,comm_user,redfish_user,secbox,<tsb_user>
 test_root:x:1:test_root
 test1:x:1001:test1
 test_linux:x:200:test_linux
-root:x:0:root]]
+root:x:0:root
+tpcm_device:x:106:ipmi_user,<tsb_user>
+<tsb_user>:x:105:<tsb_user>]]
     lu.assertEquals(ret, content)
     -- 环境恢复
     os.execute("rm " .. config.PASSWD_FILE)

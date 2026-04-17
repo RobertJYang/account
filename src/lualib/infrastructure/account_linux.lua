@@ -439,7 +439,7 @@ function GroupFile:add_user(user_name, group_id, group_name)
         group = self:create_group(base_group_name, group_id)
     end
     if not group and not ret then
-        group = self:create_group(user_name, group_id)
+        group = self:create_group(group_name, group_id)
     end
     for _, user in ipairs(group.users) do
         if user == user_name then
