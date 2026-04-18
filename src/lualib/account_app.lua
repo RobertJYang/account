@@ -149,6 +149,7 @@ end
 function app:object_register()
     object_manage.on_add_object(self.bus, function(class_name, object, position)
         if class_name == 'InterChassisAuthConfig' then
+            self.account_service_ipmi.is_support_inter_chassis_auth = true
             local inter_chassis_account = self.account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
             inter_chassis_account:flush_default_by_sr(object)
 
@@ -506,6 +507,12 @@ function app:register_ipmi_methods()
     self:register_ipmi_cmd(ipmi_cmds.SetPasswordPattern, operation_logger.proxy(function(req, ctx)
         return self.password_validator_ipmi:set_pattern(req, ctx)
     end, 'PasswordPattern'))
+    self:register_ipmi_cmd(ipmi_cmds.GetInterChassisRoleId, function(req, ctx)
+        return self.account_service_ipmi:get_inter_chassis_role(req, ctx)
+    end)
+    self:register_ipmi_cmd(ipmi_cmds.GetInterChassisInterface, function(req, ctx)
+        return self.account_service_ipmi:get_inter_chassis_interface(req, ctx)
+    end)
 end
 
 function app:register_rpc_methods()

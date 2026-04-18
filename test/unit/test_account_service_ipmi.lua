@@ -334,3 +334,47 @@ function TestAccount:test_ipmi_set_user_name_password_compare_info_should_succes
     req.CompareLength = default.CompareLength
     self.test_account_service_ipmi:set_user_name_password_compared_info(req, ctx)
 end
+
+-- 查询框内通信信息应该成功
+function TestAccount:test_ipmi_get_inter_chassis_account_role_should_success()
+    local req = {}
+    local ctx = {}
+    req.ManufactureId = 0x0007db
+    req.ParameterSelector = 0x01
+
+    -- 设置当前环境支持查询框内通信信息
+    self.test_account_service_ipmi.is_support_inter_chassis_auth = true
+    local _, rsp = pcall(function()
+        return self.test_account_service_ipmi:get_inter_chassis_role(req, ctx)
+    end)
+
+    lu.assertEquals(rsp.Data, string.char(0x04))
+
+    req.ManufactureId = 0x000700
+    local res, _ = pcall(function()
+        return self.test_account_service_ipmi:get_inter_chassis_role(req, ctx)
+    end)
+    lu.assertEquals(res, false)
+end
+
+-- 查询框内通信信息应该成功
+function TestAccount:test_ipmi_get_inter_chassis_account_interface_should_success()
+    local req = {}
+    local ctx = {}
+    req.ManufactureId = 0x0007db
+    req.ParameterSelector = 0x02
+
+    -- 设置当前环境支持查询框内通信信息
+    self.test_account_service_ipmi.is_support_inter_chassis_auth = true
+    local _, rsp = pcall(function()
+        return self.test_account_service_ipmi:get_inter_chassis_interface(req, ctx)
+    end)
+
+    lu.assertEquals(rsp.Data, string.char(0x99))
+
+    req.ManufactureId = 0x000700
+    local res, _ = pcall(function()
+        return self.test_account_service_ipmi:get_inter_chassis_interface(req, ctx)
+    end)
+    lu.assertEquals(res, false)
+end

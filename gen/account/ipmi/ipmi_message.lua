@@ -1,4 +1,4 @@
---[[-- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+--[[-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -70,7 +70,11 @@ local AccountIpmiCmdsMsg = {
     GetPasswordPatternReq = (require 'account.ipmi.cmds.GetPasswordPattern').GetPasswordPatternReq,
     GetPasswordPatternRsp = (require 'account.ipmi.cmds.GetPasswordPattern').GetPasswordPatternRsp,
     SetPasswordPatternReq = (require 'account.ipmi.cmds.SetPasswordPattern').SetPasswordPatternReq,
-    SetPasswordPatternRsp = (require 'account.ipmi.cmds.SetPasswordPattern').SetPasswordPatternRsp
+    SetPasswordPatternRsp = (require 'account.ipmi.cmds.SetPasswordPattern').SetPasswordPatternRsp,
+    GetInterChassisRoleIdReq = (require 'account.ipmi.cmds.GetInterChassisRoleId').GetInterChassisRoleIdReq,
+    GetInterChassisRoleIdRsp = (require 'account.ipmi.cmds.GetInterChassisRoleId').GetInterChassisRoleIdRsp,
+    GetInterChassisInterfaceReq = (require 'account.ipmi.cmds.GetInterChassisInterface').GetInterChassisInterfaceReq,
+    GetInterChassisInterfaceRsp = (require 'account.ipmi.cmds.GetInterChassisInterface').GetInterChassisInterfaceRsp
 }
 
 return AccountIpmiCmdsMsg

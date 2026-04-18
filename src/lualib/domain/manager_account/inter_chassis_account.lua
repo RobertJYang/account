@@ -75,6 +75,10 @@ function inter_chassis_account:set_role_id(role_id)
     self:update_privileges()
 end
 
+function inter_chassis_account:get_role_id()
+    return self.m_account_data.RoleId
+end
+
 function inter_chassis_account:set_login_interface(interface)
     if not self.account_policy_obj:check_login_interface_is_allowed(interface) then
         local interface_str = utils.interface_num_to_string(interface)
@@ -84,6 +88,10 @@ function inter_chassis_account:set_login_interface(interface)
     self.m_account_data.LoginInterface = interface
     self.m_account_data.IsLoginInterfaceChanged = true
     self.m_account_data:save()
+end
+
+function inter_chassis_account:get_interface()
+    return self.m_account_data.LoginInterface
 end
 
 --内部账户无设置，使用默认值
