@@ -343,11 +343,9 @@ LOCAL void ldap_set_context_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *
             debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_PROTOCOL_MIN failed, error code:0x%x", ret);
         }
 
-        if (ldap_auth_info->tls_cipher != NULL) {
-            ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_CIPHER_SUITE, ldap_auth_info->tls_cipher);
-            if (ret != LDAP_SUCCESS) {
-                debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_CIPHER_SUITE failed, error code: 0x%x", ret);
-            }
+        ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_CIPHER_SUITE, ldap_auth_info->tls_cipher);
+        if (ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_CIPHER_SUITE failed, error code: 0x%x", ret);
         }
     }
 
@@ -886,7 +884,7 @@ static gint32 do_sasl_bind(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_aut
     struct berval passwd = { 0, NULL };
     gint32 rc;
 
-    if (session == NULL || ldap_auth_info->username == NULL || ldap_auth_info->password == NULL) {
+    if (session == NULL) {
         return LDAP_AUTH_ERROR;
     }
 
@@ -1484,7 +1482,7 @@ LOCAL gint32 ldap_bind_user(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_au
 {
     gint32 ret;
 
-    if (session == NULL || ldap_auth_info->username == NULL || ldap_auth_info->password == NULL) {
+    if (session == NULL) {
         debug_log(DLOG_ERROR, "Input parameter error.");
         return RET_ERR;
     }
@@ -1620,7 +1618,7 @@ LOCAL gint32 ldap_search_user(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_
 {
     LDAP_USER_INFO ldap_user_info = {0};
 
-    if ((ldap_auth_info->username == NULL) || (session == NULL) || (cn == NULL)) {
+    if ((session == NULL) || (cn == NULL)) {
         return LDAP_AUTH_ERROR;
     }
 
@@ -1886,8 +1884,7 @@ gint32 mscm_ldap_authenticate(LDAP_AUTH_INFO *ldap_auth_info, guint8 *privilege,
     guint8 j = 0;
     guint8 group_id[MAX_USER_GROUP] = {0};
 
-    if ((ldap_auth_info->username == NULL) || (ldap_auth_info->password == NULL) || (privilege == NULL) ||
-        (group == NULL)) {
+    if ((privilege == NULL) || (group == NULL)) {
         return RET_ERR;
     }
     (void)memset_s(group_id, MAX_USER_GROUP, 0xff, MAX_USER_GROUP);

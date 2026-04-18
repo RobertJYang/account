@@ -359,7 +359,7 @@ LOCAL gint32 get_ipmi_user(pam_handle_t *pamh, IMANA_OPTIONS *opts, gint32 uid, 
 
     gchar *path = realpath(opts->filename, NULL);
     if (path == NULL) {
-        pam_syslog(pamh, LOG_ALERT, "Couldn't translate file path into realpath %s", path);
+        pam_syslog(pamh, LOG_ALERT, "Couldn't translate file path into realpath");
         return ((opts->ctrl & OPT_FAIL_ON_ERROR) ? PAM_AUTH_ERR : (PAM_SUCCESS));
     }
 
