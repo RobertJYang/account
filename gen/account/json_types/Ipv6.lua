@@ -1,4 +1,4 @@
--- Copyright (c) 2024 Huawei Technologies Co., Ltd.
+-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -312,7 +312,8 @@ Ipv6.interface = mdb.register_interface('bmc.kepler.Managers.EthernetInterfaces.
     IpAddr = {'s', nil, true, nil},
     PrefixLength = {'i', nil, true, nil},
     Scope = {'s', {['emitsChangedSignal'] = 'false'}, true, nil},
-    DefaultGateway = {'s', nil, true, nil}
+    DefaultGateway = {'s', nil, true, nil},
+    LoopbackIpAddr = {'s', {['emitsChangedSignal'] = 'true'}, true, nil}
 }, {
     SetIpv6PrefixGateway = {'a{ss}sis', 's', TSetIpv6PrefixGatewayReq, TSetIpv6PrefixGatewayRsp},
     SetIpAddr = {'a{ss}si', 'b', TSetIpAddrReq, TSetIpAddrRsp},

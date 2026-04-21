@@ -9,16 +9,16 @@
 local singleton = require 'mc.singleton'
 local log = require 'mc.logging'
 local class = require 'mc.class'
+local mc_utils = require 'mc.utils'
+local utils_core = require 'utils.core'
+local trace = require 'telemetry.trace'
+local skynet = require 'skynet'
 local enum = require 'class.types.types'
-local config = require 'common_config'
+local client = require 'account.client'
 local role_privilege_map = require 'models.role_privilege_map'
 local account_linux = require 'infrastructure.account_linux'
-local mc_utils = require 'mc.utils'
-local file_utils = require 'utils.file'
-local vos_utils = require 'utils.vos'
-local utils_core = require 'utils.core'
 local file_proxy = require 'infrastructure.file_proxy'
-local trace = require 'telemetry.trace'
+local config = require 'common_config'
 
 -- 文件同步管理，将passwd/shadow/group/ipmi几个文件的同步和刷新机制放在此处处理
 local file_synchronization = class()
@@ -36,12 +36,39 @@ function file_synchronization:ctor(db, account_collection, account_linux_file_pa
     }
     self.m_account_collection = account_collection
     self.m_linux_account_queue = skynet_queue
+    self.m_cert_service_obj = nil
 end
 
 function file_synchronization:init()
     self:regist_file_sync_signals()
     self:init_tally_log()
     self:set_file_owner()
+    skynet.fork_once(function()
+        self:init_certificate_service_obj()
+    end)
+end
+
+function file_synchronization:init_certificate_service_obj()
+    local obj = client:GetCertificateServiceCertificateServiceObject()
+    if not obj then
+        log:error()
+        return
+    end
+
+    self.m_cert_service_obj = obj
+end
+
+function file_synchronization:get_inter_chassis_enabled()
+    if not self.m_cert_service_obj then
+        self:init_certificate_service_obj()
+    end
+
+    -- 若获取后依然失败，暂时当作false处理
+    if not self.m_cert_service_obj then
+        return false
+    end
+
+    return self.m_cert_service_obj.props['InterChassisCertificateAuthEnabled']
 end
 
 function file_synchronization:init_tally_log()
@@ -70,6 +97,23 @@ function file_synchronization:regist_file_sync_signals()
     end)
 end
 
+-- 响应结果决定是否会呈现该用户的home目录
+function file_synchronization:is_local_user(account_type)
+    -- Local和OEM都呈现
+    if account_type == enum.AccountType.Local:value() or
+        account_type == enum.AccountType.OEM:value() then
+        return true
+    end
+
+    -- 框内通信账户仅当Visible是呈现
+    if account_type == enum.AccountType.InterChassis:value() and
+        self.m_account_collection.account_policy_collection:get_visible(account_type) then
+        return true
+    end
+
+    return false
+end
+
 function file_synchronization:get_account_file_line(account_id, is_change_user, old_username)
     local account = self.m_account_collection.collection[account_id]
     local account_line = {
@@ -78,9 +122,7 @@ function file_synchronization:get_account_file_line(account_id, is_change_user, 
         password = account:get_account_password(),
         id = account_id,
         role = account:get_role_id(),
-        is_local_user = account:get_account_type():value() == enum.AccountType.Local:value() or
-            account:get_account_type():value() == enum.AccountType.OEM:value() or
-            account:get_account_type():value() == enum.AccountType.InterChassis:value(),
+        is_local_user = self:is_local_user(account:get_account_type():value()),
         user_enabled = account:get_enabled() and 1 or 0,
         privilege_num = role_privilege_map.role_to_privilege_map[account:get_role_id()],
         is_locked = account:get_locked() and 1 or 0,
@@ -214,13 +256,14 @@ function file_synchronization:flush_account()
     local la = account_linux.new(self.linux_files, false, true)
     la:ensure_system_base_user_exists()
     local account_type, cur_account
+    local inter_chassis_enabled = self:get_inter_chassis_enabled()
     for _, account in pairs(self.m_account_collection.collection) do
         account_type = account.m_account_data.AccountType:value()
         if not self.m_account_collection.operation_type_check.LOCAL_OEM_INTERCHASSIS[account_type] then
             goto continue
         end
-        local visible = self.m_account_collection.account_policy_collection:get_visible(account_type)
-        if account_type == enum.AccountType.InterChassis:value() and not visible then
+        -- 在框内通信未使能时，不呈现框内通信账户
+        if account_type == enum.AccountType.InterChassis:value() and not inter_chassis_enabled then
             goto continue
         end
         cur_account = self:get_account_file_line(account.m_account_data.Id, false)

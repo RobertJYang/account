@@ -751,11 +751,9 @@ local function escape_username(username)
     return username
 end
 
-local TALLY_LOG_PATH = '/dev/shm/tallylog/'
-
 local function process_tallylog(account, uid)
     -- 支持snmp用户登录失败锁定功能
-    local file_path = TALLY_LOG_PATH .. account.user_name
+    local file_path = config.TALLY_LOG_PATH .. account.user_name
     local mode = mc_utils.S_IRUSR| mc_utils.S_IWUSR | mc_utils.S_IRGRP| mc_utils.S_IWGRP
     local res = file_proxy.proxy_access(file_path, 0)
     if not res then
@@ -768,7 +766,7 @@ end
 
 local function remove_tallylog(username)
     local user_name = escape_username(username)
-    local tmp_file_path = TALLY_LOG_PATH .. user_name
+    local tmp_file_path = config.TALLY_LOG_PATH .. user_name
     file_proxy.proxy_delete(tmp_file_path)
 end
 

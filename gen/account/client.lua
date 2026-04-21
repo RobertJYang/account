@@ -7,6 +7,7 @@
 -- EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
+local mdb = require 'mc.mdb'
 local class = require 'mc.class'
 local app_base = require 'mc.client_app_base'
 local mdb_service = require 'mc.mdb.mdb_service'
@@ -26,7 +27,6 @@ local Events = require 'account.json_types.Events'
 local IpmiCore = require 'account.json_types.IpmiCore'
 local EthernetInterfaces = require 'account.json_types.EthernetInterfaces'
 local Account = require 'account.json_types.Account'
-local CA = require 'account.json_types.CA'
 local Certificate = require 'account.json_types.Certificate'
 local CertificateService = require 'account.json_types.CertificateService'
 local File = require 'account.json_types.File'
@@ -111,28 +111,12 @@ function account_client:ForeachAccountObjects(cb)
         cb, true)
 end
 
-function account_client:GetCAObjects()
-    return get_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService.CA', true)
-end
-
-function account_client:ForeachCAObjects(cb)
-    return foreach_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService.CA', cb, true)
-end
-
 function account_client:GetCertificateObjects()
     return get_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService.Certificate', true)
 end
 
 function account_client:ForeachCertificateObjects(cb)
     return foreach_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService.Certificate', cb, true)
-end
-
-function account_client:GetCertificateServiceObjects()
-    return get_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService', true)
-end
-
-function account_client:ForeachCertificateServiceObjects(cb)
-    return foreach_non_virtual_interface_objects(self:get_bus(), 'bmc.kepler.CertificateService', cb, true)
 end
 
 function account_client:GetFileObjects()
@@ -287,21 +271,6 @@ function account_client:OnAccountInterfacesRemoved(cb)
         'bmc.kepler.CertificateService.Certificate.Account')
 end
 
-function account_client:OnCAPropertiesChanged(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_properties_changed(self:get_bus(), '/bmc', cb,
-        'bmc.kepler.CertificateService.CA')
-end
-
-function account_client:OnCAInterfacesAdded(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_added(self:get_bus(), '/bmc', cb,
-        'bmc.kepler.CertificateService.CA')
-end
-
-function account_client:OnCAInterfacesRemoved(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), '/bmc', cb,
-        'bmc.kepler.CertificateService.CA')
-end
-
 function account_client:OnCertificatePropertiesChanged(cb)
     self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_properties_changed(self:get_bus(), '/bmc', cb,
         'bmc.kepler.CertificateService.Certificate')
@@ -317,19 +286,26 @@ function account_client:OnCertificateInterfacesRemoved(cb)
         'bmc.kepler.CertificateService.Certificate')
 end
 
+function account_client:GetCertificateServiceCertificateServiceObject()
+    return mdb.try_get_object(self:get_bus(), '/bmc/kepler/CertificateService', 'bmc.kepler.CertificateService')
+end
+
 function account_client:OnCertificateServicePropertiesChanged(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_properties_changed(self:get_bus(), '/bmc', cb,
-        'bmc.kepler.CertificateService')
+    local path_namespace = '/bmc/kepler/CertificateService'
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_properties_changed(self:get_bus(), path_namespace,
+        cb, 'bmc.kepler.CertificateService')
 end
 
 function account_client:OnCertificateServiceInterfacesAdded(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_added(self:get_bus(), '/bmc', cb,
+    local path_namespace = '/bmc/kepler/CertificateService'
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_added(self:get_bus(), path_namespace, cb,
         'bmc.kepler.CertificateService')
 end
 
 function account_client:OnCertificateServiceInterfacesRemoved(cb)
-    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), '/bmc', cb,
-        'bmc.kepler.CertificateService')
+    local path_namespace = '/bmc/kepler/CertificateService'
+    self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), path_namespace,
+        cb, 'bmc.kepler.CertificateService')
 end
 
 function account_client:OnFilePropertiesChanged(cb)
@@ -360,6 +336,339 @@ end
 function account_client:OnChannelNumberMappingInterfacesRemoved(cb)
     self.signal_slots[#self.signal_slots + 1] = subscribe_signal.on_interfaces_removed(self:get_bus(), '/bmc', cb,
         'bmc.kepler.IpmiService.ChannelNumberMapping')
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@return CertificateService.GetCertPathRsp
+function account_client:CertificateServiceCertificateServiceGetCertPath(ctx, CertificateUsageType)
+    local req = CertificateService.GetCertPathReq.new(CertificateUsageType):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.GetCertPathRsp.new(obj:GetCertPath(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceGetCertPath(ctx, CertificateUsageType)
+    return pcall(function()
+        local req = CertificateService.GetCertPathReq.new(CertificateUsageType):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.GetCertPathRsp.new(obj:GetCertPath(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@param Type string
+---@param Content string
+---@param Id integer
+---@return CertificateService.ImportCertRsp
+function account_client:CertificateServiceCertificateServiceImportCert(ctx, CertificateUsageType, Type, Content, Id)
+    local req = CertificateService.ImportCertReq.new(CertificateUsageType, Type, Content, Id):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ImportCertRsp.new(obj:ImportCert(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceImportCert(ctx, CertificateUsageType, Type, Content, Id)
+    return pcall(function()
+        local req = CertificateService.ImportCertReq.new(CertificateUsageType, Type, Content, Id):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ImportCertRsp.new(obj:ImportCert(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@param Type string
+---@param Content string
+---@param Key string
+---@return CertificateService.ImportCertWithKeyRsp
+function account_client:CertificateServiceCertificateServiceImportCertWithKey(ctx, CertificateUsageType, Type, Content,
+    Key)
+    local req = CertificateService.ImportCertWithKeyReq.new(CertificateUsageType, Type, Content, Key):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ImportCertWithKeyRsp.new(obj:ImportCertWithKey(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceImportCertWithKey(ctx, CertificateUsageType, Type, Content,
+    Key)
+    return pcall(function()
+        local req = CertificateService.ImportCertWithKeyReq.new(CertificateUsageType, Type, Content, Key):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ImportCertWithKeyRsp.new(obj:ImportCertWithKey(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@param Type string
+---@param Content string
+---@param Id integer
+---@param WithEncryptedKey boolean
+---@param Password string
+---@param Extra CertificateService.Extra
+---@return CertificateService.ImportCertificateRsp
+function account_client:CertificateServiceCertificateServiceImportCertificate(ctx, CertificateUsageType, Type, Content,
+    Id, WithEncryptedKey, Password, Extra)
+    local req = CertificateService.ImportCertificateReq.new(CertificateUsageType, Type, Content, Id, WithEncryptedKey,
+        Password, Extra):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ImportCertificateRsp.new(obj:ImportCertificate(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceImportCertificate(ctx, CertificateUsageType, Type, Content,
+    Id, WithEncryptedKey, Password, Extra)
+    return pcall(function()
+        local req = CertificateService.ImportCertificateReq.new(CertificateUsageType, Type, Content, Id,
+            WithEncryptedKey, Password, Extra):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ImportCertificateRsp.new(obj:ImportCertificate(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Country string
+---@param State string
+---@param Location string
+---@param OrgName string
+---@param OrgUnit string
+---@param CommonName string
+---@param AlternativeNames string[]
+---@return CertificateService.StartGenerateCSRRsp
+function account_client:CertificateServiceCertificateServiceStartGenerateCSR(ctx, Country, State, Location, OrgName,
+    OrgUnit, CommonName, AlternativeNames)
+    local req = CertificateService.StartGenerateCSRReq.new(Country, State, Location, OrgName, OrgUnit, CommonName,
+        AlternativeNames):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.StartGenerateCSRRsp.new(obj:StartGenerateCSR(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceStartGenerateCSR(ctx, Country, State, Location, OrgName,
+    OrgUnit, CommonName, AlternativeNames)
+    return pcall(function()
+        local req = CertificateService.StartGenerateCSRReq.new(Country, State, Location, OrgName, OrgUnit, CommonName,
+            AlternativeNames):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.StartGenerateCSRRsp.new(obj:StartGenerateCSR(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Country string
+---@param State string
+---@param Location string
+---@param OrgName string
+---@param OrgUnit string
+---@param CommonName string
+---@param AlternativeNames string[]
+---@param KeyUsage string[]
+---@param KeyBitLength integer
+---@param Options CertificateService.CSRProperty
+---@return CertificateService.GenerateCSRRsp
+function account_client:CertificateServiceCertificateServiceGenerateCSR(ctx, Country, State, Location, OrgName, OrgUnit,
+    CommonName, AlternativeNames, KeyUsage, KeyBitLength, Options)
+    local req = CertificateService.GenerateCSRReq.new(Country, State, Location, OrgName, OrgUnit, CommonName,
+        AlternativeNames, KeyUsage, KeyBitLength, Options):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.GenerateCSRRsp.new(obj:GenerateCSR(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceGenerateCSR(ctx, Country, State, Location, OrgName,
+    OrgUnit, CommonName, AlternativeNames, KeyUsage, KeyBitLength, Options)
+    return pcall(function()
+        local req = CertificateService.GenerateCSRReq.new(Country, State, Location, OrgName, OrgUnit, CommonName,
+            AlternativeNames, KeyUsage, KeyBitLength, Options):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.GenerateCSRRsp.new(obj:GenerateCSR(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Path string
+---@return CertificateService.ExportCSRRsp
+function account_client:CertificateServiceCertificateServiceExportCSR(ctx, Path)
+    local req = CertificateService.ExportCSRReq.new(Path):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ExportCSRRsp.new(obj:ExportCSR(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceExportCSR(ctx, Path)
+    return pcall(function()
+        local req = CertificateService.ExportCSRReq.new(Path):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ExportCSRRsp.new(obj:ExportCSR(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@return CertificateService.ExportCertKeyByFIFORsp
+function account_client:CertificateServiceCertificateServiceExportCertKeyByFIFO(ctx, CertificateUsageType)
+    local req = CertificateService.ExportCertKeyByFIFOReq.new(CertificateUsageType):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ExportCertKeyByFIFORsp.new(obj:ExportCertKeyByFIFO(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceExportCertKeyByFIFO(ctx, CertificateUsageType)
+    return pcall(function()
+        local req = CertificateService.ExportCertKeyByFIFOReq.new(CertificateUsageType):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ExportCertKeyByFIFORsp.new(obj:ExportCertKeyByFIFO(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@param Id integer
+---@return CertificateService.DeleteCertRsp
+function account_client:CertificateServiceCertificateServiceDeleteCert(ctx, CertificateUsageType, Id)
+    local req = CertificateService.DeleteCertReq.new(CertificateUsageType, Id):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.DeleteCertRsp.new(obj:DeleteCert(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceDeleteCert(ctx, CertificateUsageType, Id)
+    return pcall(function()
+        local req = CertificateService.DeleteCertReq.new(CertificateUsageType, Id):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.DeleteCertRsp.new(obj:DeleteCert(ctx, req:unpack(true)))
+    end)
+end
+
+---@param CertificateUsageType CertificateService.CertificateUsageType
+---@param Id integer
+---@return CertificateService.GetCertChainInfoRsp
+function account_client:CertificateServiceCertificateServiceGetCertChainInfo(ctx, CertificateUsageType, Id)
+    local req = CertificateService.GetCertChainInfoReq.new(CertificateUsageType, Id):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.GetCertChainInfoRsp.new(obj:GetCertChainInfo(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceGetCertChainInfo(ctx, CertificateUsageType, Id)
+    return pcall(function()
+        local req = CertificateService.GetCertChainInfoReq.new(CertificateUsageType, Id):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.GetCertChainInfoRsp.new(obj:GetCertChainInfo(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Country string
+---@param CommonName string
+---@param OrgName string
+---@return CertificateService.SetDefaultSSLCertSubjectRsp
+function account_client:CertificateServiceCertificateServiceSetDefaultSSLCertSubject(ctx, Country, CommonName, OrgName)
+    local req = CertificateService.SetDefaultSSLCertSubjectReq.new(Country, CommonName, OrgName):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.SetDefaultSSLCertSubjectRsp.new(obj:SetDefaultSSLCertSubject(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceSetDefaultSSLCertSubject(ctx, Country, CommonName, OrgName)
+    return pcall(function()
+        local req = CertificateService.SetDefaultSSLCertSubjectReq.new(Country, CommonName, OrgName):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.SetDefaultSSLCertSubjectRsp.new(obj:SetDefaultSSLCertSubject(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Type string
+---@param Content string
+---@param CertId integer
+---@return CertificateService.ImportCRLRsp
+function account_client:CertificateServiceCertificateServiceImportCRL(ctx, Type, Content, CertId)
+    local req = CertificateService.ImportCRLReq.new(Type, Content, CertId):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.ImportCRLRsp.new(obj:ImportCRL(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceImportCRL(ctx, Type, Content, CertId)
+    return pcall(function()
+        local req = CertificateService.ImportCRLReq.new(Type, Content, CertId):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.ImportCRLRsp.new(obj:ImportCRL(ctx, req:unpack(true)))
+    end)
+end
+
+---@return CertificateService.GetCSRContentRsp
+function account_client:CertificateServiceCertificateServiceGetCSRContent(ctx)
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.GetCSRContentRsp.new(obj:GetCSRContent(ctx))
+end
+
+function account_client:PCertificateServiceCertificateServiceGetCSRContent(ctx)
+    return pcall(function()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.GetCSRContentRsp.new(obj:GetCSRContent(ctx))
+    end)
+end
+
+---@param Property string
+---@return CertificateService.GetCSRPropertyRsp
+function account_client:CertificateServiceCertificateServiceGetCSRProperty(ctx, Property)
+    local req = CertificateService.GetCSRPropertyReq.new(Property):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.GetCSRPropertyRsp.new(obj:GetCSRProperty(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceGetCSRProperty(ctx, Property)
+    return pcall(function()
+        local req = CertificateService.GetCSRPropertyReq.new(Property):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.GetCSRPropertyRsp.new(obj:GetCSRProperty(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Property CertificateService.CSRProperty
+---@return CertificateService.SetCSRPropertyRsp
+function account_client:CertificateServiceCertificateServiceSetCSRProperty(ctx, Property)
+    local req = CertificateService.SetCSRPropertyReq.new(Property):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.SetCSRPropertyRsp.new(obj:SetCSRProperty(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceSetCSRProperty(ctx, Property)
+    return pcall(function()
+        local req = CertificateService.SetCSRPropertyReq.new(Property):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.SetCSRPropertyRsp.new(obj:SetCSRProperty(ctx, req:unpack(true)))
+    end)
+end
+
+---@param Usage string
+---@param Certificates string[]
+---@return CertificateService.BackupCertificateRsp
+function account_client:CertificateServiceCertificateServiceBackupCertificate(ctx, Usage, Certificates)
+    local req = CertificateService.BackupCertificateReq.new(Usage, Certificates):validate()
+    local obj = self:GetCertificateServiceCertificateServiceObject()
+
+    return CertificateService.BackupCertificateRsp.new(obj:BackupCertificate(ctx, req:unpack(true)))
+end
+
+function account_client:PCertificateServiceCertificateServiceBackupCertificate(ctx, Usage, Certificates)
+    return pcall(function()
+        local req = CertificateService.BackupCertificateReq.new(Usage, Certificates):validate()
+        local obj = self:GetCertificateServiceCertificateServiceObject()
+
+        return CertificateService.BackupCertificateRsp.new(obj:BackupCertificate(ctx, req:unpack(true)))
+    end)
 end
 
 function account_client:SubscribeIpv4ChangedSignal(cb)
