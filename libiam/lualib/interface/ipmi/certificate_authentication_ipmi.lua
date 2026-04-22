@@ -14,7 +14,9 @@ local signal = require 'mc.signal'
 local class = require 'mc.class'
 local iam_enum = require 'class.types.types'
 local iam_err = require 'iam.errors'
+local base_msg = require 'messages.base'
 local log = require 'mc.logging'
+local core = require 'iam_core'
 local ipmi_cmds = require 'iam.ipmi.ipmi'
 local ipmi_types = require 'ipmi.types'
 
@@ -31,7 +33,7 @@ local cert_auth_state = {
 }
 
 local function set_two_factor_input_check(Enabled, OCSPEnabled)
-    if cert_auth_state[Enabled] == nil or cert_auth_state[OCSPEnabled] == nil  then
+    if cert_auth_state[Enabled] == nil or cert_auth_state[OCSPEnabled] == nil then
         log:error('Set Two Factor State failed, parameter Enabled or OCSPEnabled is unsupport')
         return false
     end
@@ -76,14 +78,32 @@ end
 function CertificateAuthenticationIpmi:get_two_factor_auth_state(req, ctx)
     local rsp = ipmi_cmds.GetTwoFactorAuthState.rsp.new()
     local enabled = self.m_certificate_authentication.m_db_config.Enabled and
-    iam_enum.IpmiSetTwoFactorState.Enable:value() or iam_enum.IpmiSetTwoFactorState.Disable:value()
+        iam_enum.IpmiSetTwoFactorState.Enable:value() or iam_enum.IpmiSetTwoFactorState.Disable:value()
     local ocsp_enabled = self.m_certificate_authentication.m_db_config.OCSPEnabled and
-    iam_enum.IpmiSetTwoFactorState.Enable:value() or iam_enum.IpmiSetTwoFactorState.Disable:value()
+        iam_enum.IpmiSetTwoFactorState.Enable:value() or iam_enum.IpmiSetTwoFactorState.Disable:value()
 
     rsp.ManufactureId = req.ManufactureId
     rsp.CompletionCode = ipmi_types.Cc.Success
     rsp.Enabled = enabled
     rsp.OCSPEnabled = ocsp_enabled
+    return rsp
+end
+
+function CertificateAuthenticationIpmi:get_inter_chassis_auth_enabled(req, ctx)
+    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+        error(base_msg.ActionNotSupported('get inter chassis auth enabled'))
+    end
+    if req.ManufactureId ~= 0x0007DB then
+        log:error("ManufactureId is wrong")
+        error(iam_err.invalid_parameter())
+    end
+    local rsp = ipmi_cmds.GetInterChassisAuthEnabled.rsp.new()
+    local enabled = self.m_certificate_authentication.m_db_config.InterChassisAuthEnabled
+
+    rsp.ManufactureId = req.ManufactureId
+    rsp.CompletionCode = ipmi_types.Cc.Success
+    rsp.Data = string.pack("B", enabled and 1 or 0)
+    rsp.DataLength = 1
     return rsp
 end
 

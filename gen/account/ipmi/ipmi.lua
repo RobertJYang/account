@@ -1,4 +1,4 @@
---[[-- Copyright (c) 2025 Huawei Technologies Co., Ltd.
+--[[-- Copyright (c) 2026 Huawei Technologies Co., Ltd.
 -- openUBMC is licensed under Mulan PSL v2.
 -- You can use this software according to the terms and conditions of the Mulan PSL v2.
 -- You may obtain a copy of Mulan PSL v2 at:
@@ -607,6 +607,42 @@ AccountIpmiCmds.SetPasswordPattern = {
     rsp = msg.SetPasswordPatternRsp,
     manufacturer = {0, 1},
     sysLockedPolicy = 'Forbidden'
+}
+
+AccountIpmiCmds.GetInterChassisRoleId = {
+    name = 'GetInterChassisRoleId',
+    prio = types.Priority.Default,
+    netfn = 0x30,
+    cmd = 0x94,
+    role = types.Role.User,
+    privilege = privilege.ReadOnly,
+    sensitive = false,
+    restricted_channels = {},
+    filters = [=[*,*,*,6F,02]=],
+    decode = [=[<<ManufactureId:3/unit:8, 0x6F:1/unit:8, 0x02:1/un]=] .. [=[it:8, Reserved:1/unit:8>>]=],
+    encode = [=[<<CompletionCode:1/unit:8, ManufactureId:3/unit:8,]=] .. [=[ DataLength:1/unit:8, Data/string>>]=],
+    req = msg.GetInterChassisRoleIdReq,
+    rsp = msg.GetInterChassisRoleIdRsp,
+    manufacturer = {0, 1},
+    sysLockedPolicy = 'Allowed'
+}
+
+AccountIpmiCmds.GetInterChassisInterface = {
+    name = 'GetInterChassisInterface',
+    prio = types.Priority.Default,
+    netfn = 0x30,
+    cmd = 0x94,
+    role = types.Role.User,
+    privilege = privilege.ReadOnly,
+    sensitive = false,
+    restricted_channels = {},
+    filters = [=[*,*,*,6F,03]=],
+    decode = [=[<<ManufactureId:3/unit:8, 0x6F:1/unit:8, 0x03:1/un]=] .. [=[it:8, Reserved:1/unit:8>>]=],
+    encode = [=[<<CompletionCode:1/unit:8, ManufactureId:3/unit:8,]=] .. [=[ DataLength:1/unit:8, Data/string>>]=],
+    req = msg.GetInterChassisInterfaceReq,
+    rsp = msg.GetInterChassisInterfaceRsp,
+    manufacturer = {0, 1},
+    sysLockedPolicy = 'Allowed'
 }
 
 return AccountIpmiCmds

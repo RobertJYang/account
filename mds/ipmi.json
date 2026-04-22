@@ -1780,6 +1780,120 @@
                     "customizedRule": "Manufacturer"
                 }
             ]
+        },
+        "GetInterChassisRoleId": {
+            "netfn": "0x30",
+            "cmd": "0x94",
+            "priority": "Default",
+            "role": "User",
+            "privilege": [
+                "ReadOnly"
+            ],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x6F"
+                },
+                {
+                    "data": "ParameterSelector",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x02"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "DataLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
+        },
+        "GetInterChassisInterface": {
+            "netfn": "0x30",
+            "cmd": "0x94",
+            "priority": "Default",
+            "role": "User",
+            "privilege": [
+                "ReadOnly"
+            ],
+            "req": [
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "SubCmd",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x6F"
+                },
+                {
+                    "data": "ParameterSelector",
+                    "baseType": "U8",
+                    "len": "1B",
+                    "value": "0x03"
+                },
+                {
+                    "data": "Reserved",
+                    "baseType": "U8",
+                    "len": "1B"
+                }
+            ],
+            "rsp": [
+                {
+                    "data": "CompletionCode",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "ManufactureId",
+                    "baseType": "U32",
+                    "len": "3B",
+                    "customizedRule": "Manufacturer"
+                },
+                {
+                    "data": "DataLength",
+                    "baseType": "U8",
+                    "len": "1B"
+                },
+                {
+                    "data": "Data",
+                    "baseType": "String",
+                    "len": "*"
+                }
+            ]
         }
     }
 }

@@ -78,6 +78,7 @@ function CertificateAuthenticationMdb:init()
     -- 添加自发现对象属性监听
     object_manage.on_add_object(self.m_bus, function(class_name, object, position)
         if class_name == "CertificateAuthentication" then
+            self.m_cert_auth_ipmi.is_support_inter_chassis_auth = true
             object:get_mdb_object(INTERFACE_CERT_AUTH).property_changed:on(function(name, value, sender)
                 if not self.watch_config_property_hook[name] then
                     return

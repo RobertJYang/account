@@ -16,6 +16,7 @@ local ipmi_cmds = require 'account.ipmi.ipmi'
 local ipmi_types = require 'ipmi.types'
 local account_service = require 'service.account_service'
 local signal = require 'mc.signal'
+local core = require 'account_core'
 local account_collection = require 'domain.account_collection'
 local global_account_config = require 'domain.global_account_config'
 local err_cfg = require 'error_config'
@@ -571,6 +572,40 @@ function account_service_ipmi:get_user_name_password_compared_info(req)
     rsp.CompareEnabled = self.m_account_config:get_user_name_password_compared_enabled() and
         err_cfg.STATE_ENABLE or err_cfg.STATE_DISABLE
     rsp.CompareLength = self.m_account_config:get_user_name_password_compared_length()
+    return rsp
+end
+
+function account_service_ipmi:get_inter_chassis_role(req, ctx)
+    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+        error(base_msg.ActionNotSupported('get inter chassis account role'))
+    end
+    if req.ManufactureId ~= utils.get_manufacture_id() then
+        log:error("ManufactureId is error")
+        error(custom_msg.IPMIInvalidCommand())
+    end
+    local inter_chassis_account = self.m_account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
+    local rsp = ipmi_cmds.GetInterChassisRoleId.rsp.new()
+    rsp.CompletionCode = err_cfg.USER_OPER_SUCCESS
+    rsp.ManufactureId = utils.get_manufacture_id()
+    rsp.Data = string.pack("B", inter_chassis_account:get_role_id())
+    rsp.DataLength = 1
+    return rsp
+end
+
+function account_service_ipmi:get_inter_chassis_interface(req, ctx)
+    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+        error(base_msg.ActionNotSupported('get inter chassis account login interface'))
+    end
+    if req.ManufactureId ~= utils.get_manufacture_id() then
+        log:error("ManufactureId is error")
+        error(custom_msg.IPMIInvalidCommand())
+    end
+    local inter_chassis_account = self.m_account_collection.collection[config.INTER_CHASSIS_ACCOUNT_ID]
+    local rsp = ipmi_cmds.GetInterChassisRoleId.rsp.new()
+    rsp.CompletionCode = err_cfg.USER_OPER_SUCCESS
+    rsp.ManufactureId = utils.get_manufacture_id()
+    rsp.Data = string.pack("B", inter_chassis_account:get_interface())
+    rsp.DataLength = 1
     return rsp
 end
 
