@@ -76,7 +76,8 @@ local function update_config()
         ['TEMP_PAM_FAILLOCK'] = true,
         ['PAM_FAILLOCK'] = true,
         ['PAM_TALLY_LOG_DIR'] = true,
-        ['WEAK_PWDDICT_FILE_SHM_PATH'] = true
+        ['WEAK_PWDDICT_FILE_SHM_PATH'] = true,
+        ['TALLY_LOG_PATH'] = true
     }
     for config_key, config_value in pairs(config) do
         local sn_value = skynet.getenv(config_key)

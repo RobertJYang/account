@@ -71,6 +71,7 @@ function TestServer:start_dependency()
     skynet.uniqueservice('event/service/main')
     skynet.uniqueservice('frudata/service/main')
     skynet.uniqueservice('bmc_network/service/main')
+    skynet.uniqueservice("certificate/service/main")
     skynet.sleep(200)
     -- 设置日志级别
     test_case_utils.set_log_level(self.m_bus, {'persistence', 'key_mgmt', 'trust'}, 'info')

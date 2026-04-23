@@ -1622,7 +1622,7 @@ function AccountCollection:_delete_cert(ctx, account_id)
             skynet.sleep(20)
         end
         if is_exist then
-            local obj = client:GetCertificateServiceObjects()[PATH_CERT_SERVICE]
+            local obj = client:GetCertificateServiceCertificateServiceObject()
             local dup_ctx = mc_context.new(ctx.Interface, ctx.UserName, ctx.ClientAddr)
             if obj then
                 obj:DeleteCert(dup_ctx,

@@ -218,6 +218,10 @@ function MockClient:GetChannelNumberMappingObjects()
     }
 end
 
+function MockClient:GetCertificateServiceCertificateServiceObject()
+    return nil
+end
+
 local client = clz.new()
 client.pcall = PMockClient.new()
 

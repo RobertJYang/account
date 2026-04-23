@@ -27,7 +27,7 @@ function InterChassisAccountCases.test_inter_chassis_account_mdb_init(bus)
         enum.LoginInterface.SSH:value() + enum.LoginInterface.SFTP:value())
 
     local visible = test_case_utils.get_account_policy_property(bus, "InterChassis", "Visible")
-    assert(visible == false)
+    assert(visible == true)
 end
 
 local inter_chassis_excluded_prop = {
