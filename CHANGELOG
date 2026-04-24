@@ -1,4 +1,7 @@
 All notable changes to this project will be documented in this file.
+## [1.120.6] - 2026-4-24
+fix:修改框内通信账户呈现逻辑
+
 ## [1.120.5] - 2026-4-23
 fix:修改框内通信账户呈现逻辑
 

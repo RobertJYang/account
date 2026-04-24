@@ -51,7 +51,7 @@ end
 function file_synchronization:init_certificate_service_obj()
     local obj = client:GetCertificateServiceCertificateServiceObject()
     if not obj then
-        log:error()
+        log:error("get certificate service object failed")
         return
     end
 
@@ -68,7 +68,7 @@ function file_synchronization:get_inter_chassis_enabled()
         return false
     end
 
-    return self.m_cert_service_obj.props['InterChassisCertificateAuthEnabled']
+    return self.m_cert_service_obj['InterChassisCertificateAuthEnabled']
 end
 
 function file_synchronization:init_tally_log()
