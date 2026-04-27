@@ -1,4 +1,6 @@
 All notable changes to this project will be documented in this file.
+## [1.120.10] - 2026-4-27
+fix:修改框内通信账户呈现逻辑
 
 ## [1.120.9] - 2026-4-27
 feat:支持FirstLoginPolicy配置导入导出
