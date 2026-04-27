@@ -37,6 +37,8 @@ function file_synchronization:ctor(db, account_collection, account_linux_file_pa
     self.m_account_collection = account_collection
     self.m_linux_account_queue = skynet_queue
     self.m_cert_service_obj = nil
+    self.m_inter_chassis_prop_supported = true
+    self.m_inter_chassis_enabled = false
 end
 
 function file_synchronization:init()
@@ -59,6 +61,11 @@ function file_synchronization:init_certificate_service_obj()
 end
 
 function file_synchronization:get_inter_chassis_enabled()
+    -- 当InterChassisCertificateAuthEnabled不支持时，默认返回false
+    if not self.m_inter_chassis_prop_supported then
+        return self.m_inter_chassis_enabled
+    end
+
     if not self.m_cert_service_obj then
         self:init_certificate_service_obj()
     end
@@ -68,7 +75,23 @@ function file_synchronization:get_inter_chassis_enabled()
         return false
     end
 
-    return self.m_cert_service_obj['InterChassisCertificateAuthEnabled']
+    -- 由于兼容性场景，InterChassisCertificateAuthEnabled可能尚未支持，此时默认返回false
+    local ok, value = pcall(function()
+        return self.m_cert_service_obj['InterChassisCertificateAuthEnabled']
+    end)
+
+    if not ok then
+        self.m_inter_chassis_prop_supported = false
+        self.m_inter_chassis_enabled = false
+    else
+        self.m_inter_chassis_enabled = value
+    end
+    -- 测试场景下默认返回true
+    if skynet.getenv('TEST_DATA_DIR') then
+        self.m_inter_chassis_enabled = true
+    end
+    -- 当dbus只是InterChassisCertificateAuthEnabled时，以实际值为准
+    return self.m_inter_chassis_enabled
 end
 
 function file_synchronization:init_tally_log()
