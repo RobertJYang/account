@@ -576,7 +576,7 @@ function account_service_ipmi:get_user_name_password_compared_info(req)
 end
 
 function account_service_ipmi:get_inter_chassis_role(req, ctx)
-    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+    if not self.is_support_inter_chassis_auth then
         error(base_msg.ActionNotSupported('get inter chassis account role'))
     end
     if req.ManufactureId ~= utils.get_manufacture_id() then
@@ -593,7 +593,7 @@ function account_service_ipmi:get_inter_chassis_role(req, ctx)
 end
 
 function account_service_ipmi:get_inter_chassis_interface(req, ctx)
-    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+    if not self.is_support_inter_chassis_auth then
         error(base_msg.ActionNotSupported('get inter chassis account login interface'))
     end
     if req.ManufactureId ~= utils.get_manufacture_id() then
