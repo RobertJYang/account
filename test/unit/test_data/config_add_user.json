@@ -50,6 +50,11 @@
                     "AttributeType": "ImportAndExport",
                     "Import": true
                 },
+                "FirstLoginPolicy": {
+                    "Value": "ForcePasswordReset",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
                 "SnmpPrivacyPwdInitialState": {
                     "Value": true,
                     "AttributeType": "ImportAndExport",
@@ -101,6 +106,11 @@
                 },
                 "UserName": {
                     "Value": "test3",
+                    "AttributeType": "ImportAndExport",
+                    "Import": true
+                },
+                "FirstLoginPolicy": {
+                    "Value": "PromptPasswordReset",
                     "AttributeType": "ImportAndExport",
                     "Import": true
                 },

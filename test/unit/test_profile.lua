@@ -21,6 +21,21 @@ local function make_interface()
     return interface
 end
 
+-- 创建测试账户3
+local function create_test_account3(self, ctx, first_login_policy)
+    local interface = make_interface()
+    local account_info = {
+        ['id'] = 3,
+        ['name'] = "test3",
+        ['password'] = "Paswd@9001",
+        ['role_id'] = enum.RoleType.Operator:value(),
+        ['interface'] = interface,
+        ['first_login_policy'] = first_login_policy or enum.FirstLoginPolicy.ForcePasswordReset,
+        ['account_type'] = enum.AccountType.Local:value()
+    }
+    self.test_account_collection:new_account(ctx, account_info, false)
+end
+
 -- 删除测试用户
 local function teardown_account_data(ctx, account_collection, num)
     for id = 3, num + 3 do
@@ -45,6 +60,10 @@ function TestAccount:test_when_import_account_config_then_add_user_should_succes
     config_service:on_import(ctx, object)
     lu.assertEquals(self.test_account_collection:get_user_name(3), 'test3')
     lu.assertEquals(self.test_global_account_config:get_history_password_count(), 4)
+
+    -- 校验新建用户的FirstLoginPolicy有被设置
+    local policy_enum = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(tostring(policy_enum), 'PromptPasswordReset')
 
     --恢复环境
     teardown_account_data(self.ctx, self.test_account_collection, 3)
@@ -301,4 +320,171 @@ function TestAccount:test_recover_account_info()
     local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
     local handler = config_handle.new()
     handler:on_recover(ctx, {["PreserveUsers"] = "true"})
+end
+
+-- ===========================================
+-- FirstLoginPolicy 导入导出测试
+-- ===========================================
+
+-- 场景1：导入 PromptPasswordReset，当前 ForcePasswordReset → 成功
+function TestAccount:test_import_first_login_policy_prompt_from_force()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.ForcePasswordReset)
+
+    local object = {
+        User = {
+            {
+                Id = { Value = 3, Import = true },
+                UserName = { Value = 'test3', Import = true },
+                FirstLoginPolicy = { Value = "PromptPasswordReset", Import = true }
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local policy = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(policy:value(), enum.FirstLoginPolicy.PromptPasswordReset:value())
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景2：导入 ForcePasswordReset，当前 PromptPasswordReset → 成功
+function TestAccount:test_import_first_login_policy_force_from_prompt()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.PromptPasswordReset)
+
+    local object = {
+        User = {
+            {
+                Id = { Value = 3, Import = true },
+                UserName = { Value = 'test3', Import = true },
+                FirstLoginPolicy = { Value = "ForcePasswordReset", Import = true }
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local policy = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(policy:value(), enum.FirstLoginPolicy.ForcePasswordReset:value())
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景3：导入 ForcePasswordReset，当前 ForcePasswordReset → 跳过
+function TestAccount:test_import_first_login_policy_force_unchanged()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.ForcePasswordReset)
+
+    local object = {
+        User = {
+            {
+                Id = { Value = 3, Import = true },
+                UserName = { Value = 'test3', Import = true },
+                FirstLoginPolicy = { Value = "ForcePasswordReset", Import = true }
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local policy = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(policy:value(), enum.FirstLoginPolicy.ForcePasswordReset:value())
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景4：导入 PromptPasswordReset，当前 PromptPasswordReset → 跳过
+function TestAccount:test_import_first_login_policy_prompt_unchanged()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.PromptPasswordReset)
+
+    local object = {
+        User = {
+            {
+                Id = { Value = 3, Import = true },
+                UserName = { Value = 'test3', Import = true },
+                FirstLoginPolicy = { Value = "PromptPasswordReset", Import = true }
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local policy = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(policy:value(), enum.FirstLoginPolicy.PromptPasswordReset:value())
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景5：Import=false → 跳过
+function TestAccount:test_import_first_login_policy_import_false()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.ForcePasswordReset)
+
+    local object = {
+        User = {
+            {
+                Id = { Value = 3, Import = true },
+                UserName = { Value = 'test3', Import = true },
+                FirstLoginPolicy = { Value = "PromptPasswordReset", Import = false }
+            }
+        }
+    }
+
+    local config_service = profile_adapter.new()
+    config_service:on_import(ctx, object)
+
+    local policy = self.test_account_collection:get_first_login_policy_by_id(3)
+    lu.assertEquals(policy:value(), enum.FirstLoginPolicy.ForcePasswordReset:value())
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
+end
+
+-- 场景6：导出 ForcePasswordReset
+function TestAccount:test_export_first_login_policy_force()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.ForcePasswordReset)
+
+    local config_service = profile_adapter.new()
+    local export_data = config_service:on_export(ctx)
+
+    for _, user in ipairs(export_data["User"]) do
+        if user.Id == 3 then
+            lu.assertEquals(user.FirstLoginPolicy, "ForcePasswordReset")
+            break
+        end
+    end
+
+    teardown_account_data(self.ctx, self.test_account_collection, 3)
+end
+
+-- 场景7：导出 PromptPasswordReset
+function TestAccount:test_export_first_login_policy_prompt()
+    local ctx = mc_context.new('UT', 'Administrator', '127.0.0.1')
+
+    create_test_account3(self, ctx, enum.FirstLoginPolicy.PromptPasswordReset)
+
+    local config_service = profile_adapter.new()
+    local export_data = config_service:on_export(ctx)
+
+    for _, user in ipairs(export_data["User"]) do
+        if user.Id == 3 then
+            lu.assertEquals(user.FirstLoginPolicy, "PromptPasswordReset")
+            break
+        end
+    end
+
+    teardown_account_data(self.ctx, self.test_account_collection, 1)
 end

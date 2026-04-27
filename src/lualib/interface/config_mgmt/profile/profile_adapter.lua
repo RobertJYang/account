@@ -45,6 +45,12 @@ local profile_adapter = {
             end, 'ChangeUserName'),
             export = AccountProfile.get_user_name
         },
+        FirstLoginPolicy = {
+            import = operation_logger.proxy(function(self, ctx, account_id, value)
+                AccountProfile.set_first_login_policy(self, ctx, account_id, value)
+            end, 'FirstLoginPolicy'),
+            export = AccountProfile.get_first_login_policy
+        },
         Privilege = {
             export = AccountProfile.get_role_id
         },
