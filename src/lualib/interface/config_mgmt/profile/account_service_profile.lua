@@ -7,8 +7,33 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 -- Description: 配置导入导出时用户公共服务相关项
+local custom_msg = require 'messages.custom'
+local core = require 'account_core'
 
 local AccountServiceProfile = {}
+
+function AccountServiceProfile._import_password_complexity(self, ctx, password_setting)
+    local new_prop = password_setting['PasswordComplexityStatus']
+
+    -- 在不需要导入PasswordComplexityStatus时，直接走原流程
+    local need_import_status = new_prop and new_prop.Import == true
+    if not need_import_status then
+        return password_setting
+    end
+
+    -- 否则，以PasswordComplexityStatus的导入值为准，过滤掉EnableStrongPassword
+    password_setting['EnableStrongPassword'] = nil
+    return password_setting
+end
+
+function AccountServiceProfile.import_filter(self, ctx, password_setting)
+    if password_setting == nil then
+        return password_setting
+    end
+    local filter = AccountServiceProfile._import_password_complexity(self, ctx, password_setting)
+
+    return filter
+end
 
 function AccountServiceProfile.set_password_complexity_enable(self, ctx, value)
     self.m_account_config:set_password_complexity_enable(value)
@@ -106,6 +131,58 @@ end
 
 function AccountServiceProfile.get_name_pattern(self, ctx, account_type)
     return self.m_account_policy_collection:get_name_pattern(account_type)
+end
+
+local password_complexity_status_to_bool = {
+    ['ForceEnabled'] = {
+        lock = true,
+        enable = true
+    },
+    ['Enabled'] = {
+        lock = false,
+        enable = true
+    },
+    ['Disabled'] = {
+        lock = false,
+        enable = false
+    }
+}
+
+function AccountServiceProfile.get_password_complexity_status(self)
+    local lock = self.m_account_config:get_password_complexity_lock()
+    local enable = self.m_account_config:get_password_complexity_enable()
+
+    if not enable then
+        return 'Disabled'
+    end
+
+    if lock then
+        return 'ForceEnabled'
+    end
+
+    return 'Enabled'
+end
+
+function AccountServiceProfile.set_password_complexity_status(self, ctx, value)
+    local log_state
+    if value == "ForceEnabled" then
+        log_state = "Strong-Enable"
+    elseif value == "Enabled" then
+        log_state = "Enable"
+    else
+        log_state = "Disable"
+    end
+    ctx.operation_log.params = { state = log_state }
+
+    local cur_status = AccountServiceProfile.get_password_complexity_status(self)
+    -- 非装备模式下，如果当前为ForceEnabled不可再变更为其它
+    if cur_status == 'ForceEnabled' and cur_status ~= value and not core.is_manufacture_mode() then
+        error(custom_msg.PasswordForbidSetComplexityCheck())
+    end
+
+    self.m_account_config:set_password_complexity_enable(password_complexity_status_to_bool[value].enable)
+    self.m_account_config:set_password_complexity_lock(password_complexity_status_to_bool[value].lock)
+    self.m_account_service.m_config_changed:emit('PasswordComplexityEnable', password_complexity_status_to_bool[value].enable)
 end
 
 return AccountServiceProfile

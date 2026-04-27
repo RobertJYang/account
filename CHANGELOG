@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.120.8] - 2026-4-27
+feat:支持PasswordComplexityStatus配置导入导出
+
 ## [1.120.7] - 2026-4-27
 feat:支持ipmi查询框内通信信息
 
