@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.120.9] - 2026-4-27
+feat:支持FirstLoginPolicy配置导入导出
+
 ## [1.120.8] - 2026-4-27
 feat:支持PasswordComplexityStatus配置导入导出
 

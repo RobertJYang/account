@@ -177,4 +177,20 @@ function AccountProfile.get_snmp_privacy_password_init_status(self, account_id)
     return account:get_snmp_privacy_password_init_status()
 end
 
+local first_login_policy_str_to_num = {
+    ['PromptPasswordReset'] = enum.FirstLoginPolicy.PromptPasswordReset:value(),
+    ['ForcePasswordReset'] = enum.FirstLoginPolicy.ForcePasswordReset:value()
+}
+
+function AccountProfile.get_first_login_policy(self, account_id)
+    local account = self.m_account_collection:get_account_by_account_id(account_id)
+    return tostring(account:get_first_login_policy())
+end
+
+function AccountProfile.set_first_login_policy(self, ctx, account_id, value)
+    local policy_num = first_login_policy_str_to_num[value]
+    self.m_account_collection:set_first_login_policy(ctx, account_id, policy_num)
+    self.m_account_collection.m_account_changed:emit(account_id, "FirstLoginPolicy", policy_num)
+end
+
 return AccountProfile
