@@ -161,6 +161,12 @@ local profile_adapter = {
             end, 'PasswordComplexityEnable'),
             export = AccountServiceProfile.get_password_complexity_enable
         },
+        PasswordComplexityStatus = {
+            import = operation_logger.proxy(function(self, ctx, value)
+                AccountServiceProfile.set_password_complexity_status(self, ctx, value)
+            end, 'PasswordComplexityEnable'),
+            export = AccountServiceProfile.get_password_complexity_status
+        },
         MinPasswordLength = {
             import = operation_logger.proxy(function(self, ctx, value)
                 ctx.operation_log.params = { length = value }
@@ -410,6 +416,9 @@ function ProfileAdapter:_import_dynamic_object_filter(ctx, class_name, class_dat
     end
     if class_name == "User" then
         return AccountProfile.import_filter(self, ctx, class_data)
+    end
+    if class_name == "PasswdSetting" then
+        return AccountServiceProfile.import_filter(self, ctx, class_data)
     end
     return class_data
 end
