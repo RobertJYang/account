@@ -90,7 +90,7 @@ function CertificateAuthenticationIpmi:get_two_factor_auth_state(req, ctx)
 end
 
 function CertificateAuthenticationIpmi:get_inter_chassis_auth_enabled(req, ctx)
-    if not core.is_manufacture_mode() and not self.is_support_inter_chassis_auth then
+    if not self.is_support_inter_chassis_auth then
         error(base_msg.ActionNotSupported('get inter chassis auth enabled'))
     end
     if req.ManufactureId ~= 0x0007DB then
