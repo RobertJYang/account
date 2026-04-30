@@ -41,8 +41,8 @@ function AccountPolicyCollection:ctor(db, global_account_config)
 
     local policy_collection = db:select(db.AccountPolicyDB):fold(function(policy, acc)
         if not account_type_map[policy.AccountType] then
+            -- 此处仅记录异常日志，不做删除行为，避免未来扩展新增账户策略时的兼容性问题
             log:error("invalid policy data, account_type(%d)", policy.AccountType)
-            policy:delete()
             return acc
         end
         local entity = account_type_map[policy.AccountType].obj.new(policy, self.m_account_config)
