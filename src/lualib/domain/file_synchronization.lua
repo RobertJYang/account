@@ -250,7 +250,8 @@ function file_synchronization:flush_ipmi(account_id)
         account:get_login_rule_ids(),
         account:get_login_interface(),
         is_exclude_user,
-        account:get_password_valid_time() == 0 and 1 or 0
+        account:get_password_valid_time() == 0 and 1 or 0,
+        account:get_role_id()
     )
 end
 

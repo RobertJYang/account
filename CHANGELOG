@@ -1,4 +1,8 @@
 All notable changes to this project will be documented in this file.
+
+## [1.120.13] - 2026-5-9
+fix:解除本地用户通过ssh认证对account组件的依赖
+
 ## [1.120.12] - 2026-5-9
 feat：处理DT场景下account组件依赖的各文件路径
 

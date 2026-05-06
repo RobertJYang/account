@@ -7,6 +7,7 @@
 -- MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 -- See the Mulan PSL v2 for more details.
 local class = require 'mc.class'
+local log = require 'mc.logging'
 local custom_msg = require 'messages.custom'
 local manager_account = require 'domain.manager_account.manager_account'
 
