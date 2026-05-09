@@ -1,6 +1,6 @@
 All notable changes to this project will be documented in this file.
-## [1.120.12] - 2026-5-12
-fix:支持LDAP登入认证可定位定界
+## [1.120.14] - 2026-5-12
+feat:支持LDAP登入认证可定位定界
 
 ## [1.120.11] - 2026-4-30
 fix:修改账户策略对未知数据的处理策略
