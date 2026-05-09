@@ -277,6 +277,8 @@ LOCAL gint32 ldap_initialize_handle(PAM_LDAP_SESSION_S *session)
     /* Make up the secure URL for LDAP. */
     gint32 ret;
     gchar secure_url[MAX_RSC_URI_LEN] = {0};
+    debug_log(DLOG_DEBUG, "ldap_initialize_handle: host=%s, port=%s", session->conf->host, session->conf->port);
+
     if (vos_ipv6_addr_valid_check((const guchar *)(session->conf->host)) == RET_OK) {
         ret = snprintf_s(secure_url, sizeof(secure_url), sizeof(secure_url) - 1, "ldaps://[%s]:%d/",
             session->conf->host, session->conf->port);
@@ -371,6 +373,7 @@ LOCAL void ldap_set_context_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *
  */
 LOCAL gint32 open_session(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth_info)
 {
+
     gint32 ret = ldap_initialize_handle(session);
     if (ret != LDAP_SUCCESS) {
         return ret;
@@ -1813,6 +1816,9 @@ LOCAL gint32 ldap_auth(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth_in
         goto end_auth;
     }
     ret = ldap_simple_bind_s(session->ld, (gint8 *)full_name, (gint8 *)ldap_auth_info->password);
+    if(ret != LDAP_AUTH_SUCCESS) {
+        debug_log(DLOG_ERROR, "ldap_simple_bind_s failed, code:%d, error:%s",ret,ldap_err2string(ret));
+    }
 
 end_auth:
     if (ret != LDAP_AUTH_SUCCESS) {
