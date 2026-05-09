@@ -922,7 +922,7 @@ LOCAL gint32 try_ldap_sasl_interactive_bind(PAM_LDAP_SESSION_S *session, LDAP_AU
             sasl_interact_callback, defaults);
         if (rc == LDAP_SUCCESS) {
             session->conf->dn_with_uid = 1;
-        }
+        }   
     }
 
     free_sasl_defaults(defaults);
