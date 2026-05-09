@@ -77,7 +77,18 @@ local function update_config()
         ['PAM_FAILLOCK'] = true,
         ['PAM_TALLY_LOG_DIR'] = true,
         ['WEAK_PWDDICT_FILE_SHM_PATH'] = true,
-        ['TALLY_LOG_PATH'] = true
+        ["WEAK_PWDDICT_FILE_PATH"] = true,
+        ['WEAK_PWDDICT_FILE_PATH_INIT'] = true,
+        ['TALLY_LOG_PATH'] = true,
+        ['PASSWD_FILE'] = true,
+        ['SHADOW_FILE'] = true,
+        ['GROUP_FILE'] = true,
+        ['IPMI_FILE'] = true,
+        ['TMP_PASSWD_FILE'] = true,
+        ['TMP_SHADOW_FILE'] = true,
+        ['TMP_GROUP_FILE'] = true,
+        ['TMP_IPMI_FILE'] = true,
+        ['SSH_PUBLIC_KEY_TEMP_FILE'] = true
     }
     for config_key, config_value in pairs(config) do
         local sn_value = skynet.getenv(config_key)
