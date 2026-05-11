@@ -63,6 +63,7 @@ extern "C" {
 #define INDEX_LINE_USER_LOGIN_INTERFACE 16 // 每行数据中第16个字段为 用户登录接口
 #define INDEX_LINE_IS_EXCLUDE_USER      17 // 每行数据中第17个字段为 是否逃生用户
 #define INDEX_LINE_IS_PASSWORD_EXPIRED  18 // 每行数据中第18个字段为 密码是否过期
+#define INDEX_LINE_ROLE_ID              19 // 每行数据中第19个字段为 用户角色
 
 /* 用户登陆接口编号 */
 #define LOGIN_INTERFACE_WEB_OFFSET     0

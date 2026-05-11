@@ -100,6 +100,7 @@ typedef struct {
     guint8 user_login_interface;                    /* 用户登录接口 */
     guint8 is_exclude_user;                         /* 是否使能用户标志 */
     guint8 is_password_expired;                     /* 密码是否过期 */
+    guint8 role_id;                                 /* 用户角色 */
 } IPMI_USER_S;
 
 /* 对外接口 */

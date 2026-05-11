@@ -164,6 +164,9 @@ LOCAL gint32 parse_line_to_struct(gchar *line, IPMI_USER_S *ipmi_user)
             case INDEX_LINE_IS_PASSWORD_EXPIRED:
                 ret = parse_line_token_to_uint8(token, &(ipmi_user->is_password_expired));
                 break;
+            case INDEX_LINE_ROLE_ID:
+                ret = parse_line_token_to_uint8(token, &(ipmi_user->role_id));
+                break;
             default:
                 break;
         }

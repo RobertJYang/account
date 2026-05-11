@@ -107,6 +107,7 @@ extern "C" {
 #define INDEX_LINE_USER_LOGIN_INTERFACE 16 // 每行数据中第16个字段为 用户登录接口
 #define INDEX_LINE_IS_EXCLUDE_USER      17 // 每行数据中第17个字段为 是否逃生用户
 #define INDEX_LINE_IS_PASSWORD_EXPIRED  18 // 每行数据中第18个字段为 密码是否过期
+#define INDEX_LINE_ROLE_ID              19 // 每行数据中第19个字段为 用户角色
 
 /* ******************其它参数******************* */
 #define USER_NAME_MAX_LEN    16   // 不带结束符的用户名最大长度
