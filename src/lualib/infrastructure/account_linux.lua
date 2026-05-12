@@ -508,7 +508,8 @@ function IpmiFile:ctor()
 end
 
 function IpmiFile:line_to_data(values)
-    if #values ~= 18 then
+    -- 适配旧版本数据加载
+    if #values ~= 18 and #values ~= 19 then
         log:error('invalid ipmi file, the segment count: %d', #values)
         return nil
     end
@@ -528,7 +529,8 @@ function IpmiFile:line_to_data(values)
         login_rule_ids_num = tonumber(values[15]),
         login_interface_num = tonumber(values[16]),
         is_exclude_user = tonumber(values[17]),
-        is_password_expired = tonumber(values[18])
+        is_password_expired = tonumber(values[18]),
+        role_id = tonumber(values[19] or '0') -- 增加补偿措施，避免新增字段后初始化读取旧版配置拿不到values[19]
     }
 end
 
@@ -551,7 +553,8 @@ function IpmiFile:data_to_line(ipmi_user)
         str(ipmi_user.login_rule_ids_num),
         str(ipmi_user.login_interface_num),
         str(ipmi_user.is_exclude_user),
-        str(ipmi_user.is_password_expired)
+        str(ipmi_user.is_password_expired),
+        str(ipmi_user.role_id)
     }, ':')
 end
 
@@ -735,7 +738,8 @@ function LinuxUserMgr:prepare_user(account, uid, gid, groupname)
         login_rule_ids_num = account.login_rule_ids_num,
         login_interface_num = account.login_interface_num,
         is_exclude_user = account.is_exclude_user,
-        is_password_expired = account.is_password_expired
+        is_password_expired = account.is_password_expired,
+        role_id = account.role
     }
 
     return user, shadow, ipmi_user
@@ -860,7 +864,7 @@ end
 
 -- 单独ipmi配置文件
 function LinuxUserMgr:flush_ipmi_user_cfg(username, id, user_enabled, privilege_num, is_locked, login_rule_ids_num,
-    login_interface_num, is_exclude_user, is_password_expired)
+    login_interface_num, is_exclude_user, is_password_expired, role_id)
 
     local ipmi_user = {
         user_id = id,
@@ -880,7 +884,8 @@ function LinuxUserMgr:flush_ipmi_user_cfg(username, id, user_enabled, privilege_
         login_rule_ids_num = login_rule_ids_num,
         login_interface_num = login_interface_num,
         is_exclude_user = is_exclude_user,
-        is_password_expired = is_password_expired
+        is_password_expired = is_password_expired,
+        role_id = role_id
     }
 
     self.ipmi_file:add_item(ipmi_user)
