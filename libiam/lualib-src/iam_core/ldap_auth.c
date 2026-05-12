@@ -116,12 +116,18 @@ LOCAL void release_config(PAM_LDAP_CONFIG_S **pconfig)
  */
 LOCAL void ldap_cleanup_session(PAM_LDAP_SESSION_S **session)
 {
+    gint32 ret;
+
     if (*session == NULL) {
         return;
     }
 
     if ((*session)->ld != NULL) {
-        (void)ldap_unbind((*session)->ld);
+        ret = ldap_unbind((*session)->ld);
+        if(ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "ldap unbind failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
+
         (*session)->ld = NULL;
     }
 
@@ -176,6 +182,10 @@ LOCAL gint32 get_string_values(LDAP *ld, LDAPMessage *e, gint8 *attr, gint8 ***p
 
     vals = (gint8 **)ldap_get_values(ld, e, attr);
     if (vals == NULL) {
+        gint32 ldap_errno = 0;
+        (void)ldap_get_option(ld, LDAP_OPT_ERROR_NUMBER, &ldap_errno);
+        debug_log(DLOG_ERROR, "ldap_get_values fail for attr: %s, err: %s", attr, ldap_err2string(ldap_errno));
+
         return LDAP_AUTH_UNAVAIL;
     }
 
@@ -223,18 +233,19 @@ LOCAL void set_ldap_ca_and_crl_conf(LDAP *ld, const LDAP_AUTH_INFO *ldap_auth_in
 
     rc = ldap_set_option(ld, LDAP_OPT_X_TLS_CACERTFILE, ldap_auth_info->cert_inner_dir);
     if (rc != RET_OK) {
-        debug_log(DLOG_ERROR, "ldap_set_option LDAP_OPT_X_TLS_CACERTDIR fail, ret :%d", rc);
+        debug_log(DLOG_ERROR, "ldap_set_option LDAP_OPT_X_TLS_CACERTDIR fail, ret: %d, error: %s", rc, ldap_err2string(rc));
     }
 
     rc = ldap_set_option(ld, LDAP_OPT_X_TLS_CRLCHECK, &crl_check_peer);
     if (rc != RET_OK) {
-        debug_log(DLOG_ERROR, "ldap set option LDAP_OPT_X_TLS_CRLCHECK fail, ret :%d", rc);
+        debug_log(DLOG_ERROR, "ldap set option LDAP_OPT_X_TLS_CRLCHECK fail, ret: %d, error: %s", rc, ldap_err2string(rc));
     }
 
     // 直接校验，若找不到crl吊销列表或吊销列表过期则跳过
     rc = ldap_set_option(ld, LDAP_OPT_X_TLS_CONNECT_CB, (void *)ldap_tls_cb);
     if (rc != RET_OK) {
         fprintf(stderr, "ldap set option LDAP_OPT_X_TLS_CONNECT_CB fail, ret :%d", rc);
+        debug_log(DLOG_ERROR, "ldap set option LDAP_OPT_X_TLS_CONNECT_CB fail, ret: %d, error: %s", rc, ldap_err2string(rc));
         return;
     }
 }
@@ -249,12 +260,12 @@ LOCAL void clear_ldap_ca_and_crl_conf(LDAP *ld)
 
     rc = ldap_set_option(ld, LDAP_OPT_X_TLS_CACERTDIR, NULL);
     if (rc != RET_OK) {
-        debug_log(DLOG_ERROR, "ldap_set_option LDAP_OPT_X_TLS_CACERTDIR fail, ret :%d", rc);
+        debug_log(DLOG_ERROR, "ldap_set_option LDAP_OPT_X_TLS_CACERTDIR fail, ret: %d, error: %s", rc, ldap_err2string(rc));
     }
 
     rc = ldap_set_option(ld, LDAP_OPT_X_TLS_CRLCHECK, &crl_check_none);
     if (rc != RET_OK) {
-        debug_log(DLOG_ERROR, "ldap set option LDAP_OPT_X_TLS_CRLCHECK fail, ret :%d", rc);
+        debug_log(DLOG_ERROR, "ldap set option LDAP_OPT_X_TLS_CRLCHECK fail, ret: %d, error: %s", rc, ldap_err2string(rc));
     }
 }
 
@@ -266,6 +277,8 @@ LOCAL gint32 ldap_initialize_handle(PAM_LDAP_SESSION_S *session)
     /* Make up the secure URL for LDAP. */
     gint32 ret;
     gchar secure_url[MAX_RSC_URI_LEN] = {0};
+    debug_log(DLOG_DEBUG, "ldap_initialize_handle: host= %s, port= %s", session->conf->host, session->conf->port);
+
     if (vos_ipv6_addr_valid_check((const guchar *)(session->conf->host)) == RET_OK) {
         ret = snprintf_s(secure_url, sizeof(secure_url), sizeof(secure_url) - 1, "ldaps://[%s]:%d/",
             session->conf->host, session->conf->port);
@@ -307,7 +320,7 @@ LOCAL gint32 ldap_set_certificate_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_
         option = LDAP_OPT_X_TLS_NEVER;
         ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_REQUIRE_CERT, &option);
         if (ret != LDAP_SUCCESS) {
-            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_REQUIRE_CERT failed, error code:0x%x", ret);
+            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_REQUIRE_CERT failed, error code: 0x%x, error: %s", ret, ldap_err2string(ret));
         }
         return LDAP_SUCCESS;
     }
@@ -322,7 +335,7 @@ LOCAL gint32 ldap_set_certificate_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_
     option = session->conf->cert_verifi_Level;
     ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_REQUIRE_CERT, &option);
     if (ret != LDAP_SUCCESS) {
-        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_REQUIRE_CERT failed, error code:0x%x", ret);
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_REQUIRE_CERT failed, error code: 0x%x, error: %s", ret, ldap_err2string(ret));
     }
 
     return LDAP_SUCCESS;
@@ -340,18 +353,18 @@ LOCAL void ldap_set_context_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *
         option = LDAP_OPT_X_TLS_PROTOCOL_TLS1_2;
         ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_PROTOCOL_MIN, &option);
         if (ret != LDAP_SUCCESS) {
-            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_PROTOCOL_MIN failed, error code:0x%x", ret);
+            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_PROTOCOL_MIN failed, error code: 0x%x, error: %s", ret, ldap_err2string(ret));
         }
 
         ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_CIPHER_SUITE, ldap_auth_info->tls_cipher);
         if (ret != LDAP_SUCCESS) {
-            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_CIPHER_SUITE failed, error code: 0x%x", ret);
+            debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_CIPHER_SUITE failed, error code: 0x%x, error: %s", ret, ldap_err2string(ret));
         }
     }
 
     ret = ldap_set_option(session->ld, LDAP_OPT_X_TLS_NEWCTX, &option);
     if (ret != LDAP_SUCCESS) {
-        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_NEWCTX failed, error code: 0x%x", ret);
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_X_TLS_NEWCTX failed, error code: 0x%x, error: %s", ret, ldap_err2string(ret));
     }
 }
 
@@ -360,6 +373,7 @@ LOCAL void ldap_set_context_option(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *
  */
 LOCAL gint32 open_session(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth_info)
 {
+
     gint32 ret = ldap_initialize_handle(session);
     if (ret != LDAP_SUCCESS) {
         return ret;
@@ -372,24 +386,47 @@ LOCAL gint32 open_session(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth
 
     ldap_set_context_option(session, ldap_auth_info);
 
-    (void)ldap_set_option(session->ld, LDAP_OPT_PROTOCOL_VERSION, &session->conf->version);
+    ret = ldap_set_option(session->ld, LDAP_OPT_PROTOCOL_VERSION, &session->conf->version);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_PROTOCOL_VERSION failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
-    (void)ldap_set_rebind_proc(session->ld, rebind_proc, (void *)session);
 
-    (void)ldap_set_option(session->ld, LDAP_OPT_DEREF, &session->conf->deref);
+    ret = ldap_set_rebind_proc(session->ld, rebind_proc, (void *)session);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap rebind proc failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
-    (void)ldap_set_option(session->ld, LDAP_OPT_TIMELIMIT, &session->conf->timelimit);
+    ret = ldap_set_option(session->ld, LDAP_OPT_DEREF, &session->conf->deref);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_DEREF failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
+
+    ret = ldap_set_option(session->ld, LDAP_OPT_TIMELIMIT, &session->conf->timelimit);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_TIMELIMIT failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
     struct timeval tv;
     tv.tv_sec = session->conf->bind_timelimit;
     tv.tv_usec = 0;
-    (void)ldap_set_option(session->ld, LDAP_OPT_NETWORK_TIMEOUT, &tv);
+    ret = ldap_set_option(session->ld, LDAP_OPT_NETWORK_TIMEOUT, &tv);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_NETWORK_TIMEOUT failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
-    (void)ldap_set_option(session->ld, LDAP_OPT_RESTART, session->conf->restart ? LDAP_OPT_ON : LDAP_OPT_OFF);
+    ret = ldap_set_option(session->ld, LDAP_OPT_RESTART, session->conf->restart ? LDAP_OPT_ON : LDAP_OPT_OFF);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_RESTART failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
     // 设置超时时长为30秒
     tv.tv_sec = 30;
-    ldap_set_option(session->ld, LDAP_OPT_TIMEOUT, &tv);
+    ret = ldap_set_option(session->ld, LDAP_OPT_TIMEOUT, &tv);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_TIMEOUT failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
+    
     return LDAP_AUTH_SUCCESS;
 }
 
@@ -568,6 +605,8 @@ void get_local_sasl_support_mech(LDAP *ld)
 LOCAL SASL_DEFAULT *alloc_sasl_defaults(LDAP *ld, gchar *mechanisms, gchar *realm, gchar *authentication_id,
     gchar *passwd, gchar *authorization_id)
 {
+    gint32 ret;
+
     SASL_DEFAULT *defaults = NULL;
     defaults = (SASL_DEFAULT *)g_malloc0(sizeof(SASL_DEFAULT));
     if (defaults == NULL) {
@@ -582,19 +621,31 @@ LOCAL SASL_DEFAULT *alloc_sasl_defaults(LDAP *ld, gchar *mechanisms, gchar *real
     defaults->authorization_id = strdup(authorization_id);
 
     if (defaults->mechanisms == NULL) {
-        (void)ldap_get_option(ld, LDAP_OPT_X_SASL_MECH, &defaults->mechanisms);
+        ret = ldap_get_option(ld, LDAP_OPT_X_SASL_MECH, &defaults->mechanisms);
+        if (ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "alloc_sasl_defaults ldap_get_option LDAP_OPT_X_SASL_MECH failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
     }
 
     if (defaults->realm == NULL) {
-        (void)ldap_get_option(ld, LDAP_OPT_X_SASL_REALM, &defaults->realm);
+        ret = ldap_get_option(ld, LDAP_OPT_X_SASL_REALM, &defaults->realm);
+        if (ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "alloc_sasl_defaults ldap_get_option LDAP_OPT_X_SASL_REALM failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
     }
 
     if (defaults->authentication_id == NULL) {
-        (void)ldap_get_option(ld, LDAP_OPT_X_SASL_AUTHCID, &defaults->authentication_id);
+        ret = ldap_get_option(ld, LDAP_OPT_X_SASL_AUTHCID, &defaults->authentication_id);
+        if (ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "alloc_sasl_defaults ldap_get_option LDAP_OPT_X_SASL_AUTHCID failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
     }
 
     if (defaults->authorization_id == NULL) {
-        (void)ldap_get_option(ld, LDAP_OPT_X_SASL_AUTHZID, &defaults->authorization_id);
+        ret = ldap_get_option(ld, LDAP_OPT_X_SASL_AUTHZID, &defaults->authorization_id);
+        if (ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "alloc_sasl_defaults ldap_get_option LDAP_OPT_X_SASL_AUTHZID failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
     }
 
     defaults->response = NULL;
@@ -742,7 +793,9 @@ LOCAL void print_ldap_error_message(PAM_LDAP_SESSION_S *session, gint32 rc)
         return;
     }
     (void)ldap_get_option(session->ld, LDAP_OPT_DIAGNOSTIC_MESSAGE, (void *)&msg);
+    
     if (msg != NULL) {
+        debug_log(DLOG_ERROR, "ldap sasl fail, err: %s", msg);
         ldap_memfree(msg);
     }
 
@@ -1030,10 +1083,10 @@ LOCAL gint32 do_search_user_group(PAM_LDAP_SESSION_S *session, gint8 *username, 
     ret = ldap_search_ext_s(session->ld, (const gchar *)group_name, session->conf->scope, (const gchar *)filter,
         NULL, 0, NULL, NULL, NULL, 0, &res);
     if ((ret != LDAP_SUCCESS) && (ret != LDAP_TIMELIMIT_EXCEEDED) && (ret != LDAP_SIZELIMIT_EXCEEDED)) {
-        debug_log(DLOG_ERROR, "ldap_search_ext_s failed:rc=%d", ret);
+        debug_log(DLOG_ERROR, "ldap_search_ext_s failed: rc = %d, error: %s", ret, ldap_err2string(ret));
 
         if (res != NULL) {
-            debug_log(DLOG_ERROR, "ldap_search_ext_s res is not free :rc=%d", ret);
+            debug_log(DLOG_ERROR, "ldap_search_ext_s res is not free: rc = %d", ret);
             (void)ldap_msgfree(res);
         }
 
@@ -1042,7 +1095,10 @@ LOCAL gint32 do_search_user_group(PAM_LDAP_SESSION_S *session, gint8 *username, 
 
     msg = ldap_first_entry(session->ld, res);
     if (msg == NULL) {
-        debug_log(DLOG_ERROR, "ldap_first_entry failed:rc=%d", ret);
+        gint32 ldap_errno = 0;
+        (void)ldap_get_option(session->ld, LDAP_OPT_ERROR_NUMBER, &ldap_errno);
+        debug_log(DLOG_ERROR, "ldap_first_entry fail, err: %s", ldap_err2string(ldap_errno));
+
         (void)ldap_msgfree(res);
         return LDAP_AUTH_UNKNOWN;
     }
@@ -1052,7 +1108,7 @@ LOCAL gint32 do_search_user_group(PAM_LDAP_SESSION_S *session, gint8 *username, 
      * avoid fetching any attributes at all
      */
     if (get_string_values(session->ld, msg, (gint8 *)LDAP_MEMBER, &member) == LDAP_AUTH_UNAVAIL) {
-        debug_log(DLOG_ERROR, "get_string_values failed:rc=%d", ret);
+        debug_log(DLOG_ERROR, "get_string_values failed: rc = %d", ret);
         (void)ldap_msgfree(res);
         return LDAP_AUTH_UNKNOWN;
     }
@@ -1212,7 +1268,7 @@ LOCAL gint32 do_search_group_owner(PAM_LDAP_SESSION_S *session, gchar *group_nam
     ret = ldap_search_ext_s(session->ld, (const gchar *)group_name, session->conf->scope,
         LDAP_SEARCH_FILTER_G, attrs, 0, NULL, NULL, NULL, 0, &res);
     if ((ret != LDAP_SUCCESS) && (ret != LDAP_TIMELIMIT_EXCEEDED) && (ret != LDAP_SIZELIMIT_EXCEEDED)) {
-        debug_log(DLOG_ERROR, "ldap_search_ext_s failed:rc=%d", ret);
+        debug_log(DLOG_ERROR, "ldap_search_ext_s failed: rc = %d, error: %s", ret, ldap_err2string(ret));
 
         if (res != NULL) {
             (void)ldap_msgfree(res);
@@ -1255,6 +1311,11 @@ LOCAL gint32 do_search_group_owner(PAM_LDAP_SESSION_S *session, gchar *group_nam
         attrVal = (gchar **)ldap_get_values(session->ld, msg, (gint8 *)LDAP_MEMBEROF);
         if (attrVal == NULL) {
             debug_log(DLOG_DEBUG, "[do_search_group_owner]:continue");
+
+            gint32 ldap_errno = 0;
+            (void)ldap_get_option(session->ld, LDAP_OPT_ERROR_NUMBER, &ldap_errno);
+            debug_log(DLOG_ERROR, "do_search_group_owner: ldap_get_values fail, err: %s", ldap_err2string(ldap_errno));
+
             continue;
         }
 
@@ -1296,7 +1357,7 @@ LOCAL gint32 do_search_by_memberof_ext(PAM_LDAP_SESSION_S *session, guint8 *grou
         (const gchar *)filter, attrs, 0, NULL, NULL, NULL, 0, &res);
     /* 查询失败 */
     if ((ret != LDAP_SUCCESS) && (ret != LDAP_TIMELIMIT_EXCEEDED) && (ret != LDAP_SIZELIMIT_EXCEEDED)) {
-        debug_log(DLOG_ERROR, "ldap_search_ext_s failed:ret=%d.", ret);
+        debug_log(DLOG_ERROR, "ldap_search_ext_s failed: ret = %d, error: %s", ret, ldap_err2string(ret));
 
         if (res != NULL) {
             (void)ldap_msgfree(res);
@@ -1320,6 +1381,11 @@ LOCAL gint32 do_search_by_memberof_ext(PAM_LDAP_SESSION_S *session, guint8 *grou
         attrVal = (gchar **)ldap_get_values(session->ld, msg, (gint8 *)LDAP_MEMBEROF);
         if (attrVal == NULL) {
             debug_log(DLOG_DEBUG, "[do_search_by_memberof]:continue");
+
+            gint32 ldap_errno = 0;
+            (void)ldap_get_option(session->ld, LDAP_OPT_ERROR_NUMBER, &ldap_errno);
+            debug_log(DLOG_ERROR, "do_search_by_memberof_ext: ldap_get_values fail, err: %s", ldap_err2string(ldap_errno));
+
             continue;
         }
 
@@ -1397,12 +1463,15 @@ LOCAL gint32 do_get_user_group(PAM_LDAP_SESSION_S *session, gint8 *username, gui
     gint32 rc;
 
     rc = 1;
-    (void)ldap_set_option(session->ld, LDAP_OPT_SIZELIMIT, &rc);
+    gint32 ret = ldap_set_option(session->ld, LDAP_OPT_SIZELIMIT, &rc);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_SIZELIMIT failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
     /* 将用户名中的特殊字符转义 */
     rc = escape_string(username, escaped_user, sizeof(escaped_user));
     if (rc != LDAP_AUTH_SUCCESS) {
-        debug_log(DLOG_ERROR, "escape_string failed:rc=%d", rc);
+        debug_log(DLOG_ERROR, "escape_string failed: rc = %d", rc);
         return rc;
     }
 
@@ -1492,7 +1561,11 @@ LOCAL gint32 ldap_bind_user(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_au
         /* sasl bind失败后，尝试进行simple bind */
         /* 先做unbind操作 */
         if (session->ld != NULL) {
-            (void)ldap_unbind(session->ld);
+            ret = ldap_unbind(session->ld);
+            if(ret != LDAP_SUCCESS) {
+                debug_log(DLOG_ERROR, "ldap unbind failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+            }
+
             session->ld = NULL;
         }
 
@@ -1522,12 +1595,15 @@ LOCAL gint32 ldap_find_user_cn(PAM_LDAP_SESSION_S *session, gchar *filter, gint8
     }
 
     sizelimit = 1;
-    (void)ldap_set_option(session->ld, LDAP_OPT_SIZELIMIT, &sizelimit);
+    ret = ldap_set_option(session->ld, LDAP_OPT_SIZELIMIT, &sizelimit);
+    if (ret != LDAP_SUCCESS) {
+        debug_log(DLOG_ERROR, "set ldap option LDAP_OPT_SIZELIMIT failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
     ret = ldap_search_ext_s(session->ld, (const gchar *)session->conf->base, session->conf->scope,
         (const gchar *)filter, NULL, 0, NULL, NULL, NULL, 0, &res);
     if ((ret != LDAP_SUCCESS) && (ret != LDAP_TIMELIMIT_EXCEEDED) && (ret != LDAP_SIZELIMIT_EXCEEDED)) {
-        debug_log(DLOG_ERROR, "LDAP search user failed, rc=%d", ret);
+        debug_log(DLOG_ERROR, "LDAP search user failed, rc = %d, error: %s", ret, ldap_err2string(ret));
         if (res != NULL) {
             (void)ldap_msgfree(res);
         }
@@ -1537,7 +1613,10 @@ LOCAL gint32 ldap_find_user_cn(PAM_LDAP_SESSION_S *session, gchar *filter, gint8
 
     msg = ldap_first_entry(session->ld, res);
     if (msg == NULL) {
-        debug_log(DLOG_ERROR, "ldap_first_entry failed:rc=%d", ret);
+        gint32 ldap_errno = 0;
+        (void)ldap_get_option(session->ld, LDAP_OPT_ERROR_NUMBER, &ldap_errno);
+        debug_log(DLOG_ERROR, "ldap_first_entry fail, err: %s", ldap_err2string(ldap_errno));
+
         (void)ldap_msgfree(res);
         return LDAP_AUTH_UNKNOWN;
     }
@@ -1549,7 +1628,7 @@ LOCAL gint32 ldap_find_user_cn(PAM_LDAP_SESSION_S *session, gchar *filter, gint8
     }
 
     if (ret != LDAP_AUTH_SUCCESS || cn_temp == NULL) {
-        debug_log(DLOG_ERROR, "get_string_values displayName failed:rc=%d", ret);
+        debug_log(DLOG_ERROR, "get_string_values displayName failed: rc = %d", ret);
         (void)ldap_msgfree(res);
         return LDAP_AUTH_UNKNOWN;
     }
@@ -1698,7 +1777,10 @@ LOCAL gint32 ldap_auth(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth_in
 
     /* sasl bind失败后，先做unbind操作,尝试进行simple bind */
     if (session->ld != NULL) {
-        (void)ldap_unbind(session->ld);
+        ret = ldap_unbind(session->ld);
+        if(ret != LDAP_SUCCESS) {
+            debug_log(DLOG_ERROR, "ldap unbind failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+        }
         session->ld = NULL;
     }
 
@@ -1728,6 +1810,9 @@ LOCAL gint32 ldap_auth(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ldap_auth_in
         goto end_auth;
     }
     ret = ldap_simple_bind_s(session->ld, (gint8 *)full_name, (gint8 *)ldap_auth_info->password);
+    if(ret != LDAP_AUTH_SUCCESS) {
+        debug_log(DLOG_ERROR, "ldap_simple_bind_s failed, code: %d, error: %s", ret, ldap_err2string(ret));
+    }
 
 end_auth:
     if (ret != LDAP_AUTH_SUCCESS) {
@@ -1821,7 +1906,10 @@ LOCAL gint32 ldap_proxyuser_auth(PAM_LDAP_SESSION_S *session, LDAP_AUTH_INFO *ld
 
         /* sasl bind失败后，先做unbind操作,尝试进行simple bind */
         if (session->ld != NULL) {
-            (void)ldap_unbind(session->ld);
+            ret = ldap_unbind(session->ld);
+            if(ret != LDAP_SUCCESS) {
+                debug_log(DLOG_ERROR, "ldap unbind failed, error code: %d, error: %s", ret, ldap_err2string(ret));
+            }
             session->ld = NULL;
         }
 
