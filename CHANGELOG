@@ -1,5 +1,8 @@
 All notable changes to this project will be documented in this file.
 
+## [1.120.15] - 2026-5-18
+feat:消减OEM用户设置密码能力限制，交由定制仓进行限制
+
 ## [1.120.14] - 2026-5-12
 feat:支持LDAP登入认证可定位定界
 

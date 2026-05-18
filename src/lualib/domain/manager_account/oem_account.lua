@@ -166,10 +166,6 @@ function OEMAccount:password_validator(ctx, user_name, password, is_initial, is_
 end
 
 function OEMAccount:set_account_password(password, is_config_self)
-    if not is_config_self then
-        log:error('Only custom account itself can change password')
-        error(base_msg.InsufficientPrivilege())
-    end
     self.m_account_data.Password, self.m_account_data.KDFPassword =
         self:crypt_password_by_random_salt(password)
 
